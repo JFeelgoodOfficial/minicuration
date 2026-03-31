@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniCuration - Limited Edition Art by JFeelgood</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        header {
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ff6b35;
+            text-decoration: none;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 2rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover {
+            color: #ff6b35;
+        }
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: url('1000029612.jpg') center/cover no-repeat; /* First image: Crowned figure */
+            position: relative;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+        }
+        .hero h1 {
+            font-size: 4rem;
+            color: white;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        .hero p {
+            font-size: 1.5rem;
+            color: #eee;
+            margin-bottom: 2rem;
+        }
+        .cta {
+            display: inline-block;
+            background: #ff6b35;
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255,107,53,0.4);
+        }
+        section {
+            padding: 5rem 0;
+        }
+        h2 {
+            font-size: 3rem;
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+        .about {
+            background: rgba(255,255,255,0.05);
+        }
+        .about p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            color: #ddd;
+            text-align: center;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        .art-card {
+            position: relative;
+            height: 500px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .art-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(255,107,53,0.3);
+        }
+        .art-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .art-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+            padding: 2rem;
+        }
+        .art-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .shop-section {
+            text-align: center;
+            background: rgba(255,107,53,0.1);
+        }
+        .shop-section .cta {
+            font-size: 1.5rem;
+            padding: 1.5rem 3rem;
+        }
+        footer {
+            background: #111;
+            color: #aaa;
+            text-align: center;
+            padding: 2rem 0;
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .hero p { font-size: 1.2rem; }
+            .nav-links { display: none; }
+            .gallery { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">MiniCuration</a>
+            <div class="nav-links">
+                <a href="#about">About</a>
+                <a href="#gallery">Gallery</a>
+                <a href="shop.html">Shop</a>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>MiniCuration</h1>
+            <p>The minimalist and practical art collector's answer to art investing.<br>Limited edition, magnetically sealed acrylic-cased trading card-sized art prints of JFeelgood original paintings.</p>
+            <a href="shop.html" class="cta">Shop Now</a>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <div class="container">
+            <h2>By Artist JFeelgood</h2>
+            <p>MiniCurations are the brainchild of Artist JFeelgood, transforming original paintings into collectible masterpieces. Each piece is a limited edition print, encased in magnetic acrylic for display and protection – perfect for savvy art investors seeking minimalist, high-impact art.</p>
+            <p>Own a slice of original artistry in a compact, trading card format. Practical elegance meets exclusive value.</p>
+        </div>
+    </section>
+
+    <section id="gallery" class="gallery-section">
+        <div class="container">
+            <h2>Featured MiniCurations</h2>
+            <div class="gallery">
+                <div class="art-card">
+                    <img src="1000029612.jpg" alt="Crowned Sage MiniCuration">
+                    <div class="art-overlay">
+                        <div class="art-title">Crowned Sage</div>
+                        <p>Limited Edition #/50</p>
+                    </div>
+                </div>
+                <div class="art-card">
+                    <img src="1000029606.jpg" alt="Watering Growth MiniCuration">
+                    <div class="art-overlay">
+                        <div class="art-title">Watering Growth</div>
+                        <p>Limited Edition #/50</p>
+                    </div>
+                </div>
+                <div class="art-card">
+                    <img src="1000029645.jpg" alt="Shadow Silhouette MiniCuration">
+                    <div class="art-overlay">
+                        <div class="art-title">Shadow Silhouette</div>
+                        <p>Limited Edition #/50</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="shop-section">
+        <div class="container">
+            <h2>Ready to Collect?</h2>
+            <a href="shop.html" class="cta">Shop All MiniCurations</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            &copy; 2026 MiniCuration by JFeelgood. All rights reserved. | <a href="https://jfeelgood.com" style="color: #ff6b35;">Visit JFeelgood.com</a>
+        </div>
+    </footer>
+</body>
+</html>
