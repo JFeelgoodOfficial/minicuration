@@ -140,7 +140,15 @@
         </div>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <a href="https://buy.stripe.com/fZufZa5qn0mA514cPUaVa01" class="btn-buy" onclick="openModal('dreamfall'); return false;">Buy Now — $45</a>
+        <a href="https://buy.stripe.com/fZufZa5qn0mA514cPUaVa01" class="btn-buy" onclick="openModal('dreamfall'); return false;"><script async
+  src="https://js.stripe.com/v3/buy-button.js">
+</script>
+
+<stripe-buy-button
+  buy-button-id="buy_btn_1THq522mxhfkNl2YvusQPkh0"
+  publishable-key="pk_live_51JrwsQ2mxhfkNl2YSvO4lWHKXtye4JFYlvjfJPOkVo25bfiVmny1eJpRjrM5ACsGAcYvy4Er7tA6wJwqIUBnQaj500cTHNFLde"
+>
+</stripe-buy-button></a>
       </div>
     </div>
     <div class="shop-card" data-status="available" onclick="openModal('piuma')">
