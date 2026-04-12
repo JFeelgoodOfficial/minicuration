@@ -6,7 +6,9 @@
   <title>Shop &mdash; Minicuration</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+  <script async
+  src="https://js.stripe.com/v3/buy-button.js">
+</script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     :root{
@@ -831,7 +833,11 @@
         <p class="modal-medium">Acrylic, Joint Compound, Spray Paint on Wood Panel</p>
         <p class="modal-concept">"Secret garden, sweetest dream. Hello lover, hello queen."</p>
         <div class="modal-price">$45</div>
-        <a href="#" class="btn-buy">Buy Now via Stripe</a>
+        <stripe-buy-button
+  buy-button-id="buy_btn_1TLSqn2mxhfkNl2YEvt2MX2f"
+  publishable-key="pk_live_51JrwsQ2mxhfkNl2YSvO4lWHKXtye4JFYlvjfJPOkVo25bfiVmny1eJpRjrM5ACsGAcYvy4Er7tA6wJwqIUBnQaj500cTHNFLde"
+>
+</stripe-buy-button>
       </div>
     </div>
   </div>
@@ -879,6 +885,8 @@
       }
     });
   </script>
+
+  
 
 </body>
 </html>
