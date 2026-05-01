@@ -15,6 +15,8 @@
   <meta property="og:image" content="https://minicuration.com/image/dreamfall.jpg"/>
   <meta property="og:url" content="https://minicuration.com/shop/dreamfall.html"/>
   <meta property="og:site_name" content="Minicuration"/>
+  <meta property="og:price:amount" content="45.00"/>
+  <meta property="og:price:currency" content="USD"/>
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image"/>
@@ -23,6 +25,7 @@
   <meta name="twitter:image" content="https://minicuration.com/image/dreamfall.jpg"/>
 
   <!-- Preload LCP image -->
+  <link rel="preload" as="image" href="../image/dreamfall.webp" type="image/webp"/>
   <link rel="preload" as="image" href="../image/dreamfall.jpg"/>
 
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -98,7 +101,7 @@
     .nav-logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;
       letter-spacing:.22em;text-transform:lowercase;color:var(--text);text-decoration:none;}
     .nav-links{display:flex;gap:36px;list-style:none;}
-    .nav-links a{color:var(--muted);text-decoration:none;font-size:13px;letter-spacing:.1em;
+    .nav-links a{color:#c8bfb4;text-decoration:none;font-size:15px;letter-spacing:.1em;
       text-transform:uppercase;transition:color .3s;}
     .nav-links a:hover,.nav-links a.active{color:var(--text);}
     .nav-cta{background:var(--crimson)!important;color:var(--text)!important;
@@ -106,7 +109,7 @@
     .nav-cta:hover{background:#a82020!important;}
 
     /* Breadcrumb */
-    .breadcrumb{padding:140px 48px 0;font-size:12px;color:var(--muted);}
+    .breadcrumb{padding:88px 48px 0;font-size:12px;color:var(--muted);}
     .breadcrumb a{color:var(--muted);text-decoration:none;transition:color .3s;}
     .breadcrumb a:hover{color:var(--text);}
     .breadcrumb span{margin:0 6px;opacity:.4;}
@@ -114,7 +117,7 @@
     /* Product layout */
     .product{max-width:1100px;margin:0 auto;padding:60px 48px 100px;
       display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
-    .product-images{position:sticky;top:120px;}
+    .product-images{position:sticky;top:88px;}
     .img-flipper{position:relative;perspective:900px;cursor:pointer;}
     .img-flip-inner{transition:transform .6s cubic-bezier(.4,0,.2,1);
       transform-style:preserve-3d;border-radius:6px;}
@@ -179,7 +182,7 @@
 
     @media(max-width:768px){
       nav{padding:16px 20px;}.nav-links{display:none;}
-      .breadcrumb{padding:110px 20px 0;}
+      .breadcrumb{padding:72px 20px 0;}
       .product{grid-template-columns:1fr;gap:36px;padding:36px 20px 60px;}
       .product-images{position:static;}
       .more{padding:40px 20px 60px;}
@@ -212,12 +215,18 @@
       <div class="img-flipper" onclick="toggleFlip()" title="Click to flip">
         <div class="img-flip-inner" id="cardFlipper">
           <div class="img-front">
-            <img src="../image/dreamfall.jpg"
-                 alt="Dreamfall by JFeelgood — limited edition acrylic art print, front view" fetchpriority="high" decoding="async"/>
+            <picture>
+              <source srcset="../image/dreamfall.webp" type="image/webp"/>
+              <img src="../image/dreamfall.jpg"
+                 alt="Dreamfall by JFeelgood — limited edition acrylic art print, front view" fetchpriority="high" decoding="async" width="3024" height="3024"/>
+            </picture>
           </div>
           <div class="img-back">
-            <img src="../image/dreamfall_back.jpg"
-                 alt="Dreamfall by JFeelgood — limited edition acrylic art print, back view with artist statement" loading="lazy" decoding="async"/>
+            <picture>
+              <source srcset="../image/dreamfall_back.webp" type="image/webp"/>
+              <img src="../image/dreamfall_back.jpg"
+                 alt="Dreamfall by JFeelgood — limited edition acrylic art print, back view with artist statement" loading="lazy" decoding="async" width="3024" height="3024"/>
+            </picture>
           </div>
         </div>
       </div>
@@ -253,24 +262,33 @@
     <h2>More from Minicuration</h2>
     <div class="more-grid">
       <a href="dream-mountain.html" class="more-card">
-        <img src="../image/dreammountain.jpg"
-             alt="Dream Mountain by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async"/>
+        <picture>
+              <source srcset="../image/dreammountain.webp" type="image/webp"/>
+              <img src="../image/dreammountain.jpg"
+             alt="Dream Mountain by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="3024" height="3024"/>
+            </picture>
         <div class="more-card-body">
           <h3>Dream Mountain</h3>
           <p>by JFeelgood · $45</p>
         </div>
       </a>
       <a href="pooh.html" class="more-card">
-        <img src="../image/pooh.jpg"
-             alt="Pooh. by JFeelgood — limited edition acrylic and gold leaf miniature art print" loading="lazy" decoding="async"/>
+        <picture>
+              <source srcset="../image/pooh.webp" type="image/webp"/>
+              <img src="../image/pooh.jpg"
+             alt="Pooh. by JFeelgood — limited edition acrylic and gold leaf miniature art print" loading="lazy" decoding="async" width="3024" height="3024"/>
+            </picture>
         <div class="more-card-body">
           <h3>Pooh.</h3>
           <p>by JFeelgood · $45</p>
         </div>
       </a>
       <a href="sky-miles.html" class="more-card">
-        <img src="../image/skymiles.jpg"
-             alt="Sky Miles by JFeelgood — limited edition mixed media miniature art print" loading="lazy" decoding="async"/>
+        <picture>
+              <source srcset="../image/skymiles.webp" type="image/webp"/>
+              <img src="../image/skymiles.jpg"
+             alt="Sky Miles by JFeelgood — limited edition mixed media miniature art print" loading="lazy" decoding="async" width="3024" height="3024"/>
+            </picture>
         <div class="more-card-body">
           <h3>Sky Miles</h3>
           <p>by JFeelgood · $45</p>

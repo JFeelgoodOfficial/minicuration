@@ -13,10 +13,13 @@
   <meta property="og:image" content="https://minicuration.com/image/veritas.jpg"/>
   <meta property="og:url" content="https://minicuration.com/shop/veritas.html"/>
   <meta property="og:site_name" content="Minicuration"/>
+  <meta property="og:price:amount" content="45.00"/>
+  <meta property="og:price:currency" content="USD"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="Veritas by JFeelgood — Limited Edition Mini Art Print"/>
   <meta name="twitter:description" content="Acrylic on Canvas. 01 of 50. Sealed in acrylic case. $45."/>
   <meta name="twitter:image" content="https://minicuration.com/image/veritas.jpg"/>
+  <link rel="preload" as="image" href="../image/veritas.webp" type="image/webp"/>
   <link rel="preload" as="image" href="../image/veritas.jpg"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -32,16 +35,16 @@
     nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:20px 48px;background:rgba(10,10,10,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
     .nav-logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;letter-spacing:.22em;text-transform:lowercase;color:var(--text);text-decoration:none;}
     .nav-links{display:flex;gap:36px;list-style:none;}
-    .nav-links a{color:var(--muted);text-decoration:none;font-size:13px;letter-spacing:.1em;text-transform:uppercase;transition:color .3s;}
+    .nav-links a{color:#c8bfb4;text-decoration:none;font-size:15px;letter-spacing:.1em;text-transform:uppercase;transition:color .3s;}
     .nav-links a:hover,.nav-links a.active{color:var(--text);}
     .nav-cta{background:var(--crimson)!important;color:var(--text)!important;padding:8px 20px;border-radius:2px;}
     .nav-cta:hover{background:#a82020!important;}
-    .breadcrumb{padding:140px 48px 0;font-size:12px;color:var(--muted);}
+    .breadcrumb{padding:88px 48px 0;font-size:12px;color:var(--muted);}
     .breadcrumb a{color:var(--muted);text-decoration:none;transition:color .3s;}
     .breadcrumb a:hover{color:var(--text);}
     .breadcrumb span{margin:0 6px;opacity:.4;}
     .product{max-width:1100px;margin:0 auto;padding:60px 48px 100px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
-    .product-images{position:sticky;top:120px;}
+    .product-images{position:sticky;top:88px;}
     .img-flipper{position:relative;perspective:900px;cursor:pointer;}
     .img-flip-inner{transition:transform .6s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;border-radius:6px;}
     .img-flip-inner.flipped{transform:rotateY(180deg);}
@@ -79,7 +82,7 @@
     .footer-links a{color:var(--muted);text-decoration:none;font-size:12px;letter-spacing:.1em;text-transform:uppercase;transition:color .3s;}
     .footer-links a:hover{color:var(--text);}
     .footer-copy{font-size:11px;color:var(--muted);}
-    @media(max-width:768px){nav{padding:16px 20px;}.nav-links{display:none;}.breadcrumb{padding:110px 20px 0;}.product{grid-template-columns:1fr;gap:36px;padding:36px 20px 60px;}.product-images{position:static;}.more{padding:40px 20px 60px;}.more-grid{grid-template-columns:repeat(2,1fr);}footer{flex-direction:column;text-align:center;padding:28px 20px;}}
+    @media(max-width:768px){nav{padding:16px 20px;}.nav-links{display:none;}.breadcrumb{padding:72px 20px 0;}.product{grid-template-columns:1fr;gap:36px;padding:36px 20px 60px;}.product-images{position:static;}.more{padding:40px 20px 60px;}.more-grid{grid-template-columns:repeat(2,1fr);}footer{flex-direction:column;text-align:center;padding:28px 20px;}}
     @media(max-width:480px){.more-grid{grid-template-columns:1fr;}}
   </style>
 </head>
@@ -100,10 +103,16 @@
       <div class="img-flipper" onclick="toggleFlip()" title="Click to flip">
         <div class="img-flip-inner" id="cardFlipper">
           <div class="img-front">
-            <img src="../image/veritas.jpg" alt="Veritas by JFeelgood — limited edition acrylic miniature art print, front view" fetchpriority="high" decoding="async"/>
+            <picture>
+              <source srcset="../image/veritas.webp" type="image/webp"/>
+              <img src="../image/veritas.jpg" alt="Veritas by JFeelgood — limited edition acrylic miniature art print, front view" fetchpriority="high" decoding="async" width="1280" height="1280"/>
+            </picture>
           </div>
           <div class="img-back">
-            <img src="../image/veritas_back.jpg" alt="Veritas by JFeelgood — limited edition acrylic miniature art print, back view with artist statement" loading="lazy" decoding="async"/>
+            <picture>
+              <source srcset="../image/veritas_back.webp" type="image/webp"/>
+              <img src="../image/veritas_back.jpg" alt="Veritas by JFeelgood — limited edition acrylic miniature art print, back view with artist statement" loading="lazy" decoding="async" width="1280" height="1280"/>
+            </picture>
           </div>
         </div>
       </div>
@@ -135,15 +144,24 @@
     <h2>More from Minicuration</h2>
     <div class="more-grid">
       <a href="transcend.html" class="more-card">
-        <img src="../image/transcend.jpg" alt="Transcend by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async"/>
+        <picture>
+              <source srcset="../image/transcend.webp" type="image/webp"/>
+              <img src="../image/transcend.jpg" alt="Transcend by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="1280" height="1280"/>
+            </picture>
         <div class="more-card-body"><h3>Transcend</h3><p>by JFeelgood · $45</p></div>
       </a>
       <a href="serenade.html" class="more-card">
-        <img src="../image/serenade.jpg" alt="Serenade by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async"/>
+        <picture>
+              <source srcset="../image/serenade.webp" type="image/webp"/>
+              <img src="../image/serenade.jpg" alt="Serenade by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="1280" height="1280"/>
+            </picture>
         <div class="more-card-body"><h3>Serenade</h3><p>by JFeelgood · $45</p></div>
       </a>
       <a href="worth-the-trip.html" class="more-card">
-        <img src="../image/worththetrip.jpg" alt="Worth The Trip by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async"/>
+        <picture>
+              <source srcset="../image/worththetrip.webp" type="image/webp"/>
+              <img src="../image/worththetrip.jpg" alt="Worth The Trip by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="1280" height="1280"/>
+            </picture>
         <div class="more-card-body"><h3>Worth The Trip</h3><p>by JFeelgood · $45</p></div>
       </a>
     </div>

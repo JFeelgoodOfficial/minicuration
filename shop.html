@@ -20,6 +20,9 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"CollectionPage","name":"Shop — Minicuration","url":"https://minicuration.com/shop.html","description":"Browse 14 limited edition ACEO-sized art prints by JFeelgood. Each design limited to 50 numbered prints, sealed in a magnetic acrylic collector's case with display stand.","breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://minicuration.com/"},{"@type":"ListItem","position":2,"name":"Shop","item":"https://minicuration.com/shop.html"}]}}
   </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"ItemList","name":"Minicuration — Limited Edition Art Prints","url":"https://minicuration.com/shop.html","numberOfItems":14,"itemListElement":[{"@type":"ListItem","position":1,"url":"https://minicuration.com/shop/dreamfall.html","name":"Dreamfall"},{"@type":"ListItem","position":2,"url":"https://minicuration.com/shop/dream-mountain.html","name":"Dream Mountain"},{"@type":"ListItem","position":3,"url":"https://minicuration.com/shop/sky-miles.html","name":"Sky Miles"},{"@type":"ListItem","position":4,"url":"https://minicuration.com/shop/pooh.html","name":"Pooh."},{"@type":"ListItem","position":5,"url":"https://minicuration.com/shop/a-simple-meditation.html","name":"A Simple Meditation"},{"@type":"ListItem","position":6,"url":"https://minicuration.com/shop/sisters.html","name":"Sisters"},{"@type":"ListItem","position":7,"url":"https://minicuration.com/shop/sentiments.html","name":"Sentiments"},{"@type":"ListItem","position":8,"url":"https://minicuration.com/shop/transcend.html","name":"Transcend"},{"@type":"ListItem","position":9,"url":"https://minicuration.com/shop/veritas.html","name":"Veritas"},{"@type":"ListItem","position":10,"url":"https://minicuration.com/shop/serenade.html","name":"Serenade"},{"@type":"ListItem","position":11,"url":"https://minicuration.com/shop/worth-the-trip.html","name":"Worth The Trip"},{"@type":"ListItem","position":12,"url":"https://minicuration.com/shop/vicarious.html","name":"Vicarious"},{"@type":"ListItem","position":13,"url":"https://minicuration.com/shop/crowned.html","name":"Crowned"},{"@type":"ListItem","position":14,"url":"https://minicuration.com/shop/sweet-dreams.html","name":"Sweet Dreams"}]}
+  </script>
   <link rel="preload" as="image" href="image/dreamfall.jpg"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -41,7 +44,7 @@
     .nav-logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;
       letter-spacing:.22em;text-transform:lowercase;color:var(--text);text-decoration:none;}
     .nav-links{display:flex;gap:36px;list-style:none;}
-    .nav-links a{color:var(--muted);text-decoration:none;font-size:13px;letter-spacing:.1em;
+    .nav-links a{color:#c8bfb4;text-decoration:none;font-size:15px;letter-spacing:.1em;
       text-transform:uppercase;transition:color .3s;}
     .nav-links a:hover,.nav-links a.active{color:var(--text);}
 
@@ -136,31 +139,6 @@
     .btn-buy:hover{background:#a82020;}
     .btn-buy.sold{background:#222;color:var(--muted);cursor:not-allowed;}
 
-    /* MODAL */
-    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.87);z-index:200;
-      display:none;align-items:center;justify-content:center;padding:20px;}
-    .modal-backdrop.open{display:flex;}
-    .modal{background:var(--surface);border:1px solid var(--border);border-radius:6px;
-      max-width:760px;width:100%;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;}
-    .modal-img{position:relative;}
-    .modal-img img{width:100%;height:100%;object-fit:cover;display:block;min-height:300px;}
-    .m-flip{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.7);
-      color:var(--muted);border:1px solid var(--border);padding:6px 12px;font-size:11px;
-      border-radius:3px;cursor:pointer;transition:color .3s;backdrop-filter:blur(4px);}
-    .m-flip:hover{color:var(--text);}
-    .modal-body{padding:32px 24px;display:flex;flex-direction:column;overflow-y:auto;max-height:90vh;}
-    .modal-close{align-self:flex-end;background:none;border:none;color:var(--muted);
-      font-size:20px;cursor:pointer;margin-bottom:16px;transition:color .3s;}
-    .modal-close:hover{color:var(--text);}
-    .modal-body h2{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;margin-bottom:6px;}
-    .modal-meta{font-size:12px;color:var(--muted);margin-bottom:4px;}
-    .modal-medium{font-size:11px;color:var(--muted);opacity:.7;margin-bottom:14px;}
-    .modal-concept{font-style:italic;font-size:14px;color:var(--muted);line-height:1.75;
-      margin-bottom:22px;flex:1;border-left:2px solid var(--crimson);padding-left:12px;}
-    .modal-edition{font-size:11px;letter-spacing:.2em;text-transform:uppercase;
-      color:var(--crimson);margin-bottom:10px;display:block;}
-    .modal-price{font-family:'Cormorant Garamond',serif;font-size:38px;margin-bottom:16px;}
-
     /* FOOTER */
     footer{padding:40px 48px;display:flex;justify-content:space-between;align-items:center;
       flex-wrap:wrap;gap:20px;border-top:1px solid var(--border);}
@@ -178,8 +156,6 @@
       .shop-grid{grid-template-columns:1fr;padding:0 16px 60px;}
       .page-header{padding:120px 20px 40px;}
       .filter-bar{padding:16px 20px;}
-      .modal{grid-template-columns:1fr;}
-      .modal-img{height:220px;}
       .stripe-notice-wrap{padding:0 16px;}
       footer{flex-direction:column;text-align:center;padding:28px 20px;}
     }
@@ -217,11 +193,11 @@
       <div class="card-flipper">
         <div class="card-flip-inner" id="flip-dreamfall">
           <div class="cf-front">
-            <img src="image/dreamfall.jpg" alt="Dreamfall by JFeelgood — limited edition art print" fetchpriority="high" decoding="async" onerror="this.src='image/dreamfall_back.jpg'"/><div class="avail-dot"></div>
+            <img src="image/dreamfall.jpg" alt="Dreamfall by JFeelgood — limited edition acrylic art print, front view" fetchpriority="high" decoding="async" onerror="this.src='image/dreamfall_back.jpg'"/><div class="avail-dot"></div>
             <div class="cf-overlay"><span>View Details</span></div>
           </div>
           <div class="cf-back">
-            <img src="image/dreamfall_back.jpg" alt="Dreamfall back" onerror="this.src='image/dreamfall_back.jpg'" loading="lazy" decoding="async"/>
+            <img src="image/dreamfall_back.jpg" alt="Dreamfall by JFeelgood — limited edition acrylic art print, back view with artist statement" onerror="this.src='image/dreamfall_back.jpg'" loading="lazy" decoding="async"/>
             <div class="cf-overlay"><span>View Details</span></div>
           </div>
         </div>
@@ -245,11 +221,11 @@
       <div class="card-flipper">
         <div class="card-flip-inner" id="flip-dreammountain">
           <div class="cf-front">
-            <img src="image/dreammountain.jpg" alt="Dream Mountain front" onerror="this.src='image/dreammountain_back.jpg'" loading="lazy" decoding="async"/><div class="avail-dot"></div>
+            <img src="image/dreammountain.jpg" alt="Dream Mountain by JFeelgood — limited edition acrylic art print, front view" onerror="this.src='image/dreammountain_back.jpg'" decoding="async"/><div class="avail-dot"></div>
             <div class="cf-overlay"><span>View Details</span></div>
           </div>
           <div class="cf-back">
-            <img src="image/dreammountain_back.jpg" alt="Dream Mountain back" onerror="this.src='image/dreammountain_back.jpg'" loading="lazy" decoding="async"/>
+            <img src="image/dreammountain_back.jpg" alt="Dream Mountain by JFeelgood — limited edition acrylic art print, back view with artist statement" onerror="this.src='image/dreammountain_back.jpg'" decoding="async"/>
             <div class="cf-overlay"><span>View Details</span></div>
           </div>
         </div>
@@ -273,11 +249,11 @@
       <div class="card-flipper">
         <div class="card-flip-inner" id="flip-skymiles">
           <div class="cf-front">
-            <img src="image/skymiles.jpg" alt="Sky Miles front" onerror="this.src='image/skymiles_back.jpg'" loading="lazy" decoding="async"/><div class="avail-dot"></div>
+            <img src="image/skymiles.jpg" alt="Sky Miles by JFeelgood — limited edition mixed media art print, front view" onerror="this.src='image/skymiles_back.jpg'" decoding="async"/><div class="avail-dot"></div>
             <div class="cf-overlay"><span>View Details</span></div>
           </div>
           <div class="cf-back">
-            <img src="image/skymiles_back.jpg" alt="Sky Miles back" onerror="this.src='image/skymiles_back.jpg'" loading="lazy" decoding="async"/>
+            <img src="image/skymiles_back.jpg" alt="Sky Miles by JFeelgood — limited edition mixed media art print, back view with artist statement" onerror="this.src='image/skymiles_back.jpg'" decoding="async"/>
             <div class="cf-overlay"><span>View Details</span></div>
           </div>
         </div>
@@ -301,11 +277,11 @@
       <div class="card-flipper">
         <div class="card-flip-inner" id="flip-pooh">
           <div class="cf-front">
-            <img src="image/pooh.jpg" alt="Pooh. front" onerror="this.src='image/pooh_back.jpg'" loading="lazy" decoding="async"/><div class="avail-dot"></div>
+            <img src="image/pooh.jpg" alt="Pooh. by JFeelgood — limited edition acrylic and gold leaf art print, front view" onerror="this.src='image/pooh_back.jpg'" decoding="async"/><div class="avail-dot"></div>
             <div class="cf-overlay"><span>View Details</span></div>
           </div>
           <div class="cf-back">
-            <img src="image/pooh_back.jpg" alt="Pooh. back" onerror="this.src='image/pooh_back.jpg'" loading="lazy" decoding="async"/>
+            <img src="image/pooh_back.jpg" alt="Pooh. by JFeelgood — limited edition acrylic and gold leaf art print, back view with artist statement" onerror="this.src='image/pooh_back.jpg'" decoding="async"/>
             <div class="cf-overlay"><span>View Details</span></div>
           </div>
         </div>

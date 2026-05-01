@@ -45,7 +45,7 @@
       font-weight: 300; letter-spacing: 0.22em; text-transform: lowercase;
       color: var(--text); text-decoration: none; }
     .nav-links { display: flex; gap: 36px; list-style: none; }
-    .nav-links a { color: var(--muted); text-decoration: none; font-size: 13px;
+    .nav-links a { color: #c8bfb4; text-decoration: none; font-size: 15px;
       letter-spacing: 0.1em; text-transform: uppercase; transition: color .3s; }
     .nav-links a:hover, .nav-links a.active { color: var(--text); }
     .nav-cta { background: var(--crimson) !important; color: var(--text) !important;
@@ -115,8 +115,11 @@
       position:absolute; top:0; left:0;
       transform:rotateY(180deg);
     }
-    .flip-hint { font-size:10px; letter-spacing:.15em; text-transform:uppercase;
-      color:var(--muted); margin-top:10px; text-align:center; opacity:.6; }
+    .flip-btn { margin-top:10px; background:transparent; border:1px solid var(--border);
+      color:var(--muted); padding:7px 14px; font-size:11px; letter-spacing:.1em;
+      text-transform:uppercase; border-radius:2px; cursor:pointer;
+      transition:border-color .3s,color .3s; font-family:'DM Sans',sans-serif; display:block; width:100%; }
+    .flip-btn:hover { border-color:var(--crimson); color:var(--text); }
 
     /* ── WHAT IS ── */
     section { position:relative; z-index:1; padding:100px 48px; }
@@ -207,30 +210,36 @@
   <section class="hero">
     <p class="hero-eyebrow">Trading Card Sized Art Prints</p>
     <h1>Limited Edition.<br><em>Small Format, Real Art.</em></h1>
-    <p class="hero-sub">Museum-quality prints of original paintings, sealed in a collector's acrylic case. Only 50 of each. Hover the cards to see the details.</p>
+    <p class="hero-sub">Museum-quality prints of original paintings, sealed in a collector's acrylic case. Only 50 of each. Tap a card to flip — or open it for the full story.</p>
     <a href="shop.html" class="btn-primary">Shop the Collection</a>
 
     <div class="hero-cards">
-      <div class="flip-wrap" onclick="this.classList.toggle('flipped')" style="cursor:pointer">
+      <div class="flip-wrap">
         <div class="flip-inner">
-          <div class="flip-front"><img src="image/dreamfall.jpg" alt="Dreamfall by JFeelgood — limited edition art print" fetchpriority="high" decoding="async"/></div>
-          <div class="flip-back"><img src="image/dreamfall_back.jpg" alt="Dreamfall by JFeelgood — artist statement back" loading="lazy" decoding="async"/></div>
+          <a class="flip-front" href="shop/dreamfall.html">
+            <img src="image/dreamfall.jpg" alt="Dreamfall by JFeelgood — limited edition acrylic art print, front view" fetchpriority="high" decoding="async"/>
+          </a>
+          <div class="flip-back"><img src="image/dreamfall_back.jpg" alt="Dreamfall by JFeelgood — limited edition acrylic art print, back view with artist statement" loading="lazy" decoding="async"/></div>
         </div>
-        <p class="flip-hint">Tap to flip</p>
+        <button class="flip-btn" onclick="this.closest('.flip-wrap').classList.toggle('flipped')">&#x21BB; Flip</button>
       </div>
-      <div class="flip-wrap" onclick="this.classList.toggle('flipped')" style="cursor:pointer">
+      <div class="flip-wrap">
         <div class="flip-inner">
-          <div class="flip-front"><img src="image/pooh.jpg" alt="Pooh. by JFeelgood — limited edition art print" loading="lazy" decoding="async"/></div>
-          <div class="flip-back"><img src="image/pooh_back.jpg" alt="Pooh. by JFeelgood — artist statement back" loading="lazy" decoding="async"/></div>
+          <a class="flip-front" href="shop/pooh.html">
+            <img src="image/pooh.jpg" alt="Pooh. by JFeelgood — limited edition acrylic and gold leaf art print, front view" loading="lazy" decoding="async"/>
+          </a>
+          <div class="flip-back"><img src="image/pooh_back.jpg" alt="Pooh. by JFeelgood — limited edition acrylic and gold leaf art print, back view with artist statement" loading="lazy" decoding="async"/></div>
         </div>
-        <p class="flip-hint">Tap to flip</p>
+        <button class="flip-btn" onclick="this.closest('.flip-wrap').classList.toggle('flipped')">&#x21BB; Flip</button>
       </div>
-      <div class="flip-wrap" onclick="this.classList.toggle('flipped')" style="cursor:pointer">
+      <div class="flip-wrap">
         <div class="flip-inner">
-          <div class="flip-front"><img src="image/dreammountain.jpg" alt="Dream Mountain by JFeelgood — limited edition art print" loading="lazy" decoding="async"/></div>
-          <div class="flip-back"><img src="image/dreammountain_back.jpg" alt="Dream Mountain by JFeelgood — artist statement back" loading="lazy" decoding="async"/></div>
+          <a class="flip-front" href="shop/dream-mountain.html">
+            <img src="image/dreammountain.jpg" alt="Dream Mountain by JFeelgood — limited edition acrylic art print, front view" loading="lazy" decoding="async"/>
+          </a>
+          <div class="flip-back"><img src="image/dreammountain_back.jpg" alt="Dream Mountain by JFeelgood — limited edition acrylic art print, back view with artist statement" loading="lazy" decoding="async"/></div>
         </div>
-        <p class="flip-hint">Tap to flip</p>
+        <button class="flip-btn" onclick="this.closest('.flip-wrap').classList.toggle('flipped')">&#x21BB; Flip</button>
       </div>
     </div>
   </section>
@@ -270,7 +279,7 @@
         <p class="meta-row">by JFeelgood &nbsp;·&nbsp; Acrylic on Canvas</p>
         <p class="concept">"I wanted to be closer to my craft. I painted straight from the tubes, faster than the influence of intention,and gave myself the time of Paganini's Caprice No.24."</p>
         <div class="price">$45</div>
-        <a href="shop.html" class="btn-primary">View in Shop</a>
+        <a href="shop/a-simple-meditation.html" class="btn-primary">View in Shop</a>
       </div>
     </div>
   </section>
@@ -287,7 +296,7 @@
         <p class="meta-row">by JFeelgood &nbsp;·&nbsp; Acrylic, latex, oil, stainless steel airplane model, epoxy resin on Canvas</p>
         <p class="concept">"Navigating emotions is to know the water from the winds."</p>
         <div class="price">$45</div>
-        <a href="shop.html" class="btn-primary">View in Shop</a>
+        <a href="shop/sky-miles.html" class="btn-primary">View in Shop</a>
       </div>
     </div>
   </section>
