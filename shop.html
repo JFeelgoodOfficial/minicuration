@@ -96,6 +96,14 @@
       border:1px solid var(--text);padding:9px 22px;border-radius:2px;}
     .avail-dot{position:absolute;top:12px;left:12px;width:8px;height:8px;border-radius:50%;
       background:#3ecf5a;box-shadow:0 0 8px rgba(62,207,90,.6);z-index:2;}
+    .shop-card[data-status="sold"] .cf-front img,
+    .shop-card[data-status="sold"] .cf-back img{opacity:.45;filter:grayscale(.4);}
+    .shop-card[data-status="sold"] .avail-dot{background:#555;box-shadow:none;}
+    .sold-badge{display:none;position:absolute;top:12px;left:12px;font-size:9px;letter-spacing:.18em;
+      text-transform:uppercase;background:#1a1a1a;color:var(--muted);border:1px solid #333;
+      padding:3px 9px;border-radius:2px;z-index:3;}
+    .shop-card[data-status="sold"] .sold-badge{display:block;}
+    .shop-card[data-status="sold"] .avail-dot{display:none;}
     .sold-ribbon{position:absolute;top:18px;right:-28px;background:#333;color:var(--muted);
       font-size:10px;letter-spacing:.2em;text-transform:uppercase;padding:4px 40px;
       transform:rotate(45deg);z-index:2;}
@@ -619,6 +627,17 @@
     function openModal(id) {
       location.href = 'shop/' + slugMap[id] + '.html';
     }
+    document.querySelectorAll('.shop-card[data-status="sold"]').forEach(function(card){
+      var flipper = card.querySelector('.card-flipper');
+      if(flipper && !flipper.querySelector('.sold-badge')){
+        var badge = document.createElement('span');
+        badge.className = 'sold-badge';
+        badge.textContent = 'Sold Out';
+        flipper.appendChild(badge);
+      }
+      var btn = card.querySelector('.btn-buy');
+      if(btn){ btn.classList.add('sold'); btn.style.pointerEvents='none'; btn.setAttribute('aria-disabled','true'); }
+    });
     function filterCards(status, btn) {
       document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
       btn.classList.add('active');
