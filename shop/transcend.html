@@ -19,6 +19,7 @@
   <meta name="twitter:title" content="Transcend by JFeelgood — Limited Edition Mini Art Print"/>
   <meta name="twitter:description" content="Acrylic on Canvas. 01 of 50. Sealed in acrylic case. $45."/>
   <meta name="twitter:image" content="https://minicuration.com/image/transcend.jpg"/>
+  <link rel="preload" as="image" href="../image/transcend.webp" type="image/webp"/>
   <link rel="preload" as="image" href="../image/transcend.jpg"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -102,10 +103,16 @@
       <div class="img-flipper" onclick="toggleFlip()" title="Click to flip">
         <div class="img-flip-inner" id="cardFlipper">
           <div class="img-front">
-            <img src="../image/transcend.jpg" alt="Transcend by JFeelgood — limited edition acrylic miniature art print, front view" fetchpriority="high" decoding="async" width="1280" height="1280"/>
+            <picture>
+              <source srcset="../image/transcend.webp" type="image/webp"/>
+              <img src="../image/transcend.jpg" alt="Transcend by JFeelgood — limited edition acrylic miniature art print, front view" fetchpriority="high" decoding="async" width="1280" height="1280"/>
+            </picture>
           </div>
           <div class="img-back">
-            <img src="../image/transcend_back.jpg" alt="Transcend by JFeelgood — limited edition acrylic miniature art print, back view with artist statement" loading="lazy" decoding="async" width="1280" height="1280"/>
+            <picture>
+              <source srcset="../image/transcend_back.webp" type="image/webp"/>
+              <img src="../image/transcend_back.jpg" alt="Transcend by JFeelgood — limited edition acrylic miniature art print, back view with artist statement" loading="lazy" decoding="async" width="1280" height="1280"/>
+            </picture>
           </div>
         </div>
       </div>
@@ -137,15 +144,24 @@
     <h2>More from Minicuration</h2>
     <div class="more-grid">
       <a href="sentiments.html" class="more-card">
-        <img src="../image/sentiments.jpg" alt="Sentiments by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="1280" height="1280"/>
+        <picture>
+              <source srcset="../image/sentiments.webp" type="image/webp"/>
+              <img src="../image/sentiments.jpg" alt="Sentiments by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="1280" height="1280"/>
+            </picture>
         <div class="more-card-body"><h3>Sentiments</h3><p>by JFeelgood · $45</p></div>
       </a>
       <a href="veritas.html" class="more-card">
-        <img src="../image/veritas.jpg" alt="Veritas by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="1280" height="1280"/>
+        <picture>
+              <source srcset="../image/veritas.webp" type="image/webp"/>
+              <img src="../image/veritas.jpg" alt="Veritas by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="1280" height="1280"/>
+            </picture>
         <div class="more-card-body"><h3>Veritas</h3><p>by JFeelgood · $45</p></div>
       </a>
       <a href="serenade.html" class="more-card">
-        <img src="../image/serenade.jpg" alt="Serenade by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="1280" height="1280"/>
+        <picture>
+              <source srcset="../image/serenade.webp" type="image/webp"/>
+              <img src="../image/serenade.jpg" alt="Serenade by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="1280" height="1280"/>
+            </picture>
         <div class="more-card-body"><h3>Serenade</h3><p>by JFeelgood · $45</p></div>
       </a>
     </div>

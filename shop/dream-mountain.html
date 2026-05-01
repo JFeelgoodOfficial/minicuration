@@ -19,6 +19,7 @@
   <meta name="twitter:title" content="Dream Mountain by JFeelgood — Limited Edition Mini Art Print"/>
   <meta name="twitter:description" content="Acrylic on Canvas. 01 of 50. Sealed in acrylic case. $45."/>
   <meta name="twitter:image" content="https://minicuration.com/image/dreammountain.jpg"/>
+  <link rel="preload" as="image" href="../image/dreammountain.webp" type="image/webp"/>
   <link rel="preload" as="image" href="../image/dreammountain.jpg"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -133,10 +134,16 @@
       <div class="img-flipper" onclick="toggleFlip()" title="Click to flip">
         <div class="img-flip-inner" id="cardFlipper">
           <div class="img-front">
-            <img src="../image/dreammountain.jpg" alt="Dream Mountain by JFeelgood — limited edition acrylic miniature art print, front view" fetchpriority="high" decoding="async" width="3024" height="3024"/>
+            <picture>
+              <source srcset="../image/dreammountain.webp" type="image/webp"/>
+              <img src="../image/dreammountain.jpg" alt="Dream Mountain by JFeelgood — limited edition acrylic miniature art print, front view" fetchpriority="high" decoding="async" width="3024" height="3024"/>
+            </picture>
           </div>
           <div class="img-back">
-            <img src="../image/dreammountain_back.jpg" alt="Dream Mountain by JFeelgood — limited edition acrylic miniature art print, back view with artist statement" loading="lazy" decoding="async" width="3024" height="3024"/>
+            <picture>
+              <source srcset="../image/dreammountain_back.webp" type="image/webp"/>
+              <img src="../image/dreammountain_back.jpg" alt="Dream Mountain by JFeelgood — limited edition acrylic miniature art print, back view with artist statement" loading="lazy" decoding="async" width="3024" height="3024"/>
+            </picture>
           </div>
         </div>
       </div>
@@ -168,15 +175,24 @@
     <h2>More from Minicuration</h2>
     <div class="more-grid">
       <a href="dreamfall.html" class="more-card">
-        <img src="../image/dreamfall.jpg" alt="Dreamfall by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="3024" height="3024"/>
+        <picture>
+              <source srcset="../image/dreamfall.webp" type="image/webp"/>
+              <img src="../image/dreamfall.jpg" alt="Dreamfall by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="3024" height="3024"/>
+            </picture>
         <div class="more-card-body"><h3>Dreamfall</h3><p>by JFeelgood · $45</p></div>
       </a>
       <a href="sky-miles.html" class="more-card">
-        <img src="../image/skymiles.jpg" alt="Sky Miles by JFeelgood — limited edition mixed media miniature art print" loading="lazy" decoding="async" width="3024" height="3024"/>
+        <picture>
+              <source srcset="../image/skymiles.webp" type="image/webp"/>
+              <img src="../image/skymiles.jpg" alt="Sky Miles by JFeelgood — limited edition mixed media miniature art print" loading="lazy" decoding="async" width="3024" height="3024"/>
+            </picture>
         <div class="more-card-body"><h3>Sky Miles</h3><p>by JFeelgood · $45</p></div>
       </a>
       <a href="a-simple-meditation.html" class="more-card">
-        <img src="../image/asimplemeditation.jpg" alt="A Simple Meditation by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="3024" height="3024"/>
+        <picture>
+              <source srcset="../image/asimplemeditation.webp" type="image/webp"/>
+              <img src="../image/asimplemeditation.jpg" alt="A Simple Meditation by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="3024" height="3024"/>
+            </picture>
         <div class="more-card-body"><h3>A Simple Meditation</h3><p>by JFeelgood · $45</p></div>
       </a>
     </div>
