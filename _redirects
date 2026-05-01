@@ -1,0 +1,10 @@
+# ── Minicuration redirect rules ──────────────────────────────────────────────
+# Host: Netlify / Cloudflare Pages (_redirects format)
+#
+# www → apex: this ALSO requires setting the apex domain as the primary in
+# your Netlify/Cloudflare domain settings (dashboard, not just this file).
+https://www.minicuration.com/* https://minicuration.com/:splat 301
+
+# ── Old Square/Weebly product URLs ───────────────────────────────────────────
+# Add more entries here as they surface in Google Search Console.
+/shop/Veritas-Painting-by-Jfeelgood-Minicuration-Limited-Edition-p697664093/ /shop/veritas.html 301
