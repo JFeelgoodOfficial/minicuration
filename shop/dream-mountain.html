@@ -81,7 +81,7 @@
     .img-flip-inner.flipped{transform:rotateY(180deg);}
     .img-front,.img-back{backface-visibility:hidden;border-radius:6px;overflow:hidden;}
     .img-back{position:absolute;top:0;left:0;width:100%;transform:rotateY(180deg);}
-    .img-front img,.img-back img{width:100%;display:block;border-radius:6px;}
+    .img-front img,.img-back img{width:100%;height:auto;display:block;border-radius:6px;}
     .flip-btn{margin-top:12px;background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 16px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;border-radius:2px;cursor:pointer;transition:border-color .3s,color .3s;font-family:'DM Sans',sans-serif;}
     .flip-btn:hover{border-color:var(--crimson);color:var(--text);}
     .product-info .tag{display:inline-block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;padding:4px 12px;border:1px solid var(--crimson);color:var(--crimson);border-radius:2px;margin-bottom:20px;}
@@ -134,16 +134,10 @@
       <div class="img-flipper" onclick="toggleFlip()" title="Click to flip">
         <div class="img-flip-inner" id="cardFlipper">
           <div class="img-front">
-            <picture>
-              <source srcset="../image/dreammountain.webp" type="image/webp"/>
-              <img src="../image/dreammountain.jpg" alt="Dream Mountain by JFeelgood — limited edition acrylic miniature art print, front view" fetchpriority="high" decoding="async" width="3024" height="3024"/>
-            </picture>
+            <img src="../image/dreammountain.webp" alt="Dream Mountain by JFeelgood — limited edition acrylic miniature art print, front view" fetchpriority="high" decoding="async" width="3024" height="3024"/>
           </div>
           <div class="img-back">
-            <picture>
-              <source srcset="../image/dreammountain_back.webp" type="image/webp"/>
-              <img src="../image/dreammountain_back.jpg" alt="Dream Mountain by JFeelgood — limited edition acrylic miniature art print, back view with artist statement" loading="lazy" decoding="async" width="3024" height="3024"/>
-            </picture>
+            <img src="../image/dreammountain_back.webp" alt="Dream Mountain by JFeelgood — limited edition acrylic miniature art print, back view with artist statement" loading="lazy" decoding="async" width="3024" height="3024"/>
           </div>
         </div>
       </div>
@@ -175,24 +169,15 @@
     <h2>More from Minicuration</h2>
     <div class="more-grid">
       <a href="dreamfall.html" class="more-card">
-        <picture>
-              <source srcset="../image/dreamfall.webp" type="image/webp"/>
-              <img src="../image/dreamfall.jpg" alt="Dreamfall by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="3024" height="3024"/>
-            </picture>
+        <img src="../image/dreamfall.webp" alt="Dreamfall by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="3024" height="3024"/>
         <div class="more-card-body"><h3>Dreamfall</h3><p>by JFeelgood · $45</p></div>
       </a>
       <a href="sky-miles.html" class="more-card">
-        <picture>
-              <source srcset="../image/skymiles.webp" type="image/webp"/>
-              <img src="../image/skymiles.jpg" alt="Sky Miles by JFeelgood — limited edition mixed media miniature art print" loading="lazy" decoding="async" width="3024" height="3024"/>
-            </picture>
+        <img src="../image/skymiles.webp" alt="Sky Miles by JFeelgood — limited edition mixed media miniature art print" loading="lazy" decoding="async" width="3024" height="3024"/>
         <div class="more-card-body"><h3>Sky Miles</h3><p>by JFeelgood · $45</p></div>
       </a>
       <a href="a-simple-meditation.html" class="more-card">
-        <picture>
-              <source srcset="../image/asimplemeditation.webp" type="image/webp"/>
-              <img src="../image/asimplemeditation.jpg" alt="A Simple Meditation by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="3024" height="3024"/>
-            </picture>
+        <img src="../image/asimplemeditation.webp" alt="A Simple Meditation by JFeelgood — limited edition acrylic miniature art print" loading="lazy" decoding="async" width="3024" height="3024"/>
         <div class="more-card-body"><h3>A Simple Meditation</h3><p>by JFeelgood · $45</p></div>
       </a>
     </div>
