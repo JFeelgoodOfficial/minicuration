@@ -141,6 +141,19 @@
     .spotlight-img img { width:100%; max-width:380px; border-radius:4px;
       transition:box-shadow .4s; }
     .spotlight-img img:hover { box-shadow:0 0 40px var(--crimson-glow); }
+    /* ── SPINNING CARD ── */
+    .spin-wrap{position:relative;display:inline-block;}
+    .card-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(201,169,110,.12) 0%,transparent 70%);pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse 8s ease-in-out infinite;z-index:0;}
+    .shadow-wrap{border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.8);position:relative;z-index:1;}
+    .scene{perspective:1200px;width:340px;height:476px;}
+    .card-3d{width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:spin 14s linear infinite;animation-delay:-7s;}
+    @keyframes spin{0%{transform:rotateY(0deg);}100%{transform:rotateY(360deg);}}
+    .card-3d:hover{animation-play-state:paused;cursor:pointer;}
+    .face{position:absolute;width:100%;height:100%;border-radius:14px;backface-visibility:hidden;overflow:hidden;}
+    .face.front{transform:rotateY(0deg);background:#fff;}
+    .face.back{transform:rotateY(180deg);background:#1e1e1e;}
+    .face img{width:100%;height:100%;object-fit:cover;display:block;border-radius:14px;}
+    @keyframes pulse{0%,100%{opacity:.6;transform:translate(-50%,-50%) scale(1);}50%{opacity:1;transform:translate(-50%,-50%) scale(1.15);}}
     .spotlight-text h2 { font-family:'Cormorant Garamond',serif;
       font-size:clamp(32px,4vw,48px); font-weight:300; line-height:1.15; margin-bottom:14px; }
     .spotlight-text .concept { font-style:italic; color:var(--muted);
@@ -271,7 +284,21 @@
   <section>
     <div class="spotlight">
       <div class="spotlight-img">
-        <img src="image/asimplemeditation.jpg" alt="A Simple Meditation by JFeelgood — limited edition ACEO art print" loading="lazy" decoding="async"/>
+        <div class="spin-wrap">
+          <div class="card-glow"></div>
+          <div class="shadow-wrap">
+            <div class="scene">
+              <div class="card-3d">
+                <div class="face front">
+                  <img src="image/asimplemeditation.jpg" alt="A Simple Meditation by JFeelgood — limited edition ACEO art print" loading="lazy" decoding="async"/>
+                </div>
+                <div class="face back">
+                  <img src="image/asimplemeditation_back.jpg" alt="A Simple Meditation — artist statement card back" loading="lazy" decoding="async"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="spotlight-text">
         <span class="tag">Limited Edition — 01 of 50</span>
