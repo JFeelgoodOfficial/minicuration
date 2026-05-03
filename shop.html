@@ -117,8 +117,9 @@
       padding:5px 10px;font-size:11px;border-radius:3px;cursor:pointer;
       transition:color .3s,border-color .3s;backdrop-filter:blur(4px);}
     .flip-toggle:hover{color:var(--text);border-color:var(--crimson);}
-    /* Spinning card (A Simple Meditation shop grid) */
+    /* Spinning card (shop grid — portrait 5:7 and landscape 7:5) */
     .sc-spin-wrap{position:relative;width:100%;aspect-ratio:5/7;}
+    .sc-spin-wrap.landscape{aspect-ratio:7/5;}
     .sc-spin-scene{perspective:800px;position:absolute;inset:0;}
     .sc-spin-3d{width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:sc-spin 14s linear infinite;animation-delay:-7s;}
     .sc-spin-3d:hover{animation-play-state:paused;}
@@ -427,18 +428,21 @@
       </div>
     </div>
     <div class="shop-card" data-status="available" onclick="openModal('veritas')">
-      <div class="card-flipper">
-        <div class="card-flip-inner" id="flip-veritas">
-          <div class="cf-front">
-            <img src="image/veritas.jpg" alt="Veritas front" onerror="this.src='image/veritas_back.jpg'" loading="lazy" decoding="async"/><div class="avail-dot"></div>
-            <div class="cf-overlay"><span>View Details</span></div>
-          </div>
-          <div class="cf-back">
-            <img src="image/veritas_back.jpg" alt="Veritas back" onerror="this.src='image/veritas_back.jpg'" loading="lazy" decoding="async"/>
-            <div class="cf-overlay"><span>View Details</span></div>
+      <div class="card-flipper" style="position:relative;">
+        <div class="sc-spin-wrap landscape">
+          <div class="sc-spin-scene">
+            <div class="sc-spin-3d">
+              <div class="sc-face sc-front">
+                <img src="image/veritas_artwork.png" alt="Veritas — acrylic painting by JFeelgood" loading="lazy" decoding="async"/>
+              </div>
+              <div class="sc-face sc-back">
+                <img src="image/veritas_card.png" alt="Veritas — collector card back, edition 01 of 50" loading="lazy" decoding="async"/>
+              </div>
+            </div>
           </div>
         </div>
-        <button class="flip-toggle" onclick="event.stopPropagation(); toggleFlip('veritas')" title="Flip card">&#x21BB; Flip</button>
+        <div class="avail-dot"></div>
+        <div class="cf-overlay"><span>View Details</span></div>
       </div>
       <div class="card-body">
         <div class="card-top-row"><span class="card-edition">Ltd. Ed. &mdash; 01 of 50</span></div>
