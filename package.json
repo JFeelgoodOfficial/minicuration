@@ -1,5 +1,31 @@
 {
+  "scripts": {
+    "lint": "npm run lint:html && npm run lint:css && npm run lint:js",
+    "lint:html": "html-validate '*.html' 'shop/*.html'",
+    "lint:css": "stylelint '*.html' 'shop/*.html'",
+    "lint:js": "eslint '*.html' 'shop/*.html'",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:links": "! grep -qrn 'href=\"#\"' *.html shop/*.html",
+    "audit:images": "node scripts/check-images.js",
+    "audit:seo": "node scripts/check-seo-files.js",
+    "lighthouse": "lhci autorun"
+  },
   "dependencies": {
     "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "@lhci/cli": "^0.14.0",
+    "@playwright/test": "^1.44.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-html": "^8.1.1",
+    "html-validate": "^9.4.0",
+    "postcss-html": "^1.7.0",
+    "prettier": "^3.3.0",
+    "serve": "^14.2.3",
+    "stylelint": "^16.6.0",
+    "stylelint-config-html": "^1.1.0",
+    "stylelint-config-standard": "^36.0.1",
+    "stylelint-order": "^6.0.4"
   }
 }

@@ -1,0 +1,112 @@
+# CI/CD pipeline — JFeelgoodOfficial/minicuration
+# Runs on every push to main/develop and on all PRs targeting main.
+# Lighthouse CI only fires on PRs to main (needs a live Vercel preview URL).
+# Set VERCEL_PREVIEW_URL in repo secrets to enable Lighthouse against the
+# Vercel preview; otherwise it falls back to a local static server.
+
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  ci:
+    name: CI — JFeelgoodOfficial/minicuration
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout repo and cache dependencies ───────────────────────────
+      - name: Checkout repo and cache dependencies
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }} with npm cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      # ── 2. Install dependencies ───────────────────────────────────────────
+      - name: Install dependencies (npm ci)
+        run: npm ci
+
+      # ── 3. HTML validation ────────────────────────────────────────────────
+      - name: HTML validation (html-validate)
+        run: npm run lint:html
+
+      # ── 4. CSS lint ───────────────────────────────────────────────────────
+      - name: CSS lint (stylelint)
+        run: npm run lint:css
+
+      # ── 5. JS lint ────────────────────────────────────────────────────────
+      - name: JS lint (eslint)
+        run: npm run lint:js
+
+      # ── 6. Dead link check ────────────────────────────────────────────────
+      # Fails if any href="#" is found in root or /shop/ HTML files.
+      # The Playwright shop test separately catches non-Stripe buy button URLs.
+      - name: Dead link check — fail if href="#" on buy button
+        run: npm run test:links
+
+      # ── 7. npm security audit ─────────────────────────────────────────────
+      - name: npm security audit (npm audit --audit-level=high)
+        run: npm audit --audit-level=high
+        continue-on-error: false
+
+      # ── 8. Image size audit ───────────────────────────────────────────────
+      - name: Image size audit (scripts/check-images.js)
+        run: npm run audit:images
+
+      # ── 9. SEO files check ────────────────────────────────────────────────
+      - name: SEO files check (scripts/check-seo-files.js)
+        run: npm run audit:seo
+
+      # ── 10. Playwright E2E tests ──────────────────────────────────────────
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Playwright E2E tests (all browsers)
+        run: npm run test:e2e
+        env:
+          CI: true
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      # ── 11. Lighthouse CI (PRs to main only) ──────────────────────────────
+      # Requires LHCI_GITHUB_APP_TOKEN secret for GitHub status checks.
+      # Set VERCEL_PREVIEW_URL secret to the Vercel preview URL for this PR;
+      # if unset, LHCI starts a local static server at port 3000 instead.
+      - name: Lighthouse CI (lhci autorun)
+        if: github.event_name == 'pull_request' && github.base_ref == 'main'
+        run: |
+          if [ -n "$BASE_URL" ]; then
+            npx lhci autorun \
+              --collect.url="$BASE_URL/" \
+              --collect.url="$BASE_URL/shop.html" \
+              --collect.startServerCommand="" \
+              --collect.numberOfRuns=2
+          else
+            npm run lighthouse
+          fi
+        env:
+          BASE_URL: ${{ secrets.VERCEL_PREVIEW_URL }}
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@v4
+        if: github.event_name == 'pull_request' && github.base_ref == 'main' && always()
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+          retention-days: 30

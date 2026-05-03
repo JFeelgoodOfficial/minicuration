@@ -1,0 +1,54 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-html/html"
+  ],
+  "plugins": [
+    "stylelint-order"
+  ],
+  "rules": {
+    "order/properties-alphabetical-order": true,
+
+    "declaration-block-no-duplicate-properties": [
+      true,
+      { "ignore": ["consecutive-duplicates-with-different-values"] }
+    ],
+
+    "declaration-no-important": [true, { "severity": "warning" }],
+
+    "color-no-invalid-hex": true,
+
+    "color-named": ["error", { "ignore": ["inside-function"] }],
+
+    "custom-property-pattern": "^[a-z][a-z0-9-]*$",
+
+    "no-duplicate-selectors": true,
+
+    "shorthand-property-no-redundant-values": true,
+
+    "alpha-value-notation": "percentage",
+
+    "color-function-notation": "modern",
+
+    "selector-class-pattern": null,
+
+    "selector-id-pattern": null,
+
+    "property-no-vendor-prefix": null,
+
+    "value-no-vendor-prefix": null,
+
+    "font-family-no-missing-generic-family-keyword": null,
+
+    "no-descending-specificity": null,
+
+    "import-notation": null,
+
+    "keyframes-name-pattern": null
+  },
+  "customSyntax": "postcss-html",
+  "ignoreFiles": [
+    "node_modules/**",
+    ".lighthouseci/**"
+  ]
+}
