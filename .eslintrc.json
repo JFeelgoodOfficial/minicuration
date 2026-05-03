@@ -1,0 +1,65 @@
+{
+  "env": {
+    "browser": true,
+    "es2022": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "script"
+  },
+  "plugins": ["html"],
+  "rules": {
+    "no-unused-vars": [
+      "error",
+      {
+        "vars": "all",
+        "args": "after-used",
+        "ignoreRestSiblings": true
+      }
+    ],
+
+    "no-undef": "error",
+
+    "eqeqeq": ["error", "always", { "null": "ignore" }],
+
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+
+    "no-var": "error",
+
+    "prefer-const": "error",
+
+    "no-implicit-globals": "error",
+
+    "no-eval": "error",
+
+    "no-implied-eval": "error",
+
+    "no-proto": "error",
+
+    "no-script-url": "error",
+
+    "no-alert": "warn",
+
+    "no-debugger": "error",
+
+    "no-duplicate-case": "error",
+
+    "no-unreachable": "error",
+
+    "use-isnan": "error",
+
+    "valid-typeof": "error",
+
+    "semi": ["error", "never"],
+
+    "quotes": ["error", "single", { "avoidEscape": true }]
+  },
+  "globals": {
+    "Stripe": "readonly"
+  },
+  "ignorePatterns": [
+    "node_modules/**",
+    ".lighthouseci/**",
+    "scripts/optimize-images.js"
+  ]
+}
