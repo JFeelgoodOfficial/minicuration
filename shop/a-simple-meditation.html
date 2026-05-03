@@ -19,8 +19,7 @@
   <meta name="twitter:title" content="A Simple Meditation by JFeelgood — Limited Edition Mini Art Print"/>
   <meta name="twitter:description" content="Acrylic on Canvas. 01 of 50. Sealed in acrylic case. $45."/>
   <meta name="twitter:image" content="https://minicuration.com/image/asimplemeditation.jpg"/>
-  <link rel="preload" as="image" href="../image/asimplemeditation.webp" type="image/webp"/>
-  <link rel="preload" as="image" href="../image/asimplemeditation.jpg"/>
+  <link rel="preload" as="image" href="../image/asimplemeditation_artwork.jpg"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
@@ -89,6 +88,10 @@
     .face.back{transform:rotateY(180deg);background:#1e1e1e;}
     .face img{width:100%;height:100%;object-fit:cover;display:block;border-radius:14px;}
     @keyframes pulse{0%,100%{opacity:.6;transform:translate(-50%,-50%) scale(1);}50%{opacity:1;transform:translate(-50%,-50%) scale(1.15);}}
+    /* Gallery */
+    .gallery{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+    .gallery img{width:100%;display:block;aspect-ratio:3/4;object-fit:cover;border-radius:8px;transition:opacity .3s;}
+    .gallery img:hover{opacity:.85;cursor:zoom-in;}
     .product-info .tag{display:inline-block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;padding:4px 12px;border:1px solid var(--crimson);color:var(--crimson);border-radius:2px;margin-bottom:20px;}
     .product-info h1{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,4vw,52px);font-weight:300;line-height:1.1;margin-bottom:8px;}
     .product-meta{font-size:13px;color:var(--muted);margin-bottom:4px;}
@@ -142,14 +145,18 @@
           <div class="scene">
             <div class="card-3d">
               <div class="face front">
-                <img src="../image/asimplemeditation.webp" alt="A Simple Meditation by JFeelgood — limited edition acrylic miniature art print, front view" fetchpriority="high" decoding="async"/>
+                <img src="../image/asimplemeditation_artwork.jpg" alt="A Simple Meditation — original acrylic painting by JFeelgood" fetchpriority="high" decoding="async"/>
               </div>
               <div class="face back">
-                <img src="../image/asimplemeditation_back.webp" alt="A Simple Meditation by JFeelgood — limited edition acrylic miniature art print, back view with artist statement" loading="lazy" decoding="async"/>
+                <img src="../image/asimplemeditation_card.png" alt="A Simple Meditation — collector card back with artist statement, edition 01 of 50" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>
         </div>
+      </div>
+      <div class="gallery">
+        <img src="../image/asimplemeditation_case1.jpg" alt="A Simple Meditation — physical print in magnetic acrylic collector's case with stand" loading="lazy" decoding="async"/>
+        <img src="../image/asimplemeditation_case2.jpg" alt="A Simple Meditation — collector's case close-up view" loading="lazy" decoding="async"/>
       </div>
     </div>
     <div class="product-info">
