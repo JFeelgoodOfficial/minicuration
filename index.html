@@ -21,7 +21,7 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"Minicuration","url":"https://minicuration.com/","logo":"https://minicuration.com/image/sweetdreams.jpg","description":"Limited edition ACEO-sized art prints — museum-quality reproductions of original paintings by JFeelgood, sealed in magnetic acrylic collector's cases.","sameAs":["https://jfeelgood.com","https://iexploreart.com"]},{"@type":"WebSite","name":"Minicuration","url":"https://minicuration.com/","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://minicuration.com/shop.html?q={search_term_string}"},"query-input":"required name=search_term_string"}}]}
   </script>
-  <link rel="preload" as="image" href="image/dreamfall.jpg"/>
+  <link rel="preload" as="image" href="image/spin/dreamfall_artwork.jpg"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
@@ -87,39 +87,24 @@
     .hero-sub { font-size:16px; color:var(--muted); max-width:500px;
       line-height:1.75; margin-bottom:48px; }
 
-    /* ── FLIP CARDS ── */
+    /* ── HERO SPIN CARDS ── */
     .hero-cards { display:flex; gap:28px; justify-content:center;
       align-items:flex-end; margin-top:72px; flex-wrap:wrap; }
-
-    .flip-wrap { perspective:900px; }
-    .flip-wrap:nth-child(1) .flip-inner { transform:rotate3d(0,0,1,-4deg) translateY(10px); }
-    .flip-wrap:nth-child(2) .flip-inner { transform:rotate3d(0,0,1,0deg) translateY(-10px); }
-    .flip-wrap:nth-child(3) .flip-inner { transform:rotate3d(0,0,1,3deg) translateY(10px); }
-    .flip-wrap:hover .flip-inner,
-    .flip-wrap.flipped .flip-inner {
-      transform:rotateY(180deg) !important;
-      box-shadow:0 24px 60px var(--crimson-glow);
-    }
-
-    .flip-inner {
-      position:relative; transition:transform .65s cubic-bezier(.4,0,.2,1);
-      transform-style:preserve-3d; border-radius:4px;
-    }
-    .flip-front, .flip-back {
-      backface-visibility:hidden; border-radius:4px; overflow:hidden; display:block;
-    }
-    .flip-front img, .flip-back img { width:160px; display:block; border-radius:4px; }
-    .flip-wrap:nth-child(2) .flip-front img,
-    .flip-wrap:nth-child(2) .flip-back img { width:200px; }
-    .flip-back {
-      position:absolute; top:0; left:0;
-      transform:rotateY(180deg);
-    }
-    .flip-btn { margin-top:10px; background:transparent; border:1px solid var(--border);
-      color:var(--muted); padding:7px 14px; font-size:11px; letter-spacing:.1em;
-      text-transform:uppercase; border-radius:2px; cursor:pointer;
-      transition:border-color .3s,color .3s; font-family:'DM Sans',sans-serif; display:block; width:100%; }
-    .flip-btn:hover { border-color:var(--crimson); color:var(--text); }
+    .hc-wrap { display:block; text-decoration:none; }
+    .hc-wrap:nth-child(1) { transform:rotate3d(0,0,1,-4deg) translateY(10px); }
+    .hc-wrap:nth-child(2) { transform:rotate3d(0,0,1,0deg) translateY(-10px); }
+    .hc-wrap:nth-child(3) { transform:rotate3d(0,0,1,3deg) translateY(10px); }
+    .hc-scene { perspective:800px; width:160px; height:224px; }
+    .hc-wrap:nth-child(2) .hc-scene { width:200px; height:280px; }
+    .hc-3d { width:100%; height:100%; position:relative; transform-style:preserve-3d;
+      animation:hc-spin 14s linear infinite; animation-delay:-7s; }
+    .hc-wrap:hover .hc-3d { animation-play-state:paused; }
+    .hc-face { position:absolute; width:100%; height:100%; border-radius:6px;
+      backface-visibility:hidden; overflow:hidden; }
+    .hc-front { transform:rotateY(0deg); background:#fff; }
+    .hc-back  { transform:rotateY(180deg); background:#1e1e1e; }
+    .hc-face img { width:100%; height:100%; object-fit:cover; display:block; border-radius:6px; }
+    @keyframes hc-spin { 0%{transform:rotateY(0deg);} 100%{transform:rotateY(360deg);} }
 
     /* ── WHAT IS ── */
     section { position:relative; z-index:1; padding:100px 48px; }
@@ -204,9 +189,8 @@
       .spotlight.reverse{direction:ltr;}
       .how-grid{grid-template-columns:1fr;gap:20px;}
       .hero-cards{gap:14px;}
-      .flip-front img,.flip-back img{width:110px!important;}
-      .flip-wrap:nth-child(2) .flip-front img,
-      .flip-wrap:nth-child(2) .flip-back img{width:140px!important;}
+      .hc-scene{width:110px;height:154px;}
+      .hc-wrap:nth-child(2) .hc-scene{width:140px;height:196px;}
     }
   </style>
 </head>
@@ -227,33 +211,42 @@
     <a href="shop.html" class="btn-primary">Shop the Collection</a>
 
     <div class="hero-cards">
-      <div class="flip-wrap">
-        <div class="flip-inner">
-          <a class="flip-front" href="shop/dreamfall.html">
-            <img src="image/dreamfall.jpg" alt="Dreamfall by JFeelgood — limited edition acrylic art print, front view" fetchpriority="high" decoding="async"/>
-          </a>
-          <div class="flip-back"><img src="image/dreamfall_back.jpg" alt="Dreamfall by JFeelgood — limited edition acrylic art print, back view with artist statement" loading="lazy" decoding="async"/></div>
+      <a class="hc-wrap" href="shop/dreamfall.html">
+        <div class="hc-scene">
+          <div class="hc-3d">
+            <div class="hc-face hc-front">
+              <img src="image/spin/dreamfall_artwork.jpg" alt="Dreamfall by JFeelgood — limited edition art print" fetchpriority="high" decoding="async"/>
+            </div>
+            <div class="hc-face hc-back">
+              <img src="image/spin/dreamfall-01-of-50.png" alt="Dreamfall — collector card back, 01 of 50" loading="lazy" decoding="async"/>
+            </div>
+          </div>
         </div>
-        <button class="flip-btn" onclick="this.closest('.flip-wrap').classList.toggle('flipped')">&#x21BB; Flip</button>
-      </div>
-      <div class="flip-wrap">
-        <div class="flip-inner">
-          <a class="flip-front" href="shop/pooh.html">
-            <img src="image/pooh.jpg" alt="Pooh. by JFeelgood — limited edition acrylic and gold leaf art print, front view" loading="lazy" decoding="async"/>
-          </a>
-          <div class="flip-back"><img src="image/pooh_back.jpg" alt="Pooh. by JFeelgood — limited edition acrylic and gold leaf art print, back view with artist statement" loading="lazy" decoding="async"/></div>
+      </a>
+      <a class="hc-wrap" href="shop/pooh.html">
+        <div class="hc-scene">
+          <div class="hc-3d">
+            <div class="hc-face hc-front">
+              <img src="image/spin/pooh_artwork.jpg" alt="Pooh. by JFeelgood — limited edition art print" loading="lazy" decoding="async"/>
+            </div>
+            <div class="hc-face hc-back">
+              <img src="image/spin/pooh-01-of-50.png" alt="Pooh. — collector card back, 01 of 50" loading="lazy" decoding="async"/>
+            </div>
+          </div>
         </div>
-        <button class="flip-btn" onclick="this.closest('.flip-wrap').classList.toggle('flipped')">&#x21BB; Flip</button>
-      </div>
-      <div class="flip-wrap">
-        <div class="flip-inner">
-          <a class="flip-front" href="shop/dream-mountain.html">
-            <img src="image/dreammountain.jpg" alt="Dream Mountain by JFeelgood — limited edition acrylic art print, front view" loading="lazy" decoding="async"/>
-          </a>
-          <div class="flip-back"><img src="image/dreammountain_back.jpg" alt="Dream Mountain by JFeelgood — limited edition acrylic art print, back view with artist statement" loading="lazy" decoding="async"/></div>
+      </a>
+      <a class="hc-wrap" href="shop/dream-mountain.html">
+        <div class="hc-scene">
+          <div class="hc-3d">
+            <div class="hc-face hc-front">
+              <img src="image/spin/dream-mountain_artwork.jpg" alt="Dream Mountain by JFeelgood — limited edition art print" loading="lazy" decoding="async"/>
+            </div>
+            <div class="hc-face hc-back">
+              <img src="image/spin/dreammountain-01-of-50.png" alt="Dream Mountain — collector card back, 01 of 50" loading="lazy" decoding="async"/>
+            </div>
+          </div>
         </div>
-        <button class="flip-btn" onclick="this.closest('.flip-wrap').classList.toggle('flipped')">&#x21BB; Flip</button>
-      </div>
+      </a>
     </div>
   </section>
 
