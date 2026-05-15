@@ -50,8 +50,5 @@
         }
       }
     }
-  ],
-  "transform": {
-    "^.*\\.html$": "html-validate-html"
-  }
+  ]
 }

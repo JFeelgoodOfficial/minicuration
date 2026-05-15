@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minicuration — Product Page Builder</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body, #root { height: 100%; }
+    body { background: #0a0a0a; overflow: hidden; }
+    select option { background: #111; color: #f0ebe3; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const defaultData = {
+      title: "", artist: "JFeelgood", catalogNumber: "",
+      yearReleased: "2026", price: "45", slug: "", stripeLink: "",
+      cardQuote: "", expandedNote: "",
+      medium: "", dimensions: "", yearPainted: "",
+      originalStatus: "In artist's studio", originalForSale: "No",
+      processNotes: "", whyItWorks: "",
+      faq1Q: "", faq1A: "", faq2Q: "", faq2A: "", faq3Q: "", faq3A: "",
+      pick1Title: "", pick1Slug: "", pick2Title: "", pick2Slug: "", pick3Title: "", pick3Slug: "",
+    };
+
+    const fieldStyle = { display: "flex", flexDirection: "column", gap: "5px" };
+    const labelStyle = { fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase", color: "#888", fontFamily: "'DM Sans', sans-serif" };
+    const inputStyle = { background: "#111", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "3px", color: "#f0ebe3", fontFamily: "'DM Sans', sans-serif", fontSize: "13px", padding: "8px 10px", outline: "none", width: "100%", boxSizing: "border-box", transition: "border-color 0.2s" };
+    const textareaStyle = { ...inputStyle, resize: "vertical", minHeight: "72px", lineHeight: "1.6" };
+    const sectionHeadStyle = { fontSize: "9px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#8b1a1a", fontFamily: "'DM Sans', sans-serif", borderBottom: "1px solid rgba(139,26,26,0.3)", paddingBottom: "6px", marginBottom: "14px" };
+
+    function Field({ label, children }) {
+      return <div style={fieldStyle}><label style={labelStyle}>{label}</label>{children}</div>;
+    }
+    function Input({ value, onChange, placeholder }) {
+      return <input value={value} onChange={onChange} placeholder={placeholder} style={inputStyle} onFocus={e => e.target.style.borderColor = "#8b1a1a"} onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"} />;
+    }
+    function Textarea({ value, onChange, placeholder, rows }) {
+      return <textarea value={value} onChange={onChange} placeholder={placeholder} rows={rows || 3} style={textareaStyle} onFocus={e => e.target.style.borderColor = "#8b1a1a"} onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"} />;
+    }
+    function Select({ value, onChange, options }) {
+      return <select value={value} onChange={onChange} style={{ ...inputStyle, cursor: "pointer" }}>{options.map(o => <option key={o} value={o}>{o}</option>)}</select>;
+    }
+
+    function parseHTML(html) {
+      try {
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const attr = (el, a) => el ? el.getAttribute(a) || "" : "";
+
+        const canonicalHref = attr(doc.querySelector('link[rel="canonical"]'), "href");
+        const slug = canonicalHref.split("/").pop().replace(".html", "");
+        const title = doc.querySelector("h1")?.textContent?.trim() || "";
+        const medium = doc.querySelector(".product-medium")?.textContent?.trim() || "";
+        const priceRaw = doc.querySelector(".product-price")?.textContent?.trim() || "45";
+        const price = priceRaw.replace(/\$/g, "").trim();
+        const quoteRaw = doc.querySelector(".product-quote")?.textContent?.trim() || "";
+        const cardQuote = quoteRaw.replace(/^[“"]+|[”"]+$/g, "").trim();
+        const stripeLink = attr(doc.querySelector(".btn-buy"), "href");
+        const expandedNote = doc.querySelector(".expanded-note p")?.textContent?.trim() || "";
+
+        const origEl = doc.querySelector("[data-mc-original]");
+        const dimensions = origEl ? attr(origEl, "data-dimensions") : "";
+        const yearPainted = origEl ? attr(origEl, "data-year-painted") : "";
+        const originalStatus = origEl ? attr(origEl, "data-status") : "In artist's studio";
+        const originalForSale = origEl ? attr(origEl, "data-for-sale") : "No";
+
+        const processNotes = doc.querySelector(".process-notes p")?.textContent?.trim() || "";
+        const whyItWorks = doc.querySelector(".why-it-works p")?.textContent?.trim() || "";
+
+        const faqEls = Array.from(doc.querySelectorAll(".faq-item")).slice(0, 3);
+        const faqs = faqEls.map(el => ({
+          q: el.querySelector(".faq-q")?.textContent?.trim() || "",
+          a: el.querySelector(".faq-a")?.textContent?.trim() || "",
+        }));
+
+        const cardEls = Array.from(doc.querySelectorAll(".more-card")).slice(0, 3);
+        const picks = cardEls.map(el => {
+          const href = attr(el, "href");
+          return {
+            title: el.querySelector("h3")?.textContent?.trim() || "",
+            slug: href.split("/").pop().replace(".html", ""),
+          };
+        });
+
+        let catalogNumber = "";
+        try {
+          const ld = JSON.parse(doc.querySelector('script[type="application/ld+json"]')?.textContent || "{}");
+          const product = (ld["@graph"] || []).find(n => n["@type"] === "Product") || (ld["@type"] === "Product" ? ld : null);
+          if (product) catalogNumber = product.sku || "";
+        } catch (_) {}
+
+        return {
+          title, slug, medium, price, cardQuote, stripeLink, expandedNote,
+          dimensions, yearPainted, originalStatus, originalForSale,
+          processNotes, whyItWorks, catalogNumber,
+          faq1Q: faqs[0]?.q || "", faq1A: faqs[0]?.a || "",
+          faq2Q: faqs[1]?.q || "", faq2A: faqs[1]?.a || "",
+          faq3Q: faqs[2]?.q || "", faq3A: faqs[2]?.a || "",
+          pick1Title: picks[0]?.title || "", pick1Slug: picks[0]?.slug || "",
+          pick2Title: picks[1]?.title || "", pick2Slug: picks[1]?.slug || "",
+          pick3Title: picks[2]?.title || "", pick3Slug: picks[2]?.slug || "",
+        };
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function buildPageHTML(d) {
+      const slug = d.slug || "piece-title";
+      const price = d.price || "45";
+      const artist = d.artist || "JFeelgood";
+      const title = d.title || "Untitled";
+      const medium = d.medium || "";
+      const stripeLink = d.stripeLink || "#";
+
+      const assembledSentence = d.title && d.medium && d.yearPainted
+        ? `The original ${d.title} is ${d.medium}${d.dimensions ? ", " + d.dimensions : ""}, painted in ${d.yearPainted}. It currently ${d.originalStatus.toLowerCase()}${d.originalForSale === "Yes (contact for pricing)" ? " and is available — contact for pricing" : " and is not for sale"}.`
+        : "";
+
+      const jsonLd = JSON.stringify({
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Product",
+            "name": `${title} — Limited Edition Mini Art Print`,
+            "sku": d.catalogNumber || "",
+            "description": `${title} by ${artist}. ${medium}. Limited edition ACEO-sized print — 01 of 50 numbered editions, sealed in a magnetic acrylic collector's case with display stand.`,
+            "image": [`https://minicuration.com/image/${slug}-case1.webp`, `https://minicuration.com/image/${slug}-case2.webp`],
+            "brand": { "@type": "Brand", "name": "Minicuration" },
+            "offers": { "@type": "Offer", "price": `${price}.00`, "priceCurrency": "USD", "availability": "https://schema.org/InStock", "url": `https://minicuration.com/shop/${slug}.html` }
+          },
+          {
+            "@type": "VisualArtwork",
+            "name": title,
+            "image": `https://minicuration.com/image/${slug}-case1.webp`,
+            "description": d.cardQuote ? `"${d.cardQuote}"` : `${title} by ${artist}.`,
+            "artMedium": medium, "artform": "Painting",
+            "artist": { "@type": "Person", "name": artist, "url": "https://jfeelgood.com" }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://minicuration.com/" },
+              { "@type": "ListItem", "position": 2, "name": "Shop", "item": "https://minicuration.com/shop.html" },
+              { "@type": "ListItem", "position": 3, "name": title }
+            ]
+          }
+        ]
+      }, null, 2);
+
+      const faqItems = [[d.faq1Q, d.faq1A], [d.faq2Q, d.faq2A], [d.faq3Q, d.faq3A]].filter(([q]) => q && q.trim());
+      const picks = [[d.pick1Title, d.pick1Slug], [d.pick2Title, d.pick2Slug], [d.pick3Title, d.pick3Slug]].filter(([t]) => t && t.trim());
+
+      const css = `*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#0a0a0a;--surface:#111111;--crimson:#8b1a1a;--sky:#5fc4e0;--text:#f0ebe3;--muted:#888;--border:rgba(255,255,255,.08);}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:20px 48px;background:rgba(10,10,10,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;letter-spacing:.22em;text-transform:lowercase;color:var(--text);text-decoration:none;}
+.nav-links{display:flex;gap:36px;list-style:none;}
+.nav-links a{color:#c8bfb4;text-decoration:none;font-size:15px;letter-spacing:.1em;text-transform:uppercase;transition:color .3s;}
+.nav-links a:hover,.nav-links a.active{color:var(--text);}
+.nav-cta{background:var(--crimson)!important;color:var(--text)!important;padding:8px 20px;border-radius:2px;}
+.nav-cta:hover{background:#a82020!important;}
+.breadcrumb{position:relative;display:block;background:transparent;border-bottom:none;padding:120px 48px 16px;font-size:12px;color:var(--muted);}
+.breadcrumb a{color:var(--muted);text-decoration:none;transition:color .3s;}
+.breadcrumb a:hover{color:var(--text);}
+.breadcrumb span{margin:0 6px;opacity:.4;}
+.product{max-width:1100px;margin:0 auto;padding:60px 48px 100px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
+.product-images{position:sticky;top:120px;display:flex;flex-direction:column;gap:16px;}
+.product-image-wrap{border-radius:8px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.product-image-wrap img{width:100%;height:auto;display:block;border-radius:8px;}
+.product-info .tag{display:inline-block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;padding:4px 12px;border:1px solid var(--crimson);color:var(--crimson);border-radius:2px;margin-bottom:20px;}
+.product-info h1{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,4vw,52px);font-weight:300;line-height:1.1;margin-bottom:8px;}
+.product-meta{font-size:13px;color:var(--muted);margin-bottom:4px;}
+.product-meta a{color:var(--sky);text-decoration:none;}
+.product-medium{font-size:12px;color:var(--muted);opacity:.75;margin-bottom:24px;}
+.product-quote{font-style:italic;font-size:15px;color:var(--muted);line-height:1.8;margin-bottom:28px;border-left:2px solid var(--crimson);padding-left:16px;}
+.expanded-note{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:24px;}
+.expanded-note .section-label{border-top:none;padding-top:0;margin-top:0;}
+.expanded-note p{font-size:14px;color:var(--muted);line-height:1.75;}
+.product-price{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:400;margin-bottom:24px;}
+.btn-buy{display:block;width:100%;padding:14px;background:var(--crimson);color:var(--text);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:13px;letter-spacing:.15em;text-transform:uppercase;border-radius:2px;text-align:center;transition:background .3s;}
+.btn-buy:hover{background:#a82020;}
+.section-label{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--crimson);margin-bottom:10px;padding-top:24px;border-top:1px solid var(--border);margin-top:4px;}
+.content-section{margin-top:4px;}
+.content-section p{font-size:13px;color:var(--muted);line-height:1.7;}
+.edition-table{width:100%;border-collapse:collapse;margin-top:4px;}
+.edition-table td{font-size:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.edition-table td:first-child{color:var(--muted);}
+.edition-table td:last-child{color:var(--text);text-align:right;}
+.faq-item{margin-bottom:14px;}
+.faq-q{font-size:13px;color:var(--text);font-weight:500;margin-bottom:5px;}
+.faq-a{font-size:13px;color:var(--muted);line-height:1.6;}
+.product-details{margin-top:28px;padding-top:24px;border-top:1px solid var(--border);}
+.product-details h3{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;margin-bottom:14px;color:var(--text);}
+.product-details ul{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.product-details li{font-size:13px;color:var(--muted);display:flex;gap:10px;}
+.product-details li::before{content:"—";color:var(--crimson);flex-shrink:0;}
+.more{padding:60px 48px 80px;border-top:1px solid var(--border);}
+.more-label{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--crimson);margin-bottom:12px;}
+.more h2{font-family:'Cormorant Garamond',serif;font-size:clamp(26px,3vw,36px);font-weight:300;margin-bottom:36px;}
+.more-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1100px;}
+.more-card{text-decoration:none;color:var(--text);border:1px solid var(--border);border-radius:6px;overflow:hidden;transition:border-color .3s,transform .3s;}
+.more-card:hover{border-color:rgba(139,26,26,.4);transform:translateY(-4px);}
+.more-card img{width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;display:block;}
+.more-card-body{padding:14px 16px;}
+.more-card-body h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;margin-bottom:4px;}
+.more-card-body p{font-size:12px;color:var(--muted);}
+footer{padding:40px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;border-top:1px solid var(--border);}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;letter-spacing:.2em;text-transform:lowercase;color:var(--text);text-decoration:none;}
+.footer-links{display:flex;gap:24px;list-style:none;flex-wrap:wrap;}
+.footer-links a{color:var(--muted);text-decoration:none;font-size:12px;letter-spacing:.1em;text-transform:uppercase;transition:color .3s;}
+.footer-links a:hover{color:var(--text);}
+.footer-copy{font-size:11px;color:var(--muted);}
+@media(max-width:768px){nav{padding:16px 20px;}.nav-links{display:none;}.breadcrumb{padding:100px 20px 16px;}.product{grid-template-columns:1fr;gap:36px;padding:36px 20px 60px;}.product-images{position:static;}.more{padding:40px 20px 60px;}.more-grid{grid-template-columns:repeat(2,1fr);}footer{flex-direction:column;text-align:center;padding:28px 20px;}}
+@media(max-width:480px){.more-grid{grid-template-columns:1fr;}}`;
+
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>${title} by ${artist} — Limited Edition Mini Art Print | Minicuration</title>
+  <meta name="description" content="${title} by ${artist}. ${medium}. Limited edition ACEO art print — 01 of 50. Sealed in a magnetic acrylic collector's case. $${price}.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://minicuration.com/shop/${slug}.html"/>
+
+  <meta property="og:type" content="product"/>
+  <meta property="og:title" content="${title} by ${artist} — Limited Edition Mini Art Print"/>
+  <meta property="og:description" content="${medium}. 01 of 50 numbered editions. Sealed in a magnetic acrylic case with stand. $${price}."/>
+  <meta property="og:image" content="https://minicuration.com/image/${slug}-case1.webp"/>
+  <meta property="og:url" content="https://minicuration.com/shop/${slug}.html"/>
+  <meta property="og:site_name" content="Minicuration"/>
+  <meta property="og:price:amount" content="${price}.00"/>
+  <meta property="og:price:currency" content="USD"/>
+
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="${title} by ${artist} — Limited Edition Mini Art Print"/>
+  <meta name="twitter:description" content="${medium}. 01 of 50. Sealed in acrylic case. $${price}."/>
+  <meta name="twitter:image" content="https://minicuration.com/image/${slug}-case1.webp"/>
+
+  <link rel="preload" as="image" href="../image/${slug}-case1.webp"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <script async src="https://js.stripe.com/v3/buy-button.js"><\/script>
+
+  <script type="application/ld+json">
+  ${jsonLd}
+  <\/script>
+
+  <style>${css}</style>
+</head>
+<body>
+  <nav>
+    <a href="../index.html" class="nav-logo">minicuration</a>
+    <ul class="nav-links">
+      <li><a href="../shop.html" class="active">Shop</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../shop.html" class="nav-cta">Shop Prints</a></li>
+    </ul>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="../index.html">Home</a><span>›</span>
+    <a href="../shop.html">Shop</a><span>›</span>
+    ${title}
+  </nav>
+
+  <div class="product">
+    <div class="product-images">
+      <div class="product-image-wrap">
+        <img src="../image/${slug}-case1.webp" alt="${title} by ${artist} — in magnetic acrylic collector's case" fetchpriority="high" decoding="async"/>
+      </div>
+      <div class="product-image-wrap">
+        <img src="../image/${slug}-case2.webp" alt="${title} by ${artist} — collector's case, alternate view" loading="lazy" decoding="async"/>
+      </div>
+    </div>
+
+    <div class="product-info">
+      <span class="tag">Limited Edition — 01 of 50</span>
+      <h1>${title}</h1>
+      <p class="product-meta">by <a href="../artists/jfeelgood.html">${artist}</a></p>
+      <p class="product-medium">${medium}</p>
+      ${d.cardQuote ? `<blockquote class="product-quote">"${d.cardQuote}"</blockquote>` : ""}
+
+      ${d.expandedNote ? `<div class="expanded-note">
+        <div class="section-label">Artist Note</div>
+        <p>${d.expandedNote}</p>
+      </div>` : ""}
+
+      <div class="product-price">$${price}</div>
+      <a href="${stripeLink}" class="btn-buy">Buy Now — $${price}</a>
+
+      ${assembledSentence ? `<div class="original-painting content-section" data-mc-original data-medium="${d.medium}" data-dimensions="${d.dimensions}" data-year-painted="${d.yearPainted}" data-status="${d.originalStatus}" data-for-sale="${d.originalForSale}">
+        <div class="section-label">The Original Painting</div>
+        <p>${assembledSentence}</p>
+      </div>` : ""}
+
+      ${d.processNotes ? `<div class="process-notes content-section">
+        <div class="section-label">Process Notes</div>
+        <p>${d.processNotes}</p>
+      </div>` : ""}
+
+      ${d.whyItWorks ? `<div class="why-it-works content-section">
+        <div class="section-label">Why This Works at Card Scale</div>
+        <p>${d.whyItWorks}</p>
+      </div>` : ""}
+
+      <div class="edition-details content-section">
+        <div class="section-label">Edition Details</div>
+        <table class="edition-table"><tbody>
+          <tr><td>Edition size</td><td>50</td></tr>
+          <tr><td>Catalog number</td><td>${d.catalogNumber || "MC-XXX"}</td></tr>
+          <tr><td>Year released</td><td>${d.yearReleased || "2026"}</td></tr>
+          <tr><td>Print method</td><td>Giclée on archival cotton, 330gsm</td></tr>
+          <tr><td>Card dimensions</td><td>2.5" × 3.5" — ACEO standard</td></tr>
+          <tr><td>Case material</td><td>Acrylic with magnetic closure</td></tr>
+          <tr><td>Stand</td><td>Acrylic display stand included</td></tr>
+          <tr><td>Numbered</td><td>Yes — individually numbered on card back</td></tr>
+          <tr><td>Signed</td><td>Printed signature on card back</td></tr>
+        </tbody></table>
+      </div>
+
+      ${faqItems.length ? `<div class="faq-section content-section">
+        <div class="section-label">FAQ</div>
+        ${faqItems.map(([q, a]) => `<div class="faq-item">
+          <p class="faq-q">${q}</p>
+          <p class="faq-a">${a}</p>
+        </div>`).join("")}
+      </div>` : ""}
+
+      <div class="product-details">
+        <h3>About this print</h3>
+        <ul>
+          <li>2.5 × 3.5 inches — standard ACEO / trading card size</li>
+          <li>Museum-quality reproduction of the original painting</li>
+          <li>Numbered edition: 01 of 50 — no reprints</li>
+          <li>Magnetically sealed acrylic collector's case included</li>
+          <li>Display stand included</li>
+          <li>Artist statement printed on the card back</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  ${picks.length ? `<section class="more">
+    <p class="more-label">The Collection</p>
+    <h2>More from Minicuration</h2>
+    <div class="more-grid">
+      ${picks.map(([pt, ps]) => `<a href="${ps}.html" class="more-card">
+        <img src="../image/${ps}-case1.webp" alt="${pt} by ${artist} — limited edition mini art print" loading="lazy" decoding="async" width="3024" height="3024"/>
+        <div class="more-card-body"><h3>${pt}</h3><p>by ${artist} · $${price}</p></div>
+      </a>`).join("")}
+    </div>
+  </section>` : ""}
+
+  <footer>
+    <a href="../index.html" class="footer-logo">minicuration</a>
+    <ul class="footer-links">
+      <li><a href="../shop.html">Shop</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="https://jfeelgood.com" target="_blank" rel="noopener">jfeelgood.com</a></li>
+      <li><a href="https://iexploreart.com" target="_blank" rel="noopener">iexploreart.com</a></li>
+    </ul>
+    <span class="footer-copy">&copy; ${d.yearReleased || "2026"} Minicuration. All rights reserved.</span>
+  </footer>
+</body>
+</html>`;
+    }
+
+    function Preview({ d }) {
+      const slug = d.slug || "piece-title";
+      const isEmpty = v => !v || !v.trim();
+
+      const assembledSentence = d.title && d.medium && d.yearPainted
+        ? `The original ${d.title} is ${d.medium}${d.dimensions ? ", " + d.dimensions : ""}, painted in ${d.yearPainted}. It currently ${d.originalStatus.toLowerCase()}${d.originalForSale === "Yes (contact for pricing)" ? " and is available — contact for pricing" : " and is not for sale"}.`
+        : "";
+
+      return (
+        <div style={{ background: "#0a0a0a", color: "#f0ebe3", fontFamily: "'DM Sans', sans-serif", minHeight: "100%", padding: "32px 28px 48px" }}>
+          <div style={{ fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "#888", marginBottom: "20px", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: "14px" }}>
+            Preview — shop/{slug}.html
+          </div>
+
+          <div style={{ display: "inline-block", fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase", padding: "3px 10px", border: "1px solid #8b1a1a", color: "#8b1a1a", borderRadius: "2px", marginBottom: "14px" }}>
+            Limited Edition — 01 of 50
+          </div>
+
+          <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(28px,5vw,44px)", fontWeight: 300, lineHeight: 1.1, marginBottom: "6px", color: isEmpty(d.title) ? "rgba(255,255,255,0.2)" : "#f0ebe3" }}>
+            {isEmpty(d.title) ? "Piece Title" : d.title}
+          </h1>
+          <p style={{ fontSize: "12px", color: "#5fc4e0", marginBottom: "3px" }}>by {d.artist || "JFeelgood"}</p>
+          <p style={{ fontSize: "11px", color: isEmpty(d.medium) ? "rgba(255,255,255,0.2)" : "#888", marginBottom: "18px" }}>
+            {isEmpty(d.medium) ? "Medium on Surface" : d.medium}
+          </p>
+
+          {!isEmpty(d.cardQuote) && (
+            <blockquote style={{ fontStyle: "italic", fontSize: "13px", color: "#888", lineHeight: 1.8, marginBottom: "16px", borderLeft: "2px solid #8b1a1a", paddingLeft: "14px" }}>
+              "{d.cardQuote}"
+            </blockquote>
+          )}
+
+          {!isEmpty(d.expandedNote) && (
+            <div style={{ background: "#111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "4px", padding: "16px", marginBottom: "16px" }}>
+              <div style={{ fontSize: "9px", letterSpacing: "0.25em", textTransform: "uppercase", color: "#8b1a1a", marginBottom: "8px" }}>Artist Note</div>
+              <p style={{ fontSize: "13px", color: "#888", lineHeight: 1.75 }}>{d.expandedNote}</p>
+            </div>
+          )}
+
+          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "36px", fontWeight: 400, marginBottom: "8px" }}>${d.price || "45"}</div>
+
+          <div style={{ display: "block", width: "100%", padding: "12px", background: "#8b1a1a", color: "#f0ebe3", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", borderRadius: "2px", textAlign: "center", marginBottom: "4px" }}>
+            Buy Now — ${d.price || "45"}
+          </div>
+          {!isEmpty(d.stripeLink) && (
+            <div style={{ fontSize: "9px", color: "#555", marginBottom: "20px", wordBreak: "break-all" }}>{d.stripeLink}</div>
+          )}
+          {isEmpty(d.stripeLink) && (
+            <div style={{ fontSize: "9px", color: "#8b1a1a", marginBottom: "20px" }}>⚠ Stripe link not set</div>
+          )}
+
+          {assembledSentence && (
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "16px", marginBottom: "16px" }}>
+              <div style={{ fontSize: "9px", letterSpacing: "0.25em", textTransform: "uppercase", color: "#8b1a1a", marginBottom: "8px" }}>The Original Painting</div>
+              <p style={{ fontSize: "12px", color: "#888", lineHeight: 1.7 }}>{assembledSentence}</p>
+            </div>
+          )}
+
+          {!isEmpty(d.processNotes) && (
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "16px", marginBottom: "16px" }}>
+              <div style={{ fontSize: "9px", letterSpacing: "0.25em", textTransform: "uppercase", color: "#8b1a1a", marginBottom: "8px" }}>Process Notes</div>
+              <p style={{ fontSize: "12px", color: "#888", lineHeight: 1.7 }}>{d.processNotes}</p>
+            </div>
+          )}
+
+          {!isEmpty(d.whyItWorks) && (
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "16px", marginBottom: "16px" }}>
+              <div style={{ fontSize: "9px", letterSpacing: "0.25em", textTransform: "uppercase", color: "#8b1a1a", marginBottom: "8px" }}>Why This Works at Card Scale</div>
+              <p style={{ fontSize: "12px", color: "#888", lineHeight: 1.7 }}>{d.whyItWorks}</p>
+            </div>
+          )}
+
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "16px", marginBottom: "16px" }}>
+            <div style={{ fontSize: "9px", letterSpacing: "0.25em", textTransform: "uppercase", color: "#8b1a1a", marginBottom: "10px" }}>Edition Details</div>
+            {[["Edition size","50"],["Catalog number",d.catalogNumber||"MC-XXX"],["Year released",d.yearReleased||"2026"],["Print method","Giclée on archival cotton, 330gsm"],['Card dimensions','2.5" × 3.5" — ACEO standard'],["Case","Acrylic with magnetic closure + stand"],["Numbered","Yes"],["Signed","Printed signature"]].map(([k,v]) => (
+              <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", gap: "16px" }}>
+                <span style={{ color: "#888" }}>{k}</span>
+                <span style={{ color: "#f0ebe3", textAlign: "right", maxWidth: "60%" }}>{v}</span>
+              </div>
+            ))}
+          </div>
+
+          {(!isEmpty(d.faq1Q) || !isEmpty(d.faq2Q) || !isEmpty(d.faq3Q)) && (
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "16px", marginBottom: "16px" }}>
+              <div style={{ fontSize: "9px", letterSpacing: "0.25em", textTransform: "uppercase", color: "#8b1a1a", marginBottom: "12px" }}>FAQ</div>
+              {[[d.faq1Q,d.faq1A],[d.faq2Q,d.faq2A],[d.faq3Q,d.faq3A]].filter(([q])=>!isEmpty(q)).map(([q,a],i) => (
+                <div key={i} style={{ marginBottom: "12px" }}>
+                  <p style={{ fontSize: "12px", color: "#f0ebe3", marginBottom: "4px" }}>{q}</p>
+                  <p style={{ fontSize: "12px", color: "#888", lineHeight: 1.6 }}>{a}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {(!isEmpty(d.pick1Title)||!isEmpty(d.pick2Title)||!isEmpty(d.pick3Title)) && (
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "16px", marginBottom: "16px" }}>
+              <div style={{ fontSize: "9px", letterSpacing: "0.25em", textTransform: "uppercase", color: "#8b1a1a", marginBottom: "12px" }}>Other Works</div>
+              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                {[[d.pick1Title,d.pick1Slug],[d.pick2Title,d.pick2Slug],[d.pick3Title,d.pick3Slug]].filter(([t])=>!isEmpty(t)).map(([t,s],i)=>(
+                  <div key={i} style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: "4px", padding: "8px 12px", fontSize: "11px", color: "#5fc4e0", flex: "1", minWidth: "80px" }}>
+                    {t}{s && <div style={{ fontSize: "9px", color: "#555", marginTop: "2px" }}>/shop/{s}.html</div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div style={{ marginTop: "20px", background: "#111", border: "1px solid rgba(139,26,26,0.2)", borderRadius: "4px", padding: "14px 16px" }}>
+            <div style={{ fontSize: "9px", letterSpacing: "0.2em", textTransform: "uppercase", color: "#8b1a1a", marginBottom: "6px" }}>Page URL</div>
+            <code style={{ fontSize: "11px", color: "#5fc4e0" }}>https://minicuration.com/shop/{slug}.html</code>
+          </div>
+        </div>
+      );
+    }
+
+    function MiniCurationBuilder() {
+      const [data, setData] = useState(defaultData);
+      const [activeTab, setActiveTab] = useState("hero");
+      const [copied, setCopied] = useState(false);
+      const [loadHtml, setLoadHtml] = useState("");
+      const [loadError, setLoadError] = useState("");
+
+      const set = key => e => setData(d => ({ ...d, [key]: e.target.value }));
+
+      const tabs = [
+        { id: "hero", label: "Hero" },
+        { id: "note", label: "Artist Note" },
+        { id: "original", label: "Original" },
+        { id: "why", label: "Why It Works" },
+        { id: "faq", label: "FAQ" },
+        { id: "picks", label: "Other Works" },
+        { id: "load", label: "↺ Load" },
+      ];
+
+      const handleCopy = () => {
+        navigator.clipboard.writeText(buildPageHTML(data)).then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        });
+      };
+
+      const handleLoad = () => {
+        setLoadError("");
+        if (!loadHtml.trim()) return;
+        const parsed = parseHTML(loadHtml);
+        if (parsed) {
+          setData(d => ({ ...d, ...parsed }));
+          setLoadHtml("");
+          setActiveTab("hero");
+        } else {
+          setLoadError("Couldn't parse that HTML. Paste the full source of a Minicuration shop page.");
+        }
+      };
+
+      return (
+        <div style={{ display: "grid", gridTemplateColumns: "380px 1fr", height: "100vh", background: "#0a0a0a", fontFamily: "'DM Sans', sans-serif", overflow: "hidden" }}>
+          <div style={{ borderRight: "1px solid rgba(255,255,255,0.08)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+            <div style={{ padding: "16px 20px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)", background: "#0d0d0d" }}>
+              <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "18px", fontWeight: 300, letterSpacing: "0.18em", textTransform: "lowercase", color: "#f0ebe3", marginBottom: "2px" }}>minicuration</div>
+              <div style={{ fontSize: "9px", letterSpacing: "0.25em", textTransform: "uppercase", color: "#8b1a1a" }}>Product Page Builder</div>
+            </div>
+
+            <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.06)", background: "#0d0d0d", overflowX: "auto" }}>
+              {tabs.map(t => (
+                <button key={t.id} onClick={() => setActiveTab(t.id)} style={{ background: "none", border: "none", borderBottom: activeTab === t.id ? "2px solid #8b1a1a" : "2px solid transparent", color: activeTab === t.id ? "#f0ebe3" : "#555", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase", padding: "10px 10px", cursor: "pointer", whiteSpace: "nowrap", transition: "color 0.2s" }}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ flex: 1, overflowY: "auto", padding: "20px" }}>
+              {activeTab === "hero" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  <div style={sectionHeadStyle}>§1 Hero Block</div>
+                  <Field label="Piece Title *"><Input value={data.title} onChange={set("title")} placeholder="e.g. Dreamfall" /></Field>
+                  <Field label="Artist"><Input value={data.artist} onChange={set("artist")} placeholder="JFeelgood" /></Field>
+                  <Field label="Catalog Number (SKU)"><Input value={data.catalogNumber} onChange={set("catalogNumber")} placeholder="MC-XXX" /></Field>
+                  <Field label="Year Released"><Input value={data.yearReleased} onChange={set("yearReleased")} placeholder="2026" /></Field>
+                  <Field label="Price (USD)"><Input value={data.price} onChange={set("price")} placeholder="45" /></Field>
+                  <Field label="Stripe Buy Link"><Input value={data.stripeLink} onChange={set("stripeLink")} placeholder="https://buy.stripe.com/..." /></Field>
+                  <Field label="URL Slug"><Input value={data.slug} onChange={set("slug")} placeholder="lowercase-hyphenated-title" /></Field>
+                  {data.slug && (
+                    <div style={{ fontSize: "10px", color: "#555", background: "#111", padding: "6px 10px", borderRadius: "3px", border: "1px solid rgba(255,255,255,0.06)", wordBreak: "break-all" }}>
+                      minicuration.com/shop/{data.slug}.html
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === "note" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  <div style={sectionHeadStyle}>§2 Expanded Artist Note</div>
+                  <Field label="Original Card Quote (from back of card)">
+                    <Textarea value={data.cardQuote} onChange={set("cardQuote")} placeholder="The single line already on the card back" rows={2} />
+                  </Field>
+                  <Field label="Expanded Note (60–120 words)">
+                    <Textarea value={data.expandedNote} onChange={set("expandedNote")} placeholder="What was happening when this was painted. What the piece is actually about. What you want the viewer to feel." rows={6} />
+                    <div style={{ fontSize: "9px", color: data.expandedNote.split(" ").filter(Boolean).length > 120 ? "#8b1a1a" : "#555", textAlign: "right" }}>
+                      {data.expandedNote.split(" ").filter(Boolean).length} / 120 words
+                    </div>
+                  </Field>
+                </div>
+              )}
+
+              {activeTab === "original" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  <div style={sectionHeadStyle}>§3 The Original Painting</div>
+                  <Field label="Original Medium"><Input value={data.medium} onChange={set("medium")} placeholder="e.g. Acrylic, spray paint, ink on canvas" /></Field>
+                  <Field label="Original Dimensions"><Input value={data.dimensions} onChange={set("dimensions")} placeholder='e.g. 24" × 36"' /></Field>
+                  <Field label="Year Painted"><Input value={data.yearPainted} onChange={set("yearPainted")} placeholder="YYYY" /></Field>
+                  <Field label="Status of Original">
+                    <Select value={data.originalStatus} onChange={set("originalStatus")} options={["In artist's studio","Private collection","Sold","On display"]} />
+                  </Field>
+                  <Field label="Available for Sale?">
+                    <Select value={data.originalForSale} onChange={set("originalForSale")} options={["No","Yes (contact for pricing)"]} />
+                  </Field>
+                  <div style={{ ...sectionHeadStyle, marginTop: "8px" }}>§4 Process Notes</div>
+                  <Field label="Process Notes (optional, 2–3 sentences)">
+                    <Textarea value={data.processNotes} onChange={set("processNotes")} placeholder="What actually happened with this piece — a layering technique, an unplanned moment, a tool that mattered." rows={4} />
+                  </Field>
+                </div>
+              )}
+
+              {activeTab === "why" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  <div style={sectionHeadStyle}>§5 Why This Works at Card Scale</div>
+                  <p style={{ fontSize: "11px", color: "#666", lineHeight: 1.65 }}>40–80 words. What about this piece survives shrinking?</p>
+                  <Field label="Why It Works (40–80 words)">
+                    <Textarea value={data.whyItWorks} onChange={set("whyItWorks")} placeholder="Tell the reader what to look for. Not every painting shrinks well — explain why this one does." rows={5} />
+                    <div style={{ fontSize: "9px", color: data.whyItWorks.split(" ").filter(Boolean).length > 80 ? "#8b1a1a" : "#555", textAlign: "right" }}>
+                      {data.whyItWorks.split(" ").filter(Boolean).length} / 80 words
+                    </div>
+                  </Field>
+                </div>
+              )}
+
+              {activeTab === "faq" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  <div style={sectionHeadStyle}>§6 FAQ — optional</div>
+                  <p style={{ fontSize: "11px", color: "#666", lineHeight: 1.65 }}>Only when buyers will have a real question. Leave blank to skip.</p>
+                  {[1,2,3].map(n => (
+                    <div key={n} style={{ background: "#111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "4px", padding: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                      <div style={{ fontSize: "9px", color: "#8b1a1a", letterSpacing: "0.15em", textTransform: "uppercase" }}>Q{n}</div>
+                      <Input value={data[`faq${n}Q`]} onChange={set(`faq${n}Q`)} placeholder="Question" />
+                      <Textarea value={data[`faq${n}A`]} onChange={set(`faq${n}A`)} placeholder="Answer — 1–3 sentences" rows={2} />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === "picks" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  <div style={sectionHeadStyle}>§7 Other Works — pick 3</div>
+                  <p style={{ fontSize: "11px", color: "#666", lineHeight: 1.65 }}>Three cards at the bottom. Pick pieces that pair visually or thematically.</p>
+                  {[1,2,3].map(n => (
+                    <div key={n} style={{ background: "#111", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "4px", padding: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                      <div style={{ fontSize: "9px", color: "#8b1a1a", letterSpacing: "0.15em", textTransform: "uppercase" }}>Pick {n}</div>
+                      <Input value={data[`pick${n}Title`]} onChange={set(`pick${n}Title`)} placeholder="Title" />
+                      <Input value={data[`pick${n}Slug`]} onChange={set(`pick${n}Slug`)} placeholder="url-slug" />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === "load" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  <div style={sectionHeadStyle}>Load Existing Page</div>
+                  <p style={{ fontSize: "11px", color: "#666", lineHeight: 1.65 }}>
+                    Paste the full HTML source of any Minicuration shop page to load it into the builder for editing.
+                    Use <strong style={{ color: "#888" }}>View Source</strong> (Ctrl+U) on the page, select all, paste here.
+                  </p>
+                  <Field label="Paste Page HTML">
+                    <Textarea value={loadHtml} onChange={e => { setLoadHtml(e.target.value); setLoadError(""); }} placeholder="<!DOCTYPE html>..." rows={12} />
+                  </Field>
+                  {loadError && (
+                    <div style={{ fontSize: "11px", color: "#8b1a1a", background: "rgba(139,26,26,0.1)", border: "1px solid rgba(139,26,26,0.3)", borderRadius: "3px", padding: "8px 10px" }}>
+                      {loadError}
+                    </div>
+                  )}
+                  <button
+                    onClick={handleLoad}
+                    style={{ background: "#8b1a1a", color: "#f0ebe3", border: "none", borderRadius: "2px", padding: "10px", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer" }}
+                  >
+                    Load Page →
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "14px 20px", display: "flex", gap: "10px", background: "#0d0d0d" }}>
+              <button onClick={handleCopy} style={{ flex: 1, background: copied ? "#1a3a1a" : "#8b1a1a", color: "#f0ebe3", border: "none", borderRadius: "2px", padding: "10px", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer", transition: "background 0.3s" }}>
+                {copied ? "Copied ✓" : "Copy HTML"}
+              </button>
+              <button onClick={() => setData(defaultData)} style={{ background: "none", border: "1px solid rgba(255,255,255,0.1)", color: "#555", borderRadius: "2px", padding: "10px 14px", fontSize: "10px", letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>
+                Reset
+              </button>
+            </div>
+          </div>
+
+          <div style={{ overflowY: "auto" }}>
+            <Preview d={data} />
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<MiniCurationBuilder />);
+  </script>
+</body>
+</html>
