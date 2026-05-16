@@ -22,6 +22,76 @@
   <script type="text/babel">
 const { useState } = React;
 
+function parseProductHTML(html) {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  const text = (sel) => doc.querySelector(sel)?.textContent?.trim() || "";
+  const attr = (sel, a) => doc.querySelector(sel)?.getAttribute(a) || "";
+
+  // slug from canonical
+  const canonical = attr("link[rel='canonical']", "href");
+  const slugMatch = canonical.match(/shop\/(.+?)\.html/);
+  const slug = slugMatch ? slugMatch[1] : "";
+
+  // price — strip $ and whitespace
+  const priceRaw = text(".product-price").replace(/[^0-9.]/g, "");
+
+  // card quote — strip surrounding quotes
+  const quoteRaw = text(".product-quote, blockquote.product-quote").replace(/^[""]|[""]$/g, "");
+
+  // original painting data attrs
+  const origEl = doc.querySelector("[data-mc-original]");
+  const medium = origEl ? attr("[data-mc-original]", "data-medium") : "";
+  const dimensions = origEl ? attr("[data-mc-original]", "data-dimensions") : "";
+  const yearPainted = origEl ? attr("[data-mc-original]", "data-year-painted") : "";
+  const originalStatus = origEl ? (attr("[data-mc-original]", "data-status") || "In artist's studio") : "In artist's studio";
+  const originalForSale = origEl ? (attr("[data-mc-original]", "data-for-sale") === "Yes" ? "Yes" : "No") : "No";
+
+  // edition table — catalog number & year
+  let catalogNumber = "", yearReleased = "2026";
+  doc.querySelectorAll(".edition-table tr").forEach((tr) => {
+    const cells = tr.querySelectorAll("td");
+    if (cells.length < 2) return;
+    const key = cells[0].textContent.trim().toLowerCase();
+    const val = cells[1].textContent.trim();
+    if (key === "catalog number") catalogNumber = val;
+    if (key === "year released") yearReleased = val;
+  });
+
+  // FAQ items
+  const faqQs = [...doc.querySelectorAll(".faq-q")].map((el) => el.textContent.trim());
+  const faqAs = [...doc.querySelectorAll(".faq-a")].map((el) => el.textContent.trim());
+
+  // More-from picks
+  const picks = [...doc.querySelectorAll(".more-card")].slice(0, 3).map((card) => ({
+    title: card.querySelector("h3")?.textContent?.trim() || "",
+    slug: (card.getAttribute("href") || "").replace(/.*\/(.+?)\.html.*/, "$1"),
+  }));
+
+  return {
+    title: text("h1"),
+    artist: text(".product-meta a") || "JFeelgood",
+    catalogNumber,
+    yearReleased,
+    price: priceRaw || "45",
+    slug,
+    cardQuote: quoteRaw,
+    expandedNote: text(".expanded-note p"),
+    medium,
+    dimensions,
+    yearPainted,
+    originalStatus,
+    originalForSale,
+    processNotes: text(".process-notes p"),
+    whyItWorks: text(".why-it-works p"),
+    faq1Q: faqQs[0] || "", faq1A: faqAs[0] || "",
+    faq2Q: faqQs[1] || "", faq2A: faqAs[1] || "",
+    faq3Q: faqQs[2] || "", faq3A: faqAs[2] || "",
+    pick1Title: picks[0]?.title || "", pick1Slug: picks[0]?.slug || "",
+    pick2Title: picks[1]?.title || "", pick2Slug: picks[1]?.slug || "",
+    pick3Title: picks[2]?.title || "", pick3Slug: picks[2]?.slug || "",
+  };
+}
+
 const defaultData = {
   title: "",
   artist: "JFeelgood",
@@ -258,10 +328,13 @@ function MiniCurationBuilder() {
   const [data, setData] = useState(defaultData);
   const [activeTab, setActiveTab] = useState("hero");
   const [copied, setCopied] = useState(false);
+  const [loadHTML, setLoadHTML] = useState("");
+  const [loadMsg, setLoadMsg] = useState("");
 
   const set = (key) => (e) => setData((d) => ({ ...d, [key]: e.target.value }));
 
   const tabs = [
+    { id: "load", label: "Load" },
     { id: "hero", label: "Hero" },
     { id: "note", label: "Artist Note" },
     { id: "original", label: "Original" },
@@ -269,6 +342,18 @@ function MiniCurationBuilder() {
     { id: "faq", label: "FAQ" },
     { id: "picks", label: "Other Works" },
   ];
+
+  const handleLoad = () => {
+    if (!loadHTML.trim()) { setLoadMsg("Paste some HTML first."); return; }
+    try {
+      const parsed = parseProductHTML(loadHTML);
+      setData(parsed);
+      setLoadMsg("Loaded — switch to Hero to review.");
+      setActiveTab("hero");
+    } catch (e) {
+      setLoadMsg("Parse error: " + e.message);
+    }
+  };
 
   const generateHTML = () => {
     const slug = data.slug || "piece-title";
@@ -355,6 +440,35 @@ function MiniCurationBuilder() {
 
         {/* Form body */}
         <div style={{ flex: 1, overflowY: "auto", padding: "20px" }}>
+          {activeTab === "load" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              <div style={sectionHeadStyle}>Load Existing Page</div>
+              <p style={{ fontSize: "11px", color: "#666", lineHeight: 1.65 }}>
+                Paste the full HTML of an existing product page. Fields will be parsed and loaded into the form so you can make edits.
+              </p>
+              <textarea
+                value={loadHTML}
+                onChange={(e) => setLoadHTML(e.target.value)}
+                placeholder="Paste product page HTML here…"
+                rows={16}
+                style={{ ...textareaStyle, minHeight: "260px", fontFamily: "monospace", fontSize: "11px" }}
+                onFocus={(e) => (e.target.style.borderColor = "#8b1a1a")}
+                onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
+              />
+              <button
+                onClick={handleLoad}
+                style={{ background: "#8b1a1a", color: "#f0ebe3", border: "none", borderRadius: "2px", padding: "10px", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase", cursor: "pointer" }}
+              >
+                Parse &amp; Load
+              </button>
+              {loadMsg && (
+                <div style={{ fontSize: "11px", color: loadMsg.startsWith("Parse error") ? "#c06060" : "#5fc4e0" }}>
+                  {loadMsg}
+                </div>
+              )}
+            </div>
+          )}
+
           {activeTab === "hero" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
               <div style={sectionHeadStyle}>§1 Hero Block</div>
