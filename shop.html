@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shop Limited Edition Mini Art Prints — 50 Editions Each | Minicuration</title>
+  <title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>Shop Limited Edition Mini Art Prints — 50 Editions Each | Minicuration</title>
   <meta name="description" content="Browse 6 limited edition ACEO-sized art prints by JFeelgood. Each design limited to 50 numbered prints, sealed in an acrylic collector's case. $45 each.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://minicuration.com/shop.html"/>
@@ -121,7 +124,7 @@
     .sc-spin-wrap{position:relative;width:100%;aspect-ratio:5/7;}
     .sc-spin-wrap.landscape{aspect-ratio:7/5;}
     .sc-spin-scene{perspective:800px;position:absolute;inset:0;}
-    .sc-spin-3d{width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:sc-spin 14s linear infinite;animation-delay:-7s;}
+    .sc-spin-3d{will-change:transform;width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:sc-spin 14s linear infinite;animation-delay:-7s;}
     .sc-spin-3d:hover{animation-play-state:paused;}
     .sc-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;overflow:hidden;}
     .sc-front{transform:rotateY(0deg);background:#fff;}
@@ -170,6 +173,9 @@
       .stripe-notice-wrap{padding:0 16px;}
       footer{flex-direction:column;text-align:center;padding:28px 20px;}
     }
+  @media(prefers-reduced-motion:reduce){
+  .sc-spin-3d,.hc-3d,.card-3d,.sc-spin-3d:hover{animation:none;transform:rotateY(0deg);}
+}
   </style>
 </head>
 <body>
@@ -206,10 +212,10 @@
           <div class="sc-spin-scene">
             <div class="sc-spin-3d">
               <div class="sc-face sc-front">
-                <img src="image/spin/dreamfall_artwork.webp" loading="lazy" decoding="async"/>
+                <img width="500" height="700" src="image/spin/dreamfall_artwork.webp" alt="Dreamfall — original painting by JFeelgood" loading="lazy" decoding="async"/>
               </div>
               <div class="sc-face sc-back">
-                <img src="image/spin/dreamfall-01-of-50.webp" loading="lazy" decoding="async"/>
+                <img width="500" height="700" src="image/spin/dreamfall-01-of-50.webp" alt="Dreamfall — collector card back, edition 01 of 50" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>
@@ -237,10 +243,10 @@
           <div class="sc-spin-scene">
             <div class="sc-spin-3d">
               <div class="sc-face sc-front">
-                <img src="image/spin/dream-mountain_artwork.webp" loading="lazy" decoding="async"/>
+                <img width="500" height="700" src="image/spin/dream-mountain_artwork.webp" alt="Dream Mountain — original painting by JFeelgood" loading="lazy" decoding="async"/>
               </div>
               <div class="sc-face sc-back">
-                <img src="image/spin/dreammountain-01-of-50.webp" loading="lazy" decoding="async"/>
+                <img width="500" height="700" src="image/spin/dreammountain-01-of-50.webp" alt="Dream Mountain — collector card back, edition 01 of 50" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>
@@ -268,10 +274,10 @@
           <div class="sc-spin-scene">
             <div class="sc-spin-3d">
               <div class="sc-face sc-front">
-                <img src="image/spin/skymiles_artwork.webp" loading="lazy" decoding="async"/>
+                <img width="500" height="700" src="image/spin/skymiles_artwork.webp" alt="Sky Miles — original painting by JFeelgood" loading="lazy" decoding="async"/>
               </div>
               <div class="sc-face sc-back">
-                <img src="image/spin/skymiles-01-of-50.webp" loading="lazy" decoding="async"/>
+                <img width="500" height="700" src="image/spin/skymiles-01-of-50.webp" alt="Sky Miles — collector card back, edition 01 of 50" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>
@@ -299,10 +305,10 @@
           <div class="sc-spin-scene">
             <div class="sc-spin-3d">
               <div class="sc-face sc-front">
-                <img src="image/spin/asimplemeditation_artwork.webp" alt="A Simple Meditation — acrylic painting by JFeelgood" loading="lazy" decoding="async"/>
+                <img width="500" height="700" src="image/spin/asimplemeditation_artwork.webp" alt="A Simple Meditation — acrylic painting by JFeelgood" loading="lazy" decoding="async"/>
               </div>
               <div class="sc-face sc-back">
-                <img src="image/spin/asimplemeditation-01-of-50.webp" alt="A Simple Meditation — collector card back, edition 01 of 50" loading="lazy" decoding="async"/>
+                <img width="500" height="700" src="image/spin/asimplemeditation-01-of-50.webp" alt="A Simple Meditation — collector card back, edition 01 of 50" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>
@@ -330,10 +336,10 @@
           <div class="sc-spin-scene">
             <div class="sc-spin-3d">
               <div class="sc-face sc-front">
-                <img src="image/spin/veritas_artwork.webp" alt="Veritas — acrylic painting by JFeelgood" loading="lazy" decoding="async"/>
+                <img width="500" height="700" src="image/spin/veritas_artwork.webp" alt="Veritas — acrylic painting by JFeelgood" loading="lazy" decoding="async"/>
               </div>
               <div class="sc-face sc-back">
-                <img src="image/spin/veritas_card.webp" alt="Veritas — collector card back, edition 01 of 50" loading="lazy" decoding="async"/>
+                <img width="500" height="700" src="image/spin/veritas_card.webp" alt="Veritas — collector card back, edition 01 of 50" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>
@@ -362,10 +368,10 @@
           <div class="sc-spin-scene">
             <div class="sc-spin-3d">
               <div class="sc-face sc-front">
-                <img src="image/spin/sweet-dreams_artwork.webp" loading="lazy" decoding="async"/>
+                <img width="500" height="700" src="image/spin/sweet-dreams_artwork.webp" alt="Sweet Dreams — original painting by JFeelgood" loading="lazy" decoding="async"/>
               </div>
               <div class="sc-face sc-back">
-                <img src="image/spin/sweetdreams-01-of-50.webp" loading="lazy" decoding="async"/>
+                <img width="500" height="700" src="image/spin/sweetdreams-01-of-50.webp" alt="Sweet Dreams — collector card back, edition 01 of 50" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>
@@ -394,7 +400,8 @@
     <ul class="footer-links">
       <li><a href="shop.html">Shop</a></li>
       <li><a href="index.html#about">About</a></li>
-      <li><a href="https://jfeelgood.com" target="_blank">jfeelgood.com</a></li>
+      <li><a href="policies.html">Policies</a></li>
+      <li><a href="https://jfeelgood.com" target="_blank" rel="noopener">jfeelgood.com</a></li>
     </ul>
     <span class="footer-copy">&copy; 2026 Minicuration. All rights reserved.</span>
   </footer>

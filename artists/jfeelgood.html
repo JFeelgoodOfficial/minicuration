@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>JFeelgood — Artist | Minicuration</title>
   <meta name="description" content="JFeelgood is an independent mixed-media painter working in acrylic, latex, epoxy resin, and gold leaf. Browse all 6 of his limited edition ACEO prints on Minicuration.">
@@ -60,7 +63,7 @@
     .sc-spin-wrap{position:relative;width:100%;aspect-ratio:5/7;}
     .sc-spin-wrap.landscape{aspect-ratio:7/5;}
     .sc-spin-scene{perspective:800px;position:absolute;inset:0;}
-    .sc-spin-3d{width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:sc-spin 14s linear infinite;animation-delay:-7s;}
+    .sc-spin-3d{will-change:transform;width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:sc-spin 14s linear infinite;animation-delay:-7s;}
     .sc-spin-3d:hover{animation-play-state:paused;}
     .sc-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;overflow:hidden;}
     .sc-front{transform:rotateY(0deg);background:#fff;}
@@ -79,6 +82,9 @@
     @media(max-width:900px){.artist-header{grid-template-columns:1fr;gap:32px;}.artist-avatar{max-width:200px;}.portfolio-grid{grid-template-columns:repeat(3,1fr);}}
     @media(max-width:768px){nav{padding:16px 20px;}.nav-links{display:none;}.breadcrumb{padding:80px 20px 12px;}.artist-header{padding:24px 20px 0;}.divider{margin:36px 20px;}.portfolio{padding:0 20px 60px;}.portfolio-grid{grid-template-columns:repeat(2,1fr);}footer{flex-direction:column;text-align:center;padding:28px 20px;}}
     @media(max-width:480px){.portfolio-grid{grid-template-columns:1fr;}}
+  @media(prefers-reduced-motion:reduce){
+  .sc-spin-3d,.hc-3d,.card-3d,.sc-spin-3d:hover{animation:none;transform:rotateY(0deg);}
+}
   </style>
 </head>
 <body>
@@ -96,7 +102,7 @@
 
   <div class="artist-header">
     <div class="artist-avatar">
-      <img src="../image/jfeelgood-profile.webp" alt="JFeelgood — mixed media painter, Minicuration artist" fetchpriority="high" decoding="async"/>
+      <img width="400" height="500" src="../image/jfeelgood-profile.webp" alt="JFeelgood — mixed media painter, Minicuration artist" fetchpriority="high" decoding="async"/>
     </div>
     <div class="artist-meta">
       <p class="eyebrow">Artist</p>
@@ -120,8 +126,8 @@
       <a href="../shop/dreamfall.html" class="p-card">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene"><div class="sc-spin-3d">
-            <div class="sc-face sc-front"><img src="../image/spin/dreamfall_artwork.webp" alt="Dreamfall by JFeelgood" loading="lazy" decoding="async"/></div>
-            <div class="sc-face sc-back"><img src="../image/spin/dreamfall-01-of-50.webp" alt="Dreamfall — card back" loading="lazy" decoding="async"/></div>
+            <div class="sc-face sc-front"><img width="500" height="700" src="../image/spin/dreamfall_artwork.webp" alt="Dreamfall by JFeelgood" loading="lazy" decoding="async"/></div>
+            <div class="sc-face sc-back"><img width="500" height="700" src="../image/spin/dreamfall-01-of-50.webp" alt="Dreamfall — card back" loading="lazy" decoding="async"/></div>
           </div></div>
         </div>
         <div class="p-card-body"><h3>Dreamfall</h3><p>Trading Card Sized Art Prints</p></div>
@@ -129,8 +135,8 @@
       <a href="../shop/dream-mountain.html" class="p-card">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene"><div class="sc-spin-3d" style="animation-delay:-2s">
-            <div class="sc-face sc-front"><img src="../image/spin/dream-mountain_artwork.webp" alt="Dream Mountain by JFeelgood" loading="lazy" decoding="async"/></div>
-            <div class="sc-face sc-back"><img src="../image/spin/dreammountain-01-of-50.webp" alt="Dream Mountain — card back" loading="lazy" decoding="async"/></div>
+            <div class="sc-face sc-front"><img width="500" height="700" src="../image/spin/dream-mountain_artwork.webp" alt="Dream Mountain by JFeelgood" loading="lazy" decoding="async"/></div>
+            <div class="sc-face sc-back"><img width="500" height="700" src="../image/spin/dreammountain-01-of-50.webp" alt="Dream Mountain — card back" loading="lazy" decoding="async"/></div>
           </div></div>
         </div>
         <div class="p-card-body"><h3>Dream Mountain</h3><p>Trading Card Sized Art Prints</p></div>
@@ -138,8 +144,8 @@
       <a href="../shop/sky-miles.html" class="p-card">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene"><div class="sc-spin-3d" style="animation-delay:-5s">
-            <div class="sc-face sc-front"><img src="../image/spin/skymiles_artwork.webp" alt="Sky Miles by JFeelgood" loading="lazy" decoding="async"/></div>
-            <div class="sc-face sc-back"><img src="../image/spin/skymiles-01-of-50.webp" alt="Sky Miles — card back" loading="lazy" decoding="async"/></div>
+            <div class="sc-face sc-front"><img width="500" height="700" src="../image/spin/skymiles_artwork.webp" alt="Sky Miles by JFeelgood" loading="lazy" decoding="async"/></div>
+            <div class="sc-face sc-back"><img width="500" height="700" src="../image/spin/skymiles-01-of-50.webp" alt="Sky Miles — card back" loading="lazy" decoding="async"/></div>
           </div></div>
         </div>
         <div class="p-card-body"><h3>Sky Miles</h3><p>Trading Card Sized Art Prints</p></div>
@@ -147,8 +153,8 @@
       <a href="../shop/a-simple-meditation.html" class="p-card">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene"><div class="sc-spin-3d" style="animation-delay:-9s">
-            <div class="sc-face sc-front"><img src="../image/spin/asimplemeditation_artwork.webp" alt="A Simple Meditation by JFeelgood" loading="lazy" decoding="async"/></div>
-            <div class="sc-face sc-back"><img src="../image/spin/asimplemeditation-01-of-50.webp" alt="A Simple Meditation — card back" loading="lazy" decoding="async"/></div>
+            <div class="sc-face sc-front"><img width="500" height="700" src="../image/spin/asimplemeditation_artwork.webp" alt="A Simple Meditation by JFeelgood" loading="lazy" decoding="async"/></div>
+            <div class="sc-face sc-back"><img width="500" height="700" src="../image/spin/asimplemeditation-01-of-50.webp" alt="A Simple Meditation — card back" loading="lazy" decoding="async"/></div>
           </div></div>
         </div>
         <div class="p-card-body"><h3>A Simple Meditation</h3><p>Trading Card Sized Art Prints</p></div>
@@ -156,8 +162,8 @@
       <a href="../shop/veritas.html" class="p-card">
         <div class="sc-spin-wrap landscape">
           <div class="sc-spin-scene"><div class="sc-spin-3d" style="animation-delay:-11s">
-            <div class="sc-face sc-front"><img src="../image/spin/veritas_artwork.webp" alt="Veritas by JFeelgood" loading="lazy" decoding="async"/></div>
-            <div class="sc-face sc-back"><img src="../image/spin/veritas_card.webp" alt="Veritas — card back" loading="lazy" decoding="async"/></div>
+            <div class="sc-face sc-front"><img width="500" height="700" src="../image/spin/veritas_artwork.webp" alt="Veritas by JFeelgood" loading="lazy" decoding="async"/></div>
+            <div class="sc-face sc-back"><img width="500" height="700" src="../image/spin/veritas_card.webp" alt="Veritas — card back" loading="lazy" decoding="async"/></div>
           </div></div>
         </div>
         <div class="p-card-body"><h3>Veritas</h3><p>Trading Card Sized Art Prints</p></div>
@@ -165,8 +171,8 @@
       <a href="../shop/sweet-dreams.html" class="p-card">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene"><div class="sc-spin-3d" style="animation-delay:-3s">
-            <div class="sc-face sc-front"><img src="../image/spin/sweet-dreams_artwork.webp" alt="Sweet Dreams by JFeelgood" loading="lazy" decoding="async"/></div>
-            <div class="sc-face sc-back"><img src="../image/spin/sweetdreams-01-of-50.webp" alt="Sweet Dreams — card back" loading="lazy" decoding="async"/></div>
+            <div class="sc-face sc-front"><img width="500" height="700" src="../image/spin/sweet-dreams_artwork.webp" alt="Sweet Dreams by JFeelgood" loading="lazy" decoding="async"/></div>
+            <div class="sc-face sc-back"><img width="500" height="700" src="../image/spin/sweetdreams-01-of-50.webp" alt="Sweet Dreams — card back" loading="lazy" decoding="async"/></div>
           </div></div>
         </div>
         <div class="p-card-body"><h3>Sweet Dreams</h3><p>Trading Card Sized Art Prints</p></div>
@@ -179,6 +185,7 @@
     <ul class="footer-links">
       <li><a href="../shop.html">Shop</a></li>
       <li><a href="../about.html">About</a></li>
+      <li><a href="../policies.html">Policies</a></li>
       <li><a href="https://jfeelgood.com" target="_blank" rel="noopener">jfeelgood.com</a></li>
     </ul>
     <span class="footer-copy">&copy; 2026 Minicuration. All rights reserved.</span>

@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 
   <!-- Core pages -->
   <url>
     <loc>https://minicuration.com/</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/sweetdreams.jpg</image:loc>
+      <image:title>Sweet Dreams by JFeelgood — Limited Edition Mini Art Print</image:title>
+    </image:image>
     <lastmod>2026-04-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
@@ -27,87 +32,100 @@
     <priority>0.7</priority>
   </url>
 
+  <url>
+    <loc>https://minicuration.com/policies.html</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
   <!-- Product pages -->
   <url>
     <loc>https://minicuration.com/shop/dreamfall.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/dreamfall-case1.webp</image:loc>
+      <image:title>Dreamfall by JFeelgood — Limited Edition Mini Art Print</image:title>
+      <image:caption>Dreamfall. Acrylic, Spray Paint, Ink. Edition 01 of 50. $45.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://minicuration.com/image/dreamfall-case2.webp</image:loc>
+      <image:title>Dreamfall by JFeelgood — Collector's Case View</image:title>
+    </image:image>
     <lastmod>2026-04-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://minicuration.com/shop/dream-mountain.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/dreammountain-case1.webp</image:loc>
+      <image:title>Dream Mountain by JFeelgood — Limited Edition Mini Art Print</image:title>
+      <image:caption>Dream Mountain. Acrylic on Canvas. Edition 01 of 50. $45.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://minicuration.com/image/dreammountain-case2.webp</image:loc>
+      <image:title>Dream Mountain by JFeelgood — Collector's Case View</image:title>
+    </image:image>
     <lastmod>2026-04-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://minicuration.com/shop/sky-miles.html</loc>
-    <lastmod>2026-04-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://minicuration.com/shop/pooh.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/skymiles-case1.webp</image:loc>
+      <image:title>Sky Miles by JFeelgood — Limited Edition Mini Art Print</image:title>
+      <image:caption>Sky Miles. Acrylic, Latex, Resin. Edition 01 of 50. $45.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://minicuration.com/image/skymiles-case2.webp</image:loc>
+      <image:title>Sky Miles by JFeelgood — Collector's Case View</image:title>
+    </image:image>
     <lastmod>2026-04-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://minicuration.com/shop/a-simple-meditation.html</loc>
-    <lastmod>2026-04-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://minicuration.com/shop/sisters.html</loc>
-    <lastmod>2026-04-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://minicuration.com/shop/sentiments.html</loc>
-    <lastmod>2026-04-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://minicuration.com/shop/transcend.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/asimplemeditation-case1.webp</image:loc>
+      <image:title>A Simple Meditation by JFeelgood — Limited Edition Mini Art Print</image:title>
+      <image:caption>A Simple Meditation. Acrylic on Canvas. Edition 01 of 50. $45.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://minicuration.com/image/asimplemeditation-case2.webp</image:loc>
+      <image:title>A Simple Meditation by JFeelgood — Collector's Case View</image:title>
+    </image:image>
     <lastmod>2026-04-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://minicuration.com/shop/veritas.html</loc>
-    <lastmod>2026-04-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://minicuration.com/shop/serenade.html</loc>
-    <lastmod>2026-04-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://minicuration.com/shop/worth-the-trip.html</loc>
-    <lastmod>2026-04-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://minicuration.com/shop/vicarious.html</loc>
-    <lastmod>2026-04-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://minicuration.com/shop/crowned.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/veritas-case1.webp</image:loc>
+      <image:title>Veritas by JFeelgood — Limited Edition Mini Art Print</image:title>
+      <image:caption>Veritas. Acrylic on Canvas. Edition 01 of 50. $45.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://minicuration.com/image/veritas-case2.webp</image:loc>
+      <image:title>Veritas by JFeelgood — Collector's Case View</image:title>
+    </image:image>
     <lastmod>2026-04-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://minicuration.com/shop/sweet-dreams.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/sweetdreams-case1.webp</image:loc>
+      <image:title>Sweet Dreams by JFeelgood — Limited Edition Mini Art Print</image:title>
+      <image:caption>Sweet Dreams. Acrylic, Joint Compound. Edition 01 of 50. $45.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://minicuration.com/image/sweetdreams-case2.webp</image:loc>
+      <image:title>Sweet Dreams by JFeelgood — Collector's Case View</image:title>
+    </image:image>
     <lastmod>2026-04-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
