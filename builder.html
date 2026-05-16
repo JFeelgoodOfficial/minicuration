@@ -357,57 +357,222 @@ function MiniCurationBuilder() {
 
   const generateHTML = () => {
     const slug = data.slug || "piece-title";
+    const title = data.title || "Untitled";
+    const artist = data.artist || "JFeelgood";
+    const medium = data.medium || "";
+    const price = data.price || "45";
+
     const assembledSentence = data.title && data.medium && data.yearPainted
       ? `The original ${data.title} is ${data.medium}${data.dimensions ? ", " + data.dimensions : ""}, painted in ${data.yearPainted}. It currently ${data.originalStatus.toLowerCase()}${data.originalForSale === "Yes" ? " and is available — contact for pricing" : " and is not for sale"}.`
       : "";
+
+    const jsonLd = JSON.stringify({
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Product",
+          "name": title + " — Limited Edition Mini Art Print",
+          "sku": slug + "-01",
+          "description": title + " by " + artist + ". " + medium + ". Limited edition ACEO-sized print — 01 of 50 numbered editions, sealed in a magnetic acrylic collector's case with display stand.",
+          "image": ["https://minicuration.com/image/" + slug + "-case1.webp", "https://minicuration.com/image/" + slug + "-case2.webp"],
+          "brand": { "@type": "Brand", "name": "Minicuration" },
+          "offers": { "@type": "Offer", "price": price + ".00", "priceCurrency": "USD", "availability": "https://schema.org/InStock", "url": "https://minicuration.com/shop/" + slug + ".html" }
+        },
+        {
+          "@type": "VisualArtwork",
+          "name": title,
+          "image": "https://minicuration.com/image/" + slug + "-case1.webp",
+          "description": data.cardQuote ? '"' + data.cardQuote + '"' : "",
+          "artMedium": medium,
+          "artform": "Painting",
+          "artist": { "@type": "Person", "name": artist, "url": "https://jfeelgood.com" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://minicuration.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Shop", "item": "https://minicuration.com/shop.html" },
+            { "@type": "ListItem", "position": 3, "name": title }
+          ]
+        }
+      ]
+    }, null, 2);
+
+    const artistNoteBlock = data.expandedNote
+      ? "\n      <div class=\"expanded-note\">\n        <div class=\"section-label\">Artist Note</div>\n        <p>" + data.expandedNote + "</p>\n      </div>" : "";
+
+    const originalBlock = assembledSentence
+      ? "\n      <div class=\"original-painting content-section\" data-mc-original data-medium=\"" + data.medium + "\" data-dimensions=\"" + data.dimensions + "\" data-year-painted=\"" + data.yearPainted + "\" data-status=\"" + data.originalStatus + "\" data-for-sale=\"" + data.originalForSale + "\">\n        <div class=\"section-label\">The Original Painting</div>\n        <p>" + assembledSentence + "</p>\n      </div>" : "";
+
+    const processBlock = data.processNotes
+      ? "\n      <div class=\"process-notes content-section\">\n        <div class=\"section-label\">Process Notes</div>\n        <p>" + data.processNotes + "</p>\n      </div>" : "";
+
+    const whyBlock = data.whyItWorks
+      ? "\n      <div class=\"why-it-works content-section\">\n        <div class=\"section-label\">Why This Works at Card Scale</div>\n        <p>" + data.whyItWorks + "</p>\n      </div>" : "";
+
+    const faqItems = [[data.faq1Q, data.faq1A], [data.faq2Q, data.faq2A], [data.faq3Q, data.faq3A]]
+      .filter(([q]) => q && q.trim())
+      .map(([q, a]) => "      <div class=\"faq-item\">\n        <p class=\"faq-q\">" + q + "</p>\n        <p class=\"faq-a\">" + (a || "") + "</p>\n      </div>").join("\n");
+
+    const faqBlock = faqItems
+      ? "\n  <section class=\"faq-section\" style=\"max-width:1100px;margin:0 auto;padding:0 48px 60px;\">\n    <div class=\"section-label\" style=\"border-top:1px solid var(--border);padding-top:24px;margin-bottom:16px;\">FAQ</div>\n" + faqItems + "\n  </section>" : "";
+
+    const picks = [[data.pick1Title, data.pick1Slug], [data.pick2Title, data.pick2Slug], [data.pick3Title, data.pick3Slug]]
+      .filter(([t]) => t && t.trim());
+
+    const picksBlock = picks.length > 0
+      ? "\n  <section class=\"more\">\n    <p class=\"more-label\">The Collection</p>\n    <h2>More from Minicuration</h2>\n    <div class=\"more-grid\">\n" +
+        picks.map(([t, s]) => "      <a href=\"" + s + ".html\" class=\"more-card\">\n        <img src=\"../image/" + s + "-case1.webp\" alt=\"" + t + " by " + artist + " — limited edition mini art print\" loading=\"lazy\" decoding=\"async\"/>\n        <div class=\"more-card-body\"><h3>" + t + "</h3><p>by " + artist + " · $" + price + "</p></div>\n      </a>").join("\n") +
+        "\n    </div>\n  </section>" : "";
+
+    const css = "*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}" +
+      ":root{--bg:#0a0a0a;--surface:#111111;--crimson:#8b1a1a;--sky:#5fc4e0;--text:#f0ebe3;--muted:#888;--border:rgba(255,255,255,.08);}" +
+      "html{scroll-behavior:smooth;}" +
+      "body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;}" +
+      "nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:20px 48px;background:rgba(10,10,10,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}" +
+      ".nav-logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;letter-spacing:.22em;text-transform:lowercase;color:var(--text);text-decoration:none;}" +
+      ".nav-links{display:flex;gap:36px;list-style:none;}" +
+      ".nav-links a{color:#c8bfb4;text-decoration:none;font-size:15px;letter-spacing:.1em;text-transform:uppercase;transition:color .3s;}" +
+      ".nav-links a:hover,.nav-links a.active{color:var(--text);}" +
+      ".nav-cta{background:var(--crimson)!important;color:var(--text)!important;padding:8px 20px;border-radius:2px;}" +
+      ".nav-cta:hover{background:#a82020!important;}" +
+      ".breadcrumb{position:relative;display:block;background:transparent;border-bottom:none;padding:120px 48px 16px;font-size:12px;color:var(--muted);}" +
+      ".breadcrumb a{color:var(--muted);text-decoration:none;transition:color .3s;}" +
+      ".breadcrumb a:hover{color:var(--text);}" +
+      ".breadcrumb span{margin:0 6px;opacity:.4;}" +
+      ".product{max-width:1100px;margin:0 auto;padding:60px 48px 100px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}" +
+      ".product-images{position:sticky;top:120px;display:flex;flex-direction:column;gap:16px;}" +
+      ".product-image-wrap{border-radius:8px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);}" +
+      ".product-image-wrap img{width:100%;height:auto;display:block;border-radius:8px;}" +
+      ".product-info .tag{display:inline-block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;padding:4px 12px;border:1px solid var(--crimson);color:var(--crimson);border-radius:2px;margin-bottom:20px;}" +
+      ".product-info h1{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,4vw,52px);font-weight:300;line-height:1.1;margin-bottom:8px;}" +
+      ".product-meta{font-size:13px;color:var(--muted);margin-bottom:4px;}" +
+      ".product-meta a{color:var(--sky);text-decoration:none;}" +
+      ".product-medium{font-size:12px;color:var(--muted);opacity:.75;margin-bottom:24px;}" +
+      ".product-quote{font-style:italic;font-size:15px;color:var(--muted);line-height:1.8;margin-bottom:28px;border-left:2px solid var(--crimson);padding-left:16px;}" +
+      ".expanded-note{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:24px;}" +
+      ".expanded-note .section-label{border-top:none;padding-top:0;margin-top:0;}" +
+      ".expanded-note p{font-size:14px;color:var(--muted);line-height:1.75;}" +
+      ".product-price{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:400;margin-bottom:24px;}" +
+      ".btn-buy{display:block;width:100%;padding:14px;background:var(--crimson);color:var(--text);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:13px;letter-spacing:.15em;text-transform:uppercase;border-radius:2px;text-align:center;transition:background .3s;}" +
+      ".btn-buy:hover{background:#a82020;}" +
+      ".section-label{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--crimson);margin-bottom:10px;padding-top:24px;border-top:1px solid var(--border);margin-top:4px;}" +
+      ".content-section{margin-top:4px;}" +
+      ".content-section p{font-size:13px;color:var(--muted);line-height:1.7;}" +
+      ".edition-table{width:100%;border-collapse:collapse;margin-top:4px;}" +
+      ".edition-table td{font-size:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);}" +
+      ".edition-table td:first-child{color:var(--muted);}" +
+      ".edition-table td:last-child{color:var(--text);text-align:right;}" +
+      ".faq-item{margin-bottom:14px;}" +
+      ".faq-q{font-size:13px;color:var(--text);font-weight:500;margin-bottom:5px;}" +
+      ".faq-a{font-size:13px;color:var(--muted);line-height:1.6;}" +
+      ".more{padding:60px 48px 80px;border-top:1px solid var(--border);}" +
+      ".more-label{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--crimson);margin-bottom:12px;}" +
+      ".more h2{font-family:'Cormorant Garamond',serif;font-size:clamp(26px,3vw,36px);font-weight:300;margin-bottom:36px;}" +
+      ".more-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1100px;}" +
+      ".more-card{text-decoration:none;color:var(--text);border:1px solid var(--border);border-radius:6px;overflow:hidden;transition:border-color .3s,transform .3s;}" +
+      ".more-card:hover{border-color:rgba(139,26,26,.4);transform:translateY(-4px);}" +
+      ".more-card img{width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;display:block;}" +
+      ".more-card-body{padding:14px 16px;}" +
+      ".more-card-body h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;margin-bottom:4px;}" +
+      ".more-card-body p{font-size:12px;color:var(--muted);}" +
+      "footer{padding:40px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;border-top:1px solid var(--border);}" +
+      ".footer-logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;letter-spacing:.2em;text-transform:lowercase;color:var(--text);text-decoration:none;}" +
+      ".footer-links{display:flex;gap:24px;list-style:none;flex-wrap:wrap;}" +
+      ".footer-links a{color:var(--muted);text-decoration:none;font-size:12px;letter-spacing:.1em;text-transform:uppercase;transition:color .3s;}" +
+      ".footer-links a:hover{color:var(--text);}" +
+      ".footer-copy{font-size:11px;color:var(--muted);}" +
+      "@media(max-width:768px){nav{padding:16px 20px;}.nav-links{display:none;}.breadcrumb{padding:100px 20px 16px;}.product{grid-template-columns:1fr;gap:36px;padding:36px 20px 60px;}.product-images{position:static;}.more{padding:40px 20px 60px;}.more-grid{grid-template-columns:repeat(2,1fr);}footer{flex-direction:column;text-align:center;padding:28px 20px;}}" +
+      "@media(max-width:480px){.more-grid{grid-template-columns:1fr;}}";
 
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>${data.title} by ${data.artist} — Mini Art Print | Minicuration</title>
-  <meta name="description" content="${data.title} by ${data.artist}. ${data.medium}. Limited edition ACEO art print — 01 of 50. Sealed in a magnetic acrylic collector's case. $${data.price}.">
+  <title>${title} by ${artist} — Limited Edition Mini Art Print | Minicuration</title>
+  <meta name="description" content="${title} by ${artist}. ${medium}. Limited edition ACEO art print — 01 of 50. Sealed in a magnetic acrylic collector's case. $${price}.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://minicuration.com/shop/${slug}.html"/>
+  <meta property="og:type" content="product"/>
+  <meta property="og:title" content="${title} by ${artist} — Limited Edition Mini Art Print"/>
+  <meta property="og:description" content="${medium}. 01 of 50 numbered editions. Sealed in a magnetic acrylic case with stand. $${price}."/>
+  <meta property="og:image" content="https://minicuration.com/image/${slug}-case1.webp"/>
+  <meta property="og:url" content="https://minicuration.com/shop/${slug}.html"/>
+  <meta property="og:site_name" content="Minicuration"/>
+  <meta property="og:price:amount" content="${price}.00"/>
+  <meta property="og:price:currency" content="USD"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="${title} by ${artist} — Limited Edition Mini Art Print"/>
+  <meta name="twitter:description" content="${medium}. 01 of 50. Sealed in acrylic case. $${price}."/>
+  <meta name="twitter:image" content="https://minicuration.com/image/${slug}-case1.webp"/>
+  <link rel="preload" as="image" href="../image/${slug}-case1.webp"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <script type="application/ld+json">
-  ${JSON.stringify({
-    "@context": "https://schema.org/",
-    "@type": "Product",
-    name: data.title,
-    image: `https://minicuration.com/image/${slug}.jpg`,
-    description: `Limited edition trading-card-sized print of the original '${data.title}' painting by ${data.artist}. ${data.medium}. Edition of 50, magnetically sealed in a collector's acrylic case with display stand.`,
-    sku: data.catalogNumber,
-    brand: { "@type": "Brand", name: "Minicuration" },
-    creator: { "@type": "Person", name: data.artist, url: "https://jfeelgood.com" },
-    artMedium: data.medium,
-    artform: "Limited edition print (ACEO format)",
-    offers: {
-      "@type": "Offer",
-      url: `https://minicuration.com/shop/${slug}.html`,
-      priceCurrency: "USD",
-      price: data.price || "45.00",
-      availability: "https://schema.org/InStock",
-      itemCondition: "https://schema.org/NewCondition",
-    },
-  }, null, 2)}
+  ${jsonLd}
   <\/script>
+  <style>${css}<\/style>
 </head>
 <body>
-  <span class="tag">Limited Edition — 01 of 50</span>
-  <h1>${data.title}</h1>
-  <p>by ${data.artist}</p>
-  <p>${data.medium}</p>
-  ${data.cardQuote ? `<blockquote>"${data.cardQuote}"</blockquote>` : ""}
-  ${data.expandedNote ? `<div class="artist-note"><p>${data.expandedNote}</p></div>` : ""}
-  <div class="price">$${data.price}</div>
-  <a href="https://buy.stripe.com/REPLACE_WITH_STRIPE_LINK" class="btn-buy">Buy Now — $${data.price}</a>
-  ${assembledSentence ? `<p class="original-painting">${assembledSentence}</p>` : ""}
-  ${data.processNotes ? `<div class="process-notes"><p>${data.processNotes}</p></div>` : ""}
-  ${data.whyItWorks ? `<div class="why-it-works"><p>${data.whyItWorks}</p></div>` : ""}
-  ${data.faq1Q ? `<div class="faq"><h3>${data.faq1Q}</h3><p>${data.faq1A}</p></div>` : ""}
-  ${data.faq2Q ? `<div class="faq"><h3>${data.faq2Q}</h3><p>${data.faq2A}</p></div>` : ""}
-  ${data.faq3Q ? `<div class="faq"><h3>${data.faq3Q}</h3><p>${data.faq3A}</p></div>` : ""}
+  <nav>
+    <a href="../index.html" class="nav-logo">minicuration</a>
+    <ul class="nav-links">
+      <li><a href="../shop.html" class="active">Shop</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../shop.html" class="nav-cta">Shop Prints</a></li>
+    </ul>
+  </nav>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="../index.html">Home</a><span>›</span>
+    <a href="../shop.html">Shop</a><span>›</span>
+    ${title}
+  </nav>
+
+  <div class="product">
+    <div class="product-images">
+      <div class="product-image-wrap">
+        <img src="../image/${slug}-case1.webp" alt="${title} by ${artist} — in magnetic acrylic collector's case" fetchpriority="high" decoding="async"/>
+      </div>
+      <div class="product-image-wrap">
+        <img src="../image/${slug}-case2.webp" alt="${title} by ${artist} — collector's case, alternate view" loading="lazy" decoding="async"/>
+      </div>
+    </div>
+
+    <div class="product-info">
+      <span class="tag">Limited Edition — 01 of 50</span>
+      <h1>${title}</h1>
+      <p class="product-meta">by <a href="../artists/jfeelgood.html">${artist}</a></p>
+      <p class="product-medium">${medium}</p>
+      ${data.cardQuote ? `<blockquote class="product-quote">"${data.cardQuote}"</blockquote>` : ""}${artistNoteBlock}
+      <div class="product-price">$${price}</div>
+      <a href="https://buy.stripe.com/REPLACE_WITH_STRIPE_LINK" class="btn-buy">Buy Now — $${price}</a>${originalBlock}${processBlock}${whyBlock}
+
+      <div class="edition-details content-section">
+        <div class="section-label">Edition Details</div>
+        <table class="edition-table"><tbody>
+          <tr><td>Print method</td><td>S30 (FSC-certified) professional standard card stock with blue core (smooth finish)</td></tr>
+          <tr><td>Card dimensions</td><td>2.5&quot; &times; 3.5&quot; &mdash; ACEO standard</td></tr>
+          <tr><td>Case material</td><td>Acrylic with magnetic closure</td></tr>
+          <tr><td>Stand</td><td>Acrylic display stand included</td></tr>
+          <tr><td>Numbered</td><td>Yes &mdash; individually numbered on card back</td></tr>
+          <tr><td>Notes</td><td>Artist statement printed on the card back</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+  </div>${faqBlock}${picksBlock}
+
+  <footer>
+    <a href="../index.html" class="footer-logo">minicuration</a>
+    <ul class="footer-links">
+      <li><a href="../shop.html">Shop</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="https://jfeelgood.com" target="_blank" rel="noopener">jfeelgood.com</a></li>
+    </ul>
+    <span class="footer-copy">&copy; 2026 Minicuration. All rights reserved.</span>
+  </footer>
 </body>
 </html>`;
   };
