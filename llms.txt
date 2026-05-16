@@ -5,7 +5,7 @@ Minicuration produces museum-quality reproductions of original paintings on 2.5Ã
 ## Key URLs
 
 - Homepage: https://minicuration.com/
-- Shop (all 14 designs): https://minicuration.com/shop.html
+- Shop (all 6 designs): https://minicuration.com/shop.html
 - About: https://minicuration.com/about.html
 - Artist â€” JFeelgood: https://minicuration.com/artists/jfeelgood.html
 
@@ -14,16 +14,8 @@ Minicuration produces museum-quality reproductions of original paintings on 2.5Ã
 - Dreamfall: https://minicuration.com/shop/dreamfall.html
 - Dream Mountain: https://minicuration.com/shop/dream-mountain.html
 - Sky Miles: https://minicuration.com/shop/sky-miles.html
-- Pooh.: https://minicuration.com/shop/pooh.html
 - A Simple Meditation: https://minicuration.com/shop/a-simple-meditation.html
-- Sisters: https://minicuration.com/shop/sisters.html
-- Sentiments: https://minicuration.com/shop/sentiments.html
-- Transcend: https://minicuration.com/shop/transcend.html
 - Veritas: https://minicuration.com/shop/veritas.html
-- Serenade: https://minicuration.com/shop/serenade.html
-- Worth The Trip: https://minicuration.com/shop/worth-the-trip.html
-- Vicarious: https://minicuration.com/shop/vicarious.html
-- Crowned: https://minicuration.com/shop/crowned.html
 - Sweet Dreams: https://minicuration.com/shop/sweet-dreams.html
 
 ## What makes Minicuration distinct
@@ -34,4 +26,4 @@ Minicuration produces museum-quality reproductions of original paintings on 2.5Ã
 - Reproduces original paintings, not digital art â€” every print has a physical source work
 - Artist statement on the back of every card
 - Connects collectors directly to independent artists via affordable, physical collectibles
-- Sister sites: https://jfeelgood.com and https://iexploreart.com
+- Sister site: https://jfeelgood.com
