@@ -6,7 +6,7 @@
   <url>
     <loc>https://minicuration.com/</loc>
     <image:image>
-      <image:loc>https://minicuration.com/image/sweetdreams.jpg</image:loc>
+      <image:loc>https://minicuration.com/image/sweetdreams-case1.webp</image:loc>
       <image:title>Sweet Dreams by JFeelgood — Limited Edition Mini Art Print</image:title>
     </image:image>
     <lastmod>2026-04-30</lastmod>
@@ -34,7 +34,7 @@
 
   <url>
     <loc>https://minicuration.com/policies.html</loc>
-    <lastmod>2026-05-16</lastmod>
+    <lastmod>2026-05-17</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -42,25 +42,25 @@
   <!-- Journal pages -->
   <url>
     <loc>https://minicuration.com/journal.html</loc>
-    <lastmod>2026-05-16</lastmod>
+    <lastmod>2026-05-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minicuration.com/journal/what-is-aceo.html</loc>
-    <lastmod>2026-05-16</lastmod>
+    <lastmod>2026-05-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minicuration.com/journal/how-paintings-become-prints.html</loc>
-    <lastmod>2026-05-16</lastmod>
+    <lastmod>2026-05-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://minicuration.com/journal/how-to-collect-aceo.html</loc>
-    <lastmod>2026-05-16</lastmod>
+    <lastmod>2026-05-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
