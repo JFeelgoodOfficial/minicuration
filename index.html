@@ -198,6 +198,8 @@
       .journal-grid a{border-left:none!important;border-right:none!important;}
       .why-collect-grid{grid-template-columns:1fr!important;}
     }
+    .why-collect-grid > div { border:1px solid var(--border); border-radius:4px; padding:32px 28px; transition:border-color .3s; }
+    .why-collect-grid > div:hover { border-color:var(--crimson); }
   @media(prefers-reduced-motion:reduce){
   .sc-spin-3d,.hc-3d,.card-3d,.sc-spin-3d:hover{animation:none;transform:rotateY(0deg);}
 }
