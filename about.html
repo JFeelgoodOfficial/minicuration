@@ -23,25 +23,10 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"AboutPage","name":"About Minicuration","url":"https://minicuration.com/about.html","description":"Minicuration turns original paintings into trading card-sized limited edition prints. 50 numbered editions per design, sealed in a magnetic acrylic collector's case with display stand.","breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://minicuration.com/"},{"@type":"ListItem","position":2,"name":"About","item":"https://minicuration.com/about.html"}]}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What size are Minicuration prints?","acceptedAnswer":{"@type":"Answer","text":"Every Minicuration print is 2.5 × 3.5 inches — the standard ACEO (Art Cards, Editions and Originals) size, identical to a trading card. They arrive sealed inside a magnetic acrylic collector's case with a display stand included."}},{"@type":"Question","name":"How many prints are made of each design?","acceptedAnswer":{"@type":"Answer","text":"Each design is strictly limited to 50 numbered prints. Once all 50 editions sell, the design is never reprinted. The edition number is printed on the back of every card."}},{"@type":"Question","name":"Are these reproductions or original artworks?","acceptedAnswer":{"@type":"Answer","text":"Minicuration prints are museum-quality reproductions of original paintings by JFeelgood. The original paintings are unique artworks; the prints are limited-edition reproductions that bring the work to collectors at an accessible price point."}},{"@type":"Question","name":"What is printed on the back of each card?","acceptedAnswer":{"@type":"Answer","text":"The back of each card carries the artist's statement for that specific work — the concept, the medium, and the story behind the painting — along with the edition number and artist signature."}},{"@type":"Question","name":"How is the print packaged?","acceptedAnswer":{"@type":"Answer","text":"Each print is sealed inside a magnetic acrylic collector's case (the same format used for premium trading card storage) with a clear display stand so you can prop it on a desk or shelf immediately."}},{"@type":"Question","name":"Who is JFeelgood?","acceptedAnswer":{"@type":"Answer","text":"JFeelgood is an independent mixed-media painter based in the United States. His work spans acrylic, latex, epoxy resin, gold leaf, and found materials on canvas and wood panel. You can see more of his work at jfeelgood.com."}}]}]}
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/base.css"/>
+
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    :root{--bg:#0a0a0a;--surface:#111111;--crimson:#8b1a1a;--sky:#5fc4e0;--text:#f0ebe3;--muted:#888;--border:rgba(255,255,255,.08);}
-    html{scroll-behavior:smooth;}
-    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
-    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:20px 48px;background:rgba(10,10,10,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
-    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;letter-spacing:.22em;text-transform:lowercase;color:var(--text);text-decoration:none;}
-    .nav-links{display:flex;gap:36px;list-style:none;}
-    .nav-links a{color:var(--muted);text-decoration:none;font-size:13px;letter-spacing:.1em;text-transform:uppercase;transition:color .3s;}
-    .nav-links a:hover,.nav-links a.active{color:var(--text);}
-    .nav-cta{background:var(--crimson)!important;color:var(--text)!important;padding:8px 20px;border-radius:2px;}
-    .nav-cta:hover{background:#a82020!important;}
     .breadcrumb{position:static;background:transparent;backdrop-filter:none;border-bottom:none;padding:100px 48px 0;font-size:12px;color:var(--muted);}
-    .breadcrumb a{color:var(--muted);text-decoration:none;transition:color .3s;}
-    .breadcrumb a:hover{color:var(--text);}
-    .breadcrumb span{margin:0 6px;opacity:.4;}
     .page-header{padding:48px 48px 0;max-width:760px;}
     .eyebrow{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--crimson);margin-bottom:16px;}
     .page-header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(42px,5vw,68px);font-weight:300;line-height:1.08;margin-bottom:20px;}
@@ -67,13 +52,7 @@
     .cta-band p{color:var(--muted);font-size:15px;margin-bottom:32px;}
     .btn-cta{display:inline-block;background:var(--crimson);color:var(--text);text-decoration:none;padding:14px 36px;font-size:13px;letter-spacing:.15em;text-transform:uppercase;border-radius:2px;transition:background .3s;}
     .btn-cta:hover{background:#a82020;}
-    footer{padding:40px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;border-top:1px solid var(--border);}
-    .footer-logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;letter-spacing:.2em;text-transform:lowercase;color:var(--text);text-decoration:none;}
-    .footer-links{display:flex;gap:24px;list-style:none;flex-wrap:wrap;}
-    .footer-links a{color:var(--muted);text-decoration:none;font-size:12px;letter-spacing:.1em;text-transform:uppercase;transition:color .3s;}
-    .footer-links a:hover{color:var(--text);}
-    .footer-copy{font-size:11px;color:var(--muted);}
-    @media(max-width:768px){nav{padding:16px 20px;}.nav-links{display:none;}.breadcrumb{padding:90px 20px 0;}.page-header{padding:32px 20px 0;}.content,.faq{padding-left:20px;padding-right:20px;}.cta-band{padding:48px 20px;}footer{flex-direction:column;text-align:center;padding:28px 20px;}}
+    @media(max-width:768px){.breadcrumb{padding:90px 20px 0;}.page-header{padding:32px 20px 0;}.content,.faq{padding-left:20px;padding-right:20px;}.cta-band{padding:48px 20px;}}
   </style>
 </head>
 <body>
@@ -100,23 +79,23 @@
   <div class="content" style="padding-top:48px;">
     <div class="divider"></div>
 
-    <h2>How it started</h2>
+    <h2 id="how-it-started">How it started</h2>
     <p>The idea came from a frustration with the gap between original art and the people who love it. <strong>Original paintings are expensive.</strong> Museum prints are generic. Digital art lives on a screen and disappears when the app does. There was nothing in the middle — something physical, collectible, artist-credited, and priced for a real person to actually own.</p>
     <p>The answer turned out to be hiding in plain sight: the trading card. A 2.5 × 3.5-inch card is the most durable, portable, displayable format ever invented for a small object. Collectors have understood this for a hundred years. The ACEO format (Art Cards, Editions and Originals) already existed in the fine art world. All that was missing was the right artist and the right production standard.</p>
 
-    <h2>The format</h2>
+    <h2 id="the-format">The format</h2>
     <p>Every Minicuration print is a <strong>museum-quality reproduction</strong> of an original painting, printed at 2.5 × 3.5 inches on archival stock. Each card is numbered — the edition is printed on the back, and once 50 prints of a design are gone, that design is never reprinted.</p>
     <p>The back of every card carries the artist's statement: the medium, the surface, and the concept behind the work in the artist's own words. You're not just buying an image — you're buying a piece of the story behind it.</p>
     <p>Every print ships sealed inside a <strong>magnetic acrylic collector's case</strong> with a display stand. It's ready to prop on a desk, slot into a bookshelf, or store flat in a collection. The format is identical to premium trading card storage, which means it slots into any standard card sleeve or binder if you're building a collection.</p>
 
-    <h2>The artist</h2>
+    <h2 id="the-artist">The artist</h2>
     <p>Minicuration's inaugural collection features six works by <strong><a href="artists/jfeelgood.html" style="color:var(--sky);text-decoration:none;">JFeelgood</a></strong>, an independent mixed-media painter whose practice spans acrylic, latex, epoxy resin, gold leaf, crackle medium, and found objects on canvas and wood panel. His work is personal, textural, and built around the belief that a painting should carry the weight of the experience that made it.</p>
     <p>The six prints in this collection range from intimate meditations on craft and memory to large-feeling landscapes compressed to card scale. Each one was chosen because it does something that doesn't survive shrinking — and then it does.</p>
     <p>You can explore his full practice at <a href="https://jfeelgood.com" target="_blank" rel="noopener" style="color:var(--sky);text-decoration:none;">jfeelgood.com</a>.</p>
 
     <p>For a closer look at how his paintings survive reduction to card scale — what gets lost, what doesn't, and why these six works were chosen — read <a href="journal/how-paintings-become-prints.html" style="color:var(--sky);text-decoration:none;">How JFeelgood's Paintings Survive Being Shrunk to a Trading Card</a> in the Journal.</p>
 
-    <h2>Why 50?</h2>
+    <h2 id="why-50">Why 50?</h2>
     <p>Fifty is small enough to mean something and large enough to let the work reach people. An edition of 50 means a collector can reasonably expect to own one of the earlier numbered prints. It means the work retains scarcity without becoming inaccessible. And it means that when an edition sells out, it's genuinely gone — not restocked, not reprinted, not re-released in a slightly different format.</p>
     <p>Every Minicuration print is <strong>numbered sequentially</strong>, starting at 01. The number you receive is the number on your card. No two collectors own the same piece of the same edition.</p>
   </div>
