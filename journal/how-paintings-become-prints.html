@@ -23,26 +23,11 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Article","headline":"How JFeelgood's Paintings Survive Being Shrunk to a Trading Card","description":"Not every painting earns its reduction to 2.5×3.5 inches. A look at what makes JFeelgood's six Minicuration works survive — and in some cases improve — at card scale.","url":"https://minicuration.com/journal/how-paintings-become-prints.html","image":"https://minicuration.com/image/dreamfall-case1.webp","datePublished":"2026-05-16","dateModified":"2026-05-16","author":{"@type":"Organization","name":"Minicuration","url":"https://minicuration.com/"},"publisher":{"@type":"Organization","name":"Minicuration","url":"https://minicuration.com/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://minicuration.com/"},{"@type":"ListItem","position":2,"name":"Journal","item":"https://minicuration.com/journal.html"},{"@type":"ListItem","position":3,"name":"How Paintings Become Prints"}]},"mainEntityOfPage":{"@type":"WebPage","@id":"https://minicuration.com/journal/how-paintings-become-prints.html"},"about":[{"@type":"Person","name":"JFeelgood","url":"https://jfeelgood.com"},{"@type":"VisualArtwork","name":"Dreamfall","url":"https://minicuration.com/shop/dreamfall.html"},{"@type":"VisualArtwork","name":"Dream Mountain","url":"https://minicuration.com/shop/dream-mountain.html"},{"@type":"VisualArtwork","name":"Sky Miles","url":"https://minicuration.com/shop/sky-miles.html"},{"@type":"VisualArtwork","name":"A Simple Meditation","url":"https://minicuration.com/shop/a-simple-meditation.html"},{"@type":"VisualArtwork","name":"Veritas","url":"https://minicuration.com/shop/veritas.html"},{"@type":"VisualArtwork","name":"Sweet Dreams","url":"https://minicuration.com/shop/sweet-dreams.html"}]}
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/base.css"/>
+
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    :root{--bg:#0a0a0a;--surface:#111111;--crimson:#8b1a1a;--sky:#5fc4e0;--text:#f0ebe3;--muted:#888;--border:rgba(255,255,255,.08);}
-    html{scroll-behavior:smooth;}
-    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
-    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:20px 48px;background:rgba(10,10,10,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
-    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;letter-spacing:.22em;text-transform:lowercase;color:var(--text);text-decoration:none;}
-    .nav-links{display:flex;gap:36px;list-style:none;}
-    .nav-links a{color:#c8bfb4;text-decoration:none;font-size:15px;letter-spacing:.1em;text-transform:uppercase;transition:color .3s;}
-    .nav-links a:hover,.nav-links a.active{color:var(--text);}
-    .nav-cta{background:var(--crimson)!important;color:var(--text)!important;padding:8px 20px;border-radius:2px;}
-    .nav-cta:hover{background:#a82020!important;}
 
     .breadcrumb{position:static;background:transparent;backdrop-filter:none;border-bottom:none;padding:120px 48px 0;font-size:12px;color:var(--muted);}
-    .breadcrumb a{color:var(--muted);text-decoration:none;transition:color .3s;}
-    .breadcrumb a:hover{color:var(--text);}
-    .breadcrumb span{margin:0 6px;opacity:.4;}
 
     .article-header{max-width:780px;padding:48px 48px 0;}
     .eyebrow{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--crimson);margin-bottom:16px;}
@@ -88,21 +73,12 @@
     .related-card h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;line-height:1.25;margin-bottom:10px;}
     .related-card p{font-size:12px;color:var(--muted);line-height:1.65;}
 
-    footer{padding:40px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;border-top:1px solid var(--border);}
-    .footer-logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;letter-spacing:.2em;text-transform:lowercase;color:var(--text);text-decoration:none;}
-    .footer-links{display:flex;gap:24px;list-style:none;flex-wrap:wrap;}
-    .footer-links a{color:var(--muted);text-decoration:none;font-size:12px;letter-spacing:.1em;text-transform:uppercase;transition:color .3s;}
-    .footer-links a:hover{color:var(--text);}
-    .footer-copy{font-size:11px;color:var(--muted);}
-
     @media(max-width:768px){
-      nav{padding:16px 20px;}.nav-links{display:none;}
       .breadcrumb{padding:100px 20px 0;}
       .article-header,.article-body,.related{padding-left:20px;padding-right:20px;}
       .works-grid{grid-template-columns:1fr 1fr;}
       .related-grid{grid-template-columns:1fr;}
       .article-cta{padding:48px 20px;}
-      footer{flex-direction:column;text-align:center;padding:28px 20px;}
     }
     @media(max-width:480px){.works-grid{grid-template-columns:1fr;}}
   </style>
