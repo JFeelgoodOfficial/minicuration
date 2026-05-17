@@ -194,6 +194,9 @@
       .hero-cards{gap:14px;}
       .hc-scene{width:110px;height:154px;}
       .hc-wrap:nth-child(2) .hc-scene{width:140px;height:196px;}
+      .journal-grid{grid-template-columns:1fr!important;}
+      .journal-grid a{border-left:none!important;border-right:none!important;}
+      .why-collect-grid{grid-template-columns:1fr!important;}
     }
   @media(prefers-reduced-motion:reduce){
   .sc-spin-3d,.hc-3d,.card-3d,.sc-spin-3d:hover{animation:none;transform:rotateY(0deg);}
@@ -329,7 +332,7 @@
     <div style="max-width:1100px;margin:0 auto;">
       <p class="section-label">Why Collect</p>
       <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(30px,4vw,48px);font-weight:300;margin-bottom:48px;">Small format. Real scarcity. Original source.</h2>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px;max-width:960px;">
+      <div class="why-collect-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px;max-width:960px;">
         <div>
           <h3 style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;margin-bottom:12px;">Limited edition prints, not mass reproductions</h3>
           <p style="font-size:14px;color:var(--muted);line-height:1.75;">Every Minicuration print reproduces a hand-painted original — acrylic, latex, resin, or mixed media on canvas or wood panel. The source painting exists. The edition is capped at 50. When edition 50 sells, the design is closed permanently.</p>
@@ -351,7 +354,7 @@
     <div style="max-width:1100px;margin:0 auto;">
       <p class="section-label">From the Journal</p>
       <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,46px);font-weight:300;margin-bottom:40px;">On collecting, format, and the art behind the prints.</h2>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);border:1px solid var(--border);">
+      <div class="journal-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);border:1px solid var(--border);">
         <a href="journal/what-is-aceo.html" style="background:var(--bg);padding:32px 28px;text-decoration:none;color:var(--text);display:block;transition:background .3s;" onmouseover="this.style.background='#111'" onmouseout="this.style.background='var(--bg)'">
           <p style="font-size:9px;letter-spacing:.35em;text-transform:uppercase;color:var(--crimson);margin-bottom:14px;">Format &amp; History</p>
           <h3 style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;line-height:1.25;margin-bottom:12px;">What Is ACEO? The Trading Card Format Explained</h3>
