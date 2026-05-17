@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>Shop Limited Edition Mini Art Prints — 50 Editions Each | Minicuration</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
+  <title>Shop Limited Edition Mini Art Prints — 50 Editions Each | Minicuration</title>
   <meta name="description" content="Browse 6 limited edition ACEO-sized art prints by JFeelgood. Each design limited to 50 numbered prints, sealed in an acrylic collector's case. $45 each.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://minicuration.com/shop.html"/>
@@ -26,7 +26,7 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"ItemList","name":"Minicuration — Limited Edition Art Prints","url":"https://minicuration.com/shop.html","numberOfItems":6,"itemListElement":[{"@type":"ListItem","position":1,"url":"https://minicuration.com/shop/dreamfall.html","name":"Dreamfall"},{"@type":"ListItem","position":2,"url":"https://minicuration.com/shop/dream-mountain.html","name":"Dream Mountain"},{"@type":"ListItem","position":3,"url":"https://minicuration.com/shop/sky-miles.html","name":"Sky Miles"},{"@type":"ListItem","position":4,"url":"https://minicuration.com/shop/a-simple-meditation.html","name":"A Simple Meditation"},{"@type":"ListItem","position":5,"url":"https://minicuration.com/shop/veritas.html","name":"Veritas"},{"@type":"ListItem","position":6,"url":"https://minicuration.com/shop/sweet-dreams.html","name":"Sweet Dreams"}]}
   </script>
-  <link rel="preload" as="image" href="image/dreamfall.jpg"/>
+  <link rel="preload" as="image" href="image/spin/dreamfall_artwork.webp"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
@@ -184,8 +184,9 @@
     <a href="index.html" class="nav-logo">minicuration</a>
     <ul class="nav-links">
       <li><a href="shop.html" class="active">Shop</a></li>
-      <li><a href="index.html#about">About</a></li>
-      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="artists/jfeelgood.html">Artist</a></li>
+      <li><a href="shop.html" class="nav-cta">Shop Prints</a></li>
     </ul>
   </nav>
 
@@ -435,6 +436,18 @@
     }
     function toggleFlip(id) {
       document.getElementById('flip-' + id).classList.toggle('flipped');
+    }
+    // Pause animations on cards outside the viewport to reduce GPU load
+    if ('IntersectionObserver' in window) {
+      var spinObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          var el = entry.target;
+          el.style.animationPlayState = entry.isIntersecting ? 'running' : 'paused';
+        });
+      }, { rootMargin: '100px' });
+      document.querySelectorAll('.sc-spin-3d').forEach(function(el) {
+        spinObserver.observe(el);
+      });
     }
   </script>
 
