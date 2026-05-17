@@ -13,12 +13,12 @@ function resend()    { return _resend    ||= new Resend(process.env.RESEND_API_K
 // Replace each placeholder with the real price ID from:
 //   Stripe Dashboard → Products → [product] → Pricing → copy "Price ID"
 const PRICE_TO_SLUG = {
-  'price_REPLACE_dreamfall':           'dreamfall',
-  'price_REPLACE_dream_mountain':      'dream-mountain',
-  'price_REPLACE_sky_miles':           'sky-miles',
-  'price_REPLACE_a_simple_meditation': 'a-simple-meditation',
-  'price_REPLACE_veritas':             'veritas',
-  'price_REPLACE_sweet_dreams':        'sweet-dreams',
+  'prod_UGMvr9D4aqHpRy':           'dreamfall',
+  'prod_UK66C7es1wOqHs':      'dream-mountain',
+  'prod_UK67Utoy6IVonL':           'sky-miles',
+  'prod_UK68jsUrtee7YM': 'a-simple-meditation',
+  'prod_UK6AqiIFVECYQX':             'veritas',
+  'prod_UK6CqsjPG0LcEo':        'sweet-dreams',
 }
 
 const PRODUCT_NAMES = {
