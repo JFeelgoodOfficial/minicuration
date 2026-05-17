@@ -39,6 +39,32 @@
     <priority>0.4</priority>
   </url>
 
+  <!-- Journal pages -->
+  <url>
+    <loc>https://minicuration.com/journal.html</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/journal/what-is-aceo.html</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/journal/how-paintings-become-prints.html</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/journal/how-to-collect-aceo.html</loc>
+    <lastmod>2026-05-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <!-- Product pages -->
   <url>
     <loc>https://minicuration.com/shop/dreamfall.html</loc>

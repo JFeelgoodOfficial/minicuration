@@ -81,6 +81,28 @@ if (fs.existsSync(robotsPath)) {
   }
 }
 
+// ── 5. Every journal page has a <loc> in sitemap.xml ─────────────────────────
+const journalDir = path.join(ROOT, 'journal')
+if (fs.existsSync(journalDir)) {
+  const journalPages = fs
+    .readdirSync(journalDir)
+    .filter(f => f.endsWith('.html') && f !== 'index.html')
+    .sort()
+
+  if (journalPages.length > 0) {
+    console.log(`\nChecking ${journalPages.length} journal pages against sitemap.xml…`)
+    for (const file of journalPages) {
+      const expectedUrl = `https://minicuration.com/journal/${file}`
+      if (!sitemapContent.includes(expectedUrl)) {
+        missing.push(expectedUrl)
+      }
+    }
+    if (!missing.some(u => u.includes('/journal/'))) {
+      ok(`All ${journalPages.length} journal pages have <loc> entries in sitemap.xml`)
+    }
+  }
+}
+
 // ── Result ────────────────────────────────────────────────────────────────────
 console.log('')
 if (failed) {
