@@ -176,6 +176,8 @@
   @media(prefers-reduced-motion:reduce){
   .sc-spin-3d,.hc-3d,.card-3d,.sc-spin-3d:hover{animation:none;transform:rotateY(0deg);}
 }
+  .shop-card[data-status="loading"] .btn-buy{background:#2a2a2a;color:transparent;pointer-events:none;position:relative;}
+  .shop-card[data-status="loading"] .btn-buy::after{content:'Loading\2026';color:var(--muted);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;letter-spacing:.1em;}
   </style>
 </head>
 <body>
@@ -207,7 +209,7 @@
 
   <div class="shop-grid" id="shopGrid">
     
-    <div class="shop-card" data-status="available" onclick="openModal('dreamfall')">
+    <div class="shop-card" data-slug="dreamfall" data-status="available" onclick="openModal('dreamfall')">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -238,7 +240,7 @@
         <a href="https://buy.stripe.com/28E8wI3if9Xa8dgdTYaVa02" class="btn-buy">Buy Now &mdash; $45</a>
       </div>
     </div>
-    <div class="shop-card" data-status="available" onclick="openModal('dreammountain')">
+    <div class="shop-card" data-slug="dream-mountain" data-status="available" onclick="openModal('dreammountain')">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -269,7 +271,7 @@
         <a href="https://buy.stripe.com/5kQ7sEaKH3yM514dTYaVa03" class="btn-buy">Buy Now &mdash; $45</a>
       </div>
     </div>
-    <div class="shop-card" data-status="available" onclick="openModal('skymiles')">
+    <div class="shop-card" data-slug="sky-miles" data-status="available" onclick="openModal('skymiles')">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -300,7 +302,7 @@
         <a href="https://buy.stripe.com/3cIcMY9GD0mA79c6rwaVa04" class="btn-buy">Buy Now &mdash; $45</a>
       </div>
     </div>
-<div class="shop-card" data-status="available" onclick="openModal('asimplemeditation')">
+<div class="shop-card" data-slug="a-simple-meditation" data-status="available" onclick="openModal('asimplemeditation')">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -331,7 +333,7 @@
         <a href="https://buy.stripe.com/00wcMY4mj2uI2SWaHMaVa06" class="btn-buy">Buy Now &mdash; $45</a>
       </div>
     </div>
-<div class="shop-card" data-status="available" onclick="openModal('veritas')">
+<div class="shop-card" data-slug="veritas" data-status="available" onclick="openModal('veritas')">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap landscape">
           <div class="sc-spin-scene">
@@ -363,7 +365,7 @@
       </div>
     </div>
 
-<div class="shop-card" data-status="available" onclick="openModal('sweetdreams')">
+<div class="shop-card" data-slug="sweet-dreams" data-status="available" onclick="openModal('sweetdreams')">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -417,17 +419,39 @@
     function openModal(id) {
       location.href = 'shop/' + slugMap[id] + '.html';
     }
-    document.querySelectorAll('.shop-card[data-status="sold"]').forEach(function(card){
-      var flipper = card.querySelector('.card-flipper');
-      if(flipper && !flipper.querySelector('.sold-badge')){
-        var badge = document.createElement('span');
-        badge.className = 'sold-badge';
-        badge.textContent = 'Sold Out';
-        flipper.appendChild(badge);
+    async function applyLiveStock() {
+      let inventory
+      try {
+        const res = await fetch('/api/stock')
+        inventory = await res.json()
+      } catch {
+        console.warn('Stock API unreachable')
+        document.querySelectorAll('.shop-card[data-status="loading"]')
+          .forEach(function(c){ c.dataset.status = 'available' })
+        return
       }
-      var btn = card.querySelector('.btn-buy');
-      if(btn){ btn.classList.add('sold'); btn.style.pointerEvents='none'; btn.setAttribute('aria-disabled','true'); }
-    });
+      document.querySelectorAll('.shop-card[data-slug]').forEach(function(card) {
+        var slug = card.dataset.slug
+        if (!inventory[slug]) return
+        if (inventory[slug].soldOut) {
+          card.dataset.status = 'sold'
+          var btn = card.querySelector('.btn-buy')
+          if (btn) { btn.classList.add('sold'); btn.style.pointerEvents = 'none'; btn.setAttribute('aria-disabled', 'true'); btn.textContent = 'Sold Out' }
+          var dot = card.querySelector('.avail-dot')
+          if (dot) dot.style.display = 'none'
+          var flipper = card.querySelector('.card-flipper')
+          if (flipper && !flipper.querySelector('.sold-badge')) {
+            var badge = document.createElement('span')
+            badge.className = 'sold-badge'
+            badge.textContent = 'Sold Out'
+            flipper.appendChild(badge)
+          }
+        } else {
+          card.dataset.status = 'available'
+        }
+      })
+    }
+    applyLiveStock()
     function filterCards(status, btn) {
       document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
       btn.classList.add('active');
