@@ -10,8 +10,6 @@ function supabase()  { return _supabase  ||= createClient(process.env.SUPABASE_U
 function resend()    { return _resend    ||= new Resend(process.env.RESEND_API_KEY) }
 
 // ── Stripe price ID → product slug ───────────────────────────────────────────
-// Replace each placeholder with the real price ID from:
-//   Stripe Dashboard → Products → [product] → Pricing → copy "Price ID"
 const PRICE_TO_SLUG = {
   'price_1THqBC2mxhfkNl2YBY8WvOMV':           'dreamfall',
   'price_1TLRuH2mxhfkNl2Y79qbJAxg':      'dream-mountain',
