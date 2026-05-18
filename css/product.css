@@ -32,6 +32,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content
 .expanded-note .section-label{border-top:none;padding-top:0;margin-top:0;}
 .expanded-note p{font-size:14px;color:var(--muted);line-height:1.75;}
 .product-price{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:400;margin-bottom:24px;}
+.price-note{font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);font-weight:300;vertical-align:middle;}
 .btn-buy{display:block;width:100%;padding:14px;background:var(--crimson);color:var(--text);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:13px;letter-spacing:.15em;text-transform:uppercase;border-radius:2px;text-align:center;transition:background .3s;}
 .btn-buy:hover{background:#a82020;}
 .section-label{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--crimson);margin-bottom:10px;padding-top:24px;border-top:1px solid var(--border);margin-top:4px;}
