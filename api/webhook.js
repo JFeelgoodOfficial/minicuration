@@ -11,12 +11,12 @@ function resend()    { return _resend    ||= new Resend(process.env.RESEND_API_K
 
 // ── Stripe price ID → product slug ───────────────────────────────────────────
 const PRICE_TO_SLUG = {
-  'price_1THqBC2mxhfkNl2YBY8WvOMV':           'dreamfall',
-  'price_1TLRuH2mxhfkNl2Y79qbJAxg':      'dream-mountain',
-  'price_1TLRv52mxhfkNl2YApKWxTqX':           'sky-miles',
-  'price_1TLRwB2mxhfkNl2YSBrpZOaE': 'a-simple-meditation',
-  'price_1TLRy02mxhfkNl2Yb3iw3bCd':             'veritas',
-  'price_1TLS0S2mxhfkNl2YwCu7HMrZ':        'sweet-dreams',
+  'price_1TYe162mxhfkNl2YfTEeMam4':           'dreamfall',
+  'price_1TYe0Z2mxhfkNl2YQly65K69':      'dream-mountain',
+  'price_1TYdzt2mxhfkNl2Y5DazJzes':           'sky-miles',
+  'price_1TYdz82mxhfkNl2Y9ioFZci0': 'a-simple-meditation',
+  'price_1TYdyF2mxhfkNl2Y6YezO7rQ':             'veritas',
+  'price_1TYGcr2mxhfkNl2YAUNVRpw4':        'sweet-dreams',
 }
 
 const PRODUCT_NAMES = {
