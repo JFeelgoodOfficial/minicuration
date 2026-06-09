@@ -20,7 +20,7 @@ Map every acceptance criterion from the spec to a specific test. If a criterion 
 Run tests using web-quality-skills. Cover these categories for every build:
 
 ### Performance — Core Web Vitals
-Use web-quality-skills performance subagent. Thresholds are hard:
+Spawn the `web-quality-performance` subagent (or `web-quality-core-web-vitals` for targeted CWV work). Thresholds are hard:
 - LCP: Good < 2.5s, Needs Improvement 2.5–4s, Poor > 4s
 - CLS: Good < 0.1, Needs Improvement 0.1–0.25, Poor > 0.25
 - INP: Good < 200ms, Needs Improvement 200–500ms, Poor > 500ms
@@ -30,7 +30,7 @@ Note: INP, not FID. FID is deprecated.
 Test on mobile profile (Moto G4 equivalent or similar) in addition to desktop. A build that passes only on desktop is not a pass.
 
 ### Accessibility
-Run axe-based automated checks via web-quality-skills accessibility subagent.
+Spawn the `web-quality-accessibility` subagent for axe-based automated checks.
 Then manually verify:
 - Tab order is logical through all interactive elements
 - Focus states are visible
@@ -55,7 +55,7 @@ Test every user flow that the spec covers:
 - H1 present and singular
 - If new routes added: confirm they're crawlable
 
-Run `/seo page [url]` via SEO skill for any new or significantly modified public page.
+Run `/seo-page [url]` for any new or significantly modified public page.
 
 ### Build-Specific
 Check the "QA focus areas" in the builder's handoff note. These are where the builder flagged uncertainty — give them extra scrutiny.

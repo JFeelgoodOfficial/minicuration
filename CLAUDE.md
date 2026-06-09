@@ -12,6 +12,21 @@ This file governs how Claude Code operates in this repo. All subagents are defin
 | reviewer | `.claude/agents/reviewer.md` | Code review after QA passes |
 | conversion | `.claude/agents/conversion.md` | CRO audits and funnel analysis |
 | growth | `.claude/agents/growth.md` | Zero/low-spend acquisition strategy |
+| web-quality-performance | `.claude/agents/web-quality-performance.md` | Performance subagent used by qa |
+| web-quality-accessibility | `.claude/agents/web-quality-accessibility.md` | Accessibility subagent used by qa |
+| web-quality-core-web-vitals | `.claude/agents/web-quality-core-web-vitals.md` | CWV subagent used by qa |
+| web-quality-audit | `.claude/agents/web-quality-audit.md` | Full Lighthouse audit subagent |
+
+## Slash Commands (SEO Skills)
+
+| Command | File | Use |
+|---------|------|-----|
+| `/seo-audit` | `.claude/commands/seo-audit.md` | Full technical + on-page SEO audit |
+| `/seo-page` | `.claude/commands/seo-page.md` | Single-page SEO check |
+| `/seo-plan` | `.claude/commands/seo-plan.md` | AI/GEO visibility + keyword strategy |
+| `/seo-geo` | `.claude/commands/seo-geo.md` | Site architecture + crawl structure |
+| `/seo-programmatic` | `.claude/commands/seo-programmatic.md` | Programmatic SEO at scale |
+| `/seo-content` | `.claude/commands/seo-content.md` | Content strategy planning |
 
 ## Standard Workflow
 

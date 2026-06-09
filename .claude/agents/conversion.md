@@ -31,8 +31,8 @@ If stages are unclear from inspection, note that — a funnel you can't map is i
 Conversion starts before the page loads. Use the SEO skill to check the primary conversion pages:
 
 ```
-/seo page https://minicuration.com
-/seo content https://minicuration.com
+/seo-page https://minicuration.com
+/seo-content https://minicuration.com
 ```
 
 Intent mismatch is a pre-conversion failure: if the wrong audience is landing, on-page optimization has a ceiling. Note any intent or content quality issues from the SEO output as findings.

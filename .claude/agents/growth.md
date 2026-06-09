@@ -28,10 +28,10 @@ Either:
 Run these before generating ideas — the actual opportunity landscape should inform strategy, not the other way around:
 
 ```
-/seo audit https://minicuration.com
-/seo plan [curation product / relevant category]
-/seo geo https://minicuration.com
-/seo programmatic https://minicuration.com
+/seo-audit https://minicuration.com
+/seo-plan [curation product / relevant category]
+/seo-geo https://minicuration.com
+/seo-programmatic https://minicuration.com
 ```
 
 Key questions to answer from the SEO output:

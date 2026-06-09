@@ -18,17 +18,17 @@ Before writing a spec, use the SEO skill to ground the work in reality.
 
 For any feature touching a public-facing page:
 ```
-/seo page https://minicuration.com/[relevant-path]
+/seo-page https://minicuration.com/[relevant-path]
 ```
 
 For new sections or content types:
 ```
-/seo plan [business-type or topic]
+/seo-plan [business-type or topic]
 ```
 
 For anything with content discovery implications:
 ```
-/seo geo https://minicuration.com
+/seo-geo https://minicuration.com
 ```
 
 Document what you found. If the SEO skill surfaces a conflict with the proposed plan — a URL structure that hurts crawlability, a content type with no search demand, a technical issue that would undermine the feature — note it explicitly in the spec. Do not suppress findings that complicate the brief.
