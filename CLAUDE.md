@@ -21,31 +21,17 @@ Brief → planner → [human approval] → builder → qa → reviewer → [huma
 
 Conversion and growth agents run independently and feed back into the planner when findings are approved for implementation.
 
-## When to Spawn Which Agent
+## Agent Invocation
 
-Spawn **planner** when:
-- A new feature or page needs to be built
-- A bug has unclear scope
-- A growth or conversion finding needs to become a spec
+**Agents are only spawned when explicitly requested by the human.** Do not auto-invoke any agent based on context or inferred intent. Wait for the human to say which agent to run.
 
-Spawn **builder** when:
-- A planner spec exists and has been approved
-- The spec includes clear acceptance criteria QA can test
-
-Spawn **qa** when:
-- Builder outputs a handoff note indicating work is complete
-
-Spawn **reviewer** when:
-- QA has written a report with result PASS or CONDITIONAL PASS
-
-Spawn **conversion** when:
-- Auditing the funnel, a specific page, or CTA performance
-- Evaluating copy, trust signals, or signup flow
-
-Spawn **growth** when:
-- Exploring acquisition channels
-- Planning SEO-driven content or structural changes
-- Looking for zero-spend distribution opportunities
+When asked, the available agents are:
+- **planner** — turns a brief into a testable spec
+- **builder** — implements an approved spec
+- **qa** — tests a completed build
+- **reviewer** — code review after QA passes
+- **conversion** — CRO and funnel audit
+- **growth** — zero-spend acquisition strategy
 
 ## Parallelism
 

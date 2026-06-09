@@ -1,6 +1,6 @@
 ---
 name: builder
-description: Implements features for minicuration.com from approved planner specs. Uses the frontend-design skill for all UI work. Spawn after a spec has been human-approved. Writes a handoff note for QA when done. Never ships directly.
+description: Implements features for minicuration.com from approved planner specs. Uses the frontend-design skill for all UI work. Only use when explicitly requested.
 tools: Read, Write, Edit, Bash, Task
 ---
 

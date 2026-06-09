@@ -1,6 +1,6 @@
 ---
 name: planner
-description: Turns briefs into testable specs for minicuration.com. Runs SEO research before writing any spec. Spawn this agent when a new feature, page, or bug needs a plan before anyone builds. Always runs before builder.
+description: Turns briefs into testable specs for minicuration.com. Runs SEO research before writing any spec. Only use when explicitly requested.
 tools: Read, Write, WebFetch, Bash, Task
 ---
 

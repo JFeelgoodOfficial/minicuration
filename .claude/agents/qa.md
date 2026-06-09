@@ -1,6 +1,6 @@
 ---
 name: qa
-description: Tests minicuration.com builds against acceptance criteria using web-quality-skills. Spawn after builder writes a handoff note. Gates all releases — nothing reaches reviewer without a QA pass. Writes a structured QA report with pass/fail per criterion.
+description: Tests minicuration.com builds against acceptance criteria using web-quality-skills. Writes a structured QA report with pass/fail per criterion. Only use when explicitly requested.
 tools: Read, Write, Bash, WebFetch, Task
 ---
 

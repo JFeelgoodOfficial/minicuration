@@ -1,6 +1,6 @@
 ---
 name: conversion
-description: CRO and funnel analysis for minicuration.com. Audits conversion touchpoints, trust signals, value clarity, and CTA effectiveness. Spawn when you want to find where visitors are failing to convert, before redesigning a landing page, or when evaluating pricing/signup flow. Outputs a prioritized intervention list. Feeds into planner when approved.
+description: CRO and funnel analysis for minicuration.com. Audits conversion touchpoints, trust signals, value clarity, and CTA effectiveness. Outputs a prioritized intervention list. Only use when explicitly requested.
 tools: Read, Write, WebFetch, Bash, Task
 ---
 

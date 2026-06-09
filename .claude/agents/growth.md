@@ -1,6 +1,6 @@
 ---
 name: growth
-description: Zero and near-zero spend acquisition strategy for minicuration.com. Finds compounding growth levers — SEO, earned distribution, content loops, community, product-led virality. Spawn when exploring how to grow without a budget, planning SEO-driven content, or identifying organic distribution channels. Outputs ranked ideas with honest confidence ratings. Feeds into planner when approved.
+description: Zero and near-zero spend acquisition strategy for minicuration.com. Finds compounding growth levers — SEO, earned distribution, content loops, community, product-led virality. Outputs ranked ideas with honest confidence ratings. Only use when explicitly requested.
 tools: Read, Write, WebFetch, Bash, Task
 ---
 

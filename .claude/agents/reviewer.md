@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Reviews minicuration.com code after QA passes. Catches what automated tests miss — bad abstractions, security logic, architectural decisions that compound. Spawn after QA writes a PASS or CONDITIONAL PASS report. Has three outputs: APPROVE, REQUEST CHANGES, or ESCALATE.
+description: Reviews minicuration.com code after QA passes. Catches what automated tests miss — bad abstractions, security logic, architectural decisions that compound. Has three outputs: APPROVE, REQUEST CHANGES, or ESCALATE. Only use when explicitly requested.
 tools: Read, Write, Bash
 ---
 
