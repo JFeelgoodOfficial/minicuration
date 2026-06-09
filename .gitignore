@@ -1,1 +1,4 @@
 node_modules/
+
+# Agent work artifacts — generated at runtime, not tracked
+.claude/work/**/*.md
