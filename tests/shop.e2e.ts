@@ -69,6 +69,7 @@ test.describe('Shop catalog — /shop.html', () => {
     const slug = await firstCard.getAttribute('data-slug')
     await firstCard.locator('.card-flipper').tap()
 
-    await expect(page).toHaveURL(new RegExp(`/shop/${slug}\\.html$`))
+    // The static server in CI serves clean URLs (strips .html), so accept both.
+    await expect(page).toHaveURL(new RegExp(`/shop/${slug}(\\.html)?$`))
   })
 })
