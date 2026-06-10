@@ -1,11 +1,6 @@
 {
   "extends": ["html-validate:recommended"],
   "rules": {
-    "alt-text": "error",
-
-    "no-duplicate-id": "error",
-    "no-duplicate-attr": "error",
-
     "void-content": "error",
     "no-implicit-close": "error",
 
@@ -14,6 +9,8 @@
     "attr-case": ["error", { "style": "lowercase" }],
 
     "doctype-style": ["error", { "style": "uppercase" }],
+
+    "void-style": ["error", { "style": "selfclosing" }],
 
     "id-pattern": "off",
 
@@ -35,8 +32,6 @@
 
     "meta-refresh": "error",
 
-    "no-abstract-roles": "error",
-
     "heading-level": "warn"
   },
   "elements": [
@@ -50,8 +45,5 @@
         }
       }
     }
-  ],
-  "transform": {
-    "^.*\\.html$": "html-validate-html"
-  }
+  ]
 }
