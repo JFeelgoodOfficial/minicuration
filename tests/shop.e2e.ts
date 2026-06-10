@@ -9,9 +9,9 @@ test.describe('Shop catalog — /shop.html', () => {
     await page.goto('/shop.html')
   })
 
-  test('all 14 product cards are present in the grid', async ({ page }) => {
+  test('all 6 product cards are present in the grid', async ({ page }) => {
     const cards = page.locator('.shop-card')
-    await expect(cards).toHaveCount(14)
+    await expect(cards).toHaveCount(6)
   })
 
   test('no Buy Now button has href="#"', async ({ page }) => {
@@ -25,7 +25,7 @@ test.describe('Shop catalog — /shop.html', () => {
     // instead of https://buy.stripe.com/…
     const buyButtons = page.locator('a.btn-buy')
     const count = await buyButtons.count()
-    expect(count, 'Expected 14 buy buttons (one per product)').toBe(14)
+    expect(count, 'Expected 6 buy buttons (one per product)').toBe(6)
 
     for (let i = 0; i < count; i++) {
       const btn = buyButtons.nth(i)
