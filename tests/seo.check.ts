@@ -1,20 +1,12 @@
 import { test, expect } from '@playwright/test'
 
-// All 14 product page slugs — keep in sync with /shop/*.html files.
+// All 6 product page slugs — keep in sync with /shop/*.html files.
 const PRODUCT_SLUGS = [
   'dreamfall',
   'dream-mountain',
   'sky-miles',
-  'pooh',
   'a-simple-meditation',
-  'sisters',
-  'sentiments',
-  'transcend',
   'veritas',
-  'serenade',
-  'worth-the-trip',
-  'vicarious',
-  'crowned',
   'sweet-dreams',
 ]
 

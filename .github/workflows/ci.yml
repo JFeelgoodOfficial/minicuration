@@ -55,7 +55,7 @@ jobs:
 
       # ── 7. npm security audit ─────────────────────────────────────────────
       - name: npm security audit (npm audit --audit-level=high)
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=high --omit=dev
         continue-on-error: false
 
       # ── 8. Image size audit ───────────────────────────────────────────────

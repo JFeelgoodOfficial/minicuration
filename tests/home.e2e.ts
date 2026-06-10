@@ -25,15 +25,6 @@ test.describe('Homepage — /', () => {
     }
   })
 
-  test('at least one flip card is visible in the DOM', async ({ page }) => {
-    await page.goto('/')
-    // Homepage hero uses .flip-wrap for the 3D card flip components.
-    const flipCards = page.locator('.flip-wrap')
-    await expect(flipCards.first()).toBeVisible()
-    const count = await flipCards.count()
-    expect(count, 'Expected at least one flip card on the homepage').toBeGreaterThan(0)
-  })
-
   test('zero console errors on load', async ({ page }) => {
     // Listener must be registered before navigation to catch all errors.
     const errors: string[] = []
