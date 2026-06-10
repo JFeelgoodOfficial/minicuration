@@ -110,3 +110,21 @@ jobs:
           name: lighthouse-reports
           path: .lighthouseci/
           retention-days: 30
+
+      # ── 12. Deploy to Vercel (production, main pushes only) ──────────────
+      # Runs after ALL CI checks pass. This is the authoritative deployment
+      # trigger — Vercel's GitHub integration errors instantly (before CI
+      # can finish), so we deploy explicitly from CI instead.
+      # Required GitHub secret: VERCEL_TOKEN (create at vercel.com → Settings → Tokens)
+      - name: Deploy to Vercel (production)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "VERCEL_TOKEN secret not set — skipping. Add it at github.com → repo Settings → Secrets."
+            exit 0
+          fi
+          npx vercel deploy --prod --token="$VERCEL_TOKEN" --yes
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: team_Lbkrq0XowJ4UKneBKGtQFmTE
+          VERCEL_PROJECT_ID: prj_Yy0vEgmuTLeYLxfYD8Jr14QA3gx2
