@@ -421,15 +421,15 @@
   </footer>
 
   <script>
-    var slugMap = {
+    const slugMap = {
       dreamfall:'dreamfall', dreammountain:'dream-mountain', skymiles:'sky-miles',
       asimplemeditation:'a-simple-meditation', veritas:'veritas',
       sweetdreams:'sweet-dreams'
-    };
-    function openModal(id) {
-      location.href = 'shop/' + slugMap[id] + '.html';
     }
-    async function applyLiveStock() {
+window.openModal = function(id) {
+      location.href = 'shop/' + slugMap[id] + '.html'
+    }
+    ;(async function() {
       let inventory
       try {
         const res = await fetch('/api/stock')
@@ -441,17 +441,17 @@
         return
       }
       document.querySelectorAll('.shop-card[data-slug]').forEach(function(card) {
-        var slug = card.dataset.slug
+        const slug = card.dataset.slug
         if (!inventory[slug]) return
         if (inventory[slug].soldOut) {
           card.dataset.status = 'sold'
-          var btn = card.querySelector('.btn-buy')
+          const btn = card.querySelector('.btn-buy')
           if (btn) { btn.classList.add('sold'); btn.style.pointerEvents = 'none'; btn.setAttribute('aria-disabled', 'true'); btn.textContent = 'Sold Out' }
-          var dot = card.querySelector('.avail-dot')
+          const dot = card.querySelector('.avail-dot')
           if (dot) dot.style.display = 'none'
-          var flipper = card.querySelector('.card-flipper')
+          const flipper = card.querySelector('.card-flipper')
           if (flipper && !flipper.querySelector('.sold-badge')) {
-            var badge = document.createElement('span')
+            const badge = document.createElement('span')
             badge.className = 'sold-badge'
             badge.textContent = 'Sold Out'
             flipper.appendChild(badge)
@@ -459,9 +459,9 @@
         } else {
           card.dataset.status = 'available'
         }
-        var stockEl = card.querySelector('.card-stock-count')
+        const stockEl = card.querySelector('.card-stock-count')
         if (stockEl && inventory[slug]) {
-          var sold = 50 - inventory[slug].stock
+          const sold = 50 - inventory[slug].stock
           if (inventory[slug].soldOut) {
             stockEl.textContent = '50 of 50 sold'
             stockEl.classList.add('low-stock')
@@ -471,30 +471,29 @@
           }
         }
       })
-    }
-    applyLiveStock()
-    function filterCards(status, btn) {
-      document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
-      btn.classList.add('active');
+    })()
+    window.filterCards = function(status, btn) {
+      document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active')})
+      btn.classList.add('active')
       document.querySelectorAll('.shop-card').forEach(function(card) {
-        card.style.display = (status === 'all' || card.dataset.status === status) ? '' : 'none';
-      });
+        card.style.display = (status === 'all' || card.dataset.status === status) ? '' : 'none'
+      })
     }
-    function toggleFlip(id) {
-      document.getElementById('flip-' + id).classList.toggle('flipped');
+    window.toggleFlip = function(id) {
+      document.getElementById('flip-' + id).classList.toggle('flipped')
     }
     // Pause animations on cards outside the viewport to reduce GPU load
     if ('IntersectionObserver' in window) {
-      var spinObserver = new IntersectionObserver(function(entries) {
+      const spinObserver = new IntersectionObserver(function(entries) {
         entries.forEach(function(entry) {
-          var el = entry.target;
-          el.style.animationPlayState = entry.isIntersecting ? 'running' : 'paused';
-        });
-      }, { rootMargin: '100px' });
-      document.querySelectorAll('.sc-spin-3d').forEach(function(el) {
-        spinObserver.observe(el);
-      });
-    }
+          const el = entry.target
+      el.style.animationPlayState = entry.isIntersecting ? 'running' : 'paused'
+    })
+  }, { rootMargin: '100px' })
+  document.querySelectorAll('.sc-spin-3d').forEach(function(el) {
+        spinObserver.observe(el)
+  })
+}
   </script>
 
   

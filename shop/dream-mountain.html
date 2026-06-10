@@ -172,16 +172,16 @@ This piece is purely an homage to the surrender to the wonder of imagination.
   </footer>
   <script>
   (function(){
-    var slug='dream-mountain';
-    fetch('/api/stock').then(function(r){return r.json();}).then(function(inv){
-      if(!inv[slug])return;
-      var el=document.getElementById('product-stock-count');
-      if(!el)return;
-      var s=inv[slug].stock,sold=50-s;
-      if(inv[slug].soldOut){el.textContent='Sold out';el.style.color='var(--crimson)';}
-      else if(sold>0){el.textContent=sold+' of 50 sold';if(s<=10)el.style.color='var(--crimson)';}
-    }).catch(function(){});
-  })();
+    const slug='dream-mountain'
+  fetch('/api/stock').then(function(r){return r.json()}).then(function(inv){
+      if(!inv[slug])return
+    const el=document.getElementById('product-stock-count')
+    if(!el)return
+    const s=inv[slug].stock,sold=50-s
+    if(inv[slug].soldOut){el.textContent='Sold out';el.style.color='var(--crimson)'}
+      else if(sold>0){el.textContent=sold+' of 50 sold';if(s<=10)el.style.color='var(--crimson)'}
+    }).catch(function(){})
+})()
   </script>
   <script src="/js/nav.js"></script>
 </body>
