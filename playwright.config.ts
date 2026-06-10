@@ -6,6 +6,7 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:3000'
 
 export default defineConfig({
   testDir: './tests',
+  testMatch: ['**/*.e2e.ts', '**/*.check.ts'],
   fullyParallel: true,
   // Forbid test.only() in CI so no tests are accidentally skipped.
   forbidOnly: !!process.env.CI,
