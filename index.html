@@ -90,10 +90,11 @@
     .spotlight-img img { width:100%; max-width:380px; border-radius:4px;
       transition:box-shadow .4s; }
     .spotlight-img img:hover { box-shadow:0 0 40px var(--crimson-glow); }
+
     /* ── SPINNING CARD ── */
     .spin-wrap{position:relative;display:inline-block;}
-    .card-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(201,169,110,.12) 0%,transparent 70%);pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse 8s ease-in-out infinite;z-index:0;}
-    .shadow-wrap{border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.8);position:relative;z-index:1;}
+    .card-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgb(201 169 110 / 12%) 0%,transparent 70%);pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse 8s ease-in-out infinite;z-index:0;}
+    .shadow-wrap{border-radius:14px;box-shadow:0 30px 80px rgb(0 0 0 / 80%);position:relative;z-index:1;}
     .scene{perspective:1200px;width:240px;height:336px;}
     .card-3d{will-change:transform;width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:none;transform:rotateY(0deg);}
     @keyframes spin{0%{transform:rotateY(0deg);}100%{transform:rotateY(360deg);}}
@@ -102,7 +103,7 @@
     .face.front{transform:rotateY(0deg);background:#fff;}
     .face.back{transform:rotateY(180deg);background:#1e1e1e;}
     .face img{width:100%;height:100%;object-fit:cover;display:block;border-radius:14px;}
-    @keyframes pulse{0%,100%{opacity:.6;transform:translate(-50%,-50%) scale(1);}50%{opacity:1;transform:translate(-50%,-50%) scale(1.15);}}
+    @keyframes pulse{0%,100%{opacity:60%;transform:translate(-50%,-50%) scale(1);}50%{opacity:100%;transform:translate(-50%,-50%) scale(1.15);}}
     .spotlight-text h2 { font-family:'Cormorant Garamond',serif;
       font-size:clamp(32px,4vw,48px); font-weight:300; line-height:1.15; margin-bottom:14px; }
     .spotlight-text .concept { font-style:italic; color:var(--muted);

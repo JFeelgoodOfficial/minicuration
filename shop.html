@@ -33,16 +33,16 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     :root{
-      --bg:#0a0a0a;--surface:#111111;--crimson:#8b1a1a;
-      --crimson-glow:rgba(139,26,26,.4);--sky:#5fc4e0;
-      --text:#f0ebe3;--muted:#888;--border:rgba(255,255,255,.08);
+      --bg:#0a0a0a;--surface:#111;--crimson:#8b1a1a;
+      --crimson-glow:rgb(139 26 26 / 40%);--sky:#5fc4e0;
+      --text:#f0ebe3;--muted:#888;--border:rgb(255 255 255 / 8%);
     }
     html{scroll-behavior:smooth;}
     body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
 
     /* NAV */
     nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;
-      align-items:center;padding:20px 48px;background:rgba(10,10,10,.92);
+      align-items:center;padding:20px 48px;background:rgb(10 10 10 / 92%);
       backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
     .nav-logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;
       letter-spacing:.22em;text-transform:lowercase;color:var(--text);text-decoration:none;}
@@ -62,11 +62,11 @@
 
     /* STRIPE NOTICE */
     .stripe-notice-wrap{max-width:1200px;margin:32px auto 0;padding:0 48px;}
-    .stripe-notice{background:rgba(95,196,224,.05);border:1px solid rgba(95,196,224,.18);
+    .stripe-notice{background:rgb(95 196 224 / 5%);border:1px solid rgb(95 196 224 / 18%);
       border-radius:4px;padding:16px 20px;display:flex;gap:14px;align-items:flex-start;}
     .stripe-notice p{font-size:13px;color:var(--muted);line-height:1.6;}
     .stripe-notice strong{color:var(--sky);}
-    .stripe-notice code{background:rgba(255,255,255,.07);padding:2px 6px;border-radius:3px;
+    .stripe-notice code{background:rgb(255 255 255 / 7%);padding:2px 6px;border-radius:3px;
       font-size:11px;font-family:monospace;color:var(--text);}
 
     /* FILTER */
@@ -75,7 +75,7 @@
       color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:.1em;
       text-transform:uppercase;border-radius:2px;cursor:pointer;transition:all .3s;}
     .filter-btn:hover,.filter-btn.active{border-color:var(--crimson);color:var(--text);
-      background:rgba(139,26,26,.1);}
+      background:rgb(139 26 26 / 10%);}
 
     /* GRID */
     .shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
@@ -86,8 +86,8 @@
       overflow:hidden;cursor:pointer;
       transition:transform .3s,box-shadow .3s,border-color .3s;}
     .shop-card:hover{transform:translateY(-6px);
-      box-shadow:0 20px 50px rgba(0,0,0,.5),0 0 30px var(--crimson-glow);
-      border-color:rgba(139,26,26,.4);}
+      box-shadow:0 20px 50px rgb(0 0 0 / 50%),0 0 30px var(--crimson-glow);
+      border-color:rgb(139 26 26 / 40%);}
 
     /* FLIP */
     .card-flipper{position:relative;perspective:800px;}
@@ -97,29 +97,30 @@
     .cf-front,.cf-back{backface-visibility:hidden;position:relative;}
     .cf-back{position:absolute;top:0;left:0;width:100%;transform:rotateY(180deg);}
     .cf-front img,.cf-back img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
-    .cf-overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;
-      align-items:center;justify-content:center;opacity:0;transition:opacity .3s;}
-    .shop-card:hover .cf-overlay{opacity:1;}
+    .cf-overlay{position:absolute;inset:0;background:rgb(0 0 0 / 60%);display:flex;
+      align-items:center;justify-content:center;opacity:0%;transition:opacity .3s;}
+    .shop-card:hover .cf-overlay{opacity:100%;}
     .cf-overlay span{font-size:12px;letter-spacing:.2em;text-transform:uppercase;
       border:1px solid var(--text);padding:9px 22px;border-radius:2px;}
     .avail-dot{position:absolute;top:12px;left:12px;width:8px;height:8px;border-radius:50%;
-      background:#3ecf5a;box-shadow:0 0 8px rgba(62,207,90,.6);z-index:2;}
+      background:#3ecf5a;box-shadow:0 0 8px rgb(62 207 90 / 60%);z-index:2;}
     .shop-card[data-status="sold"] .cf-front img,
-    .shop-card[data-status="sold"] .cf-back img{opacity:.45;filter:grayscale(.4);}
-    .shop-card[data-status="sold"] .avail-dot{background:#555;box-shadow:none;}
+    .shop-card[data-status="sold"] .cf-back img{opacity:45%;filter:grayscale(.4);}
+    .shop-card[data-status="sold"] .avail-dot{background:#555;box-shadow:none;display:none;}
     .sold-badge{display:none;position:absolute;top:12px;left:12px;font-size:9px;letter-spacing:.18em;
       text-transform:uppercase;background:#1a1a1a;color:var(--muted);border:1px solid #333;
       padding:3px 9px;border-radius:2px;z-index:3;}
     .shop-card[data-status="sold"] .sold-badge{display:block;}
-    .shop-card[data-status="sold"] .avail-dot{display:none;}
+    
     .sold-ribbon{position:absolute;top:18px;right:-28px;background:#333;color:var(--muted);
       font-size:10px;letter-spacing:.2em;text-transform:uppercase;padding:4px 40px;
       transform:rotate(45deg);z-index:2;}
     .flip-toggle{position:absolute;bottom:10px;right:10px;z-index:5;
-      background:rgba(0,0,0,.65);color:var(--muted);border:1px solid var(--border);
+      background:rgb(0 0 0 / 65%);color:var(--muted);border:1px solid var(--border);
       padding:5px 10px;font-size:11px;border-radius:3px;cursor:pointer;
       transition:color .3s,border-color .3s;backdrop-filter:blur(4px);}
     .flip-toggle:hover{color:var(--text);border-color:var(--crimson);}
+
     /* Spinning card (shop grid — portrait 5:7 and landscape 7:5) */
     .sc-spin-wrap{position:relative;width:100%;aspect-ratio:5/7;}
     .sc-spin-wrap.landscape{aspect-ratio:7/5;}
@@ -138,7 +139,7 @@
     .card-edition{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--crimson);}
     .card-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;margin-bottom:4px;}
     .card-artist{font-size:12px;color:var(--muted);margin-bottom:3px;}
-    .card-medium{font-size:11px;color:var(--muted);opacity:.7;margin-bottom:10px;}
+    .card-medium{font-size:11px;color:var(--muted);opacity:70%;margin-bottom:10px;}
     .card-concept{font-size:12px;color:var(--muted);font-style:italic;line-height:1.6;
       margin-bottom:10px;border-left:2px solid var(--crimson);padding-left:10px;}
     .card-price-row{display:flex;justify-content:space-between;align-items:center;
