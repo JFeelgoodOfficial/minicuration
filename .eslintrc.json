@@ -60,6 +60,7 @@
   "ignorePatterns": [
     "node_modules/**",
     ".lighthouseci/**",
-    "scripts/optimize-images.js"
+    "scripts/optimize-images.js",
+    "builder.html"
   ]
 }
