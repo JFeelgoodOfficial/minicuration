@@ -144,6 +144,8 @@
     .card-price-row{display:flex;justify-content:space-between;align-items:center;
       padding:12px 0;border-top:1px solid var(--border);}
     .card-price{font-family:'Cormorant Garamond',serif;font-size:26px;}
+    .card-stock-count{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:4px;min-height:14px;}
+    .card-stock-count.low-stock{color:var(--crimson);}
     .sold-price{color:var(--muted);}
     .stripe-wrap{padding:0 18px 18px;}
     .btn-buy{display:block;width:100%;padding:12px;background:var(--crimson);color:var(--text);
@@ -184,6 +186,7 @@
 
   <nav>
     <a href="index.html" class="nav-logo">minicuration</a>
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
     <ul class="nav-links">
       <li><a href="shop.html">Shop</a></li>
       <li><a href="about.html">About</a></li>
@@ -195,7 +198,7 @@
   <div class="page-header">
     <p class="eyebrow">The Collection</p>
     <h1>50 prints. Pocket-sized.</h1>
-    <p>Limited edition reproductions of original paintings, magnetically sealed in an acrylic case. Hover over any card to pause the spin and see the artwork up close.</p>
+    <p>Limited edition reproductions of original paintings, magnetically sealed in an acrylic case. Hover over any card to pause the spin and see the artwork up close. &mdash; $23 each &middot; $5 US shipping</p>
     <div class="divider"></div>
   </div>
 
@@ -235,6 +238,7 @@
         <div class="card-price-row">
           <span class="card-price">$23</span>
         </div>
+        <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
         <a href="https://buy.stripe.com/28E8wI3if9Xa8dgdTYaVa02" class="btn-buy">Buy Now &mdash; $23</a>
@@ -266,6 +270,7 @@
         <div class="card-price-row">
           <span class="card-price">$23</span>
         </div>
+        <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
         <a href="https://buy.stripe.com/5kQ7sEaKH3yM514dTYaVa03" class="btn-buy">Buy Now &mdash; $23</a>
@@ -297,6 +302,7 @@
         <div class="card-price-row">
           <span class="card-price">$23</span>
         </div>
+        <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
         <a href="https://buy.stripe.com/3cIcMY9GD0mA79c6rwaVa04" class="btn-buy">Buy Now &mdash; $23</a>
@@ -328,6 +334,7 @@
         <div class="card-price-row">
           <span class="card-price">$23</span>
         </div>
+        <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
         <a href="https://buy.stripe.com/00wcMY4mj2uI2SWaHMaVa06" class="btn-buy">Buy Now &mdash; $23</a>
@@ -359,6 +366,7 @@
         <div class="card-price-row">
           <span class="card-price">$23</span>
         </div>
+        <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
         <a href="https://buy.stripe.com/bJecMY9GD3yMdxA6rwaVa09" class="btn-buy">Buy Now &mdash; $23</a>
@@ -391,6 +399,7 @@
         <div class="card-price-row">
           <span class="card-price">$23</span>
         </div>
+        <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
         <a href="https://buy.stripe.com/dRm3co6ur9XabpsdTYaVa0e" class="btn-buy">Buy Now &mdash; $23</a>
@@ -449,6 +458,17 @@
         } else {
           card.dataset.status = 'available'
         }
+        var stockEl = card.querySelector('.card-stock-count')
+        if (stockEl && inventory[slug]) {
+          var sold = 50 - inventory[slug].stock
+          if (inventory[slug].soldOut) {
+            stockEl.textContent = '50 of 50 sold'
+            stockEl.classList.add('low-stock')
+          } else if (sold > 0) {
+            stockEl.textContent = sold + ' of 50 sold'
+            if (inventory[slug].stock <= 10) stockEl.classList.add('low-stock')
+          }
+        }
       })
     }
     applyLiveStock()
@@ -478,5 +498,6 @@
 
   
 
+  <script src="/js/nav.js"></script>
 </body>
 </html>

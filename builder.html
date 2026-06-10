@@ -521,6 +521,7 @@ function MiniCurationBuilder() {
 <body>
   <nav>
     <a href="../index.html" class="nav-logo">minicuration</a>
+    <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
     <ul class="nav-links">
       <li><a href="../shop.html" class="active">Shop</a></li>
       <li><a href="../index.html#about">About</a></li>
@@ -576,6 +577,7 @@ function MiniCurationBuilder() {
     </ul>
     <span class="footer-copy">&copy; 2026 Minicuration. All rights reserved.</span>
   </footer>
+  <script src="/js/nav.js"></script>
 </body>
 </html>`;
   };
@@ -751,5 +753,6 @@ function MiniCurationBuilder() {
 
 ReactDOM.createRoot(document.getElementById("root")).render(<MiniCurationBuilder />);
   </script>
+  <script src="/js/nav.js"></script>
 </body>
 </html>
