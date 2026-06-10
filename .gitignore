@@ -1,4 +1,8 @@
 node_modules/
 
+# Playwright test output
+playwright-report/
+test-results/
+
 # Agent work artifacts — generated at runtime, not tracked
 .claude/work/**/*.md
