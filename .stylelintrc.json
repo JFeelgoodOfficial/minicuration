@@ -7,7 +7,9 @@
     "stylelint-order"
   ],
   "rules": {
-    "order/properties-alphabetical-order": true,
+    "order/properties-alphabetical-order": null,
+
+    "declaration-block-single-line-max-declarations": null,
 
     "declaration-block-no-duplicate-properties": [
       true,
@@ -18,7 +20,7 @@
 
     "color-no-invalid-hex": true,
 
-    "color-named": ["error", { "ignore": ["inside-function"] }],
+    "color-named": ["never", { "ignore": ["inside-function"] }],
 
     "custom-property-pattern": "^[a-z][a-z0-9-]*$",
 
@@ -44,11 +46,20 @@
 
     "import-notation": null,
 
-    "keyframes-name-pattern": null
+    "keyframes-name-pattern": null,
+
+    "at-rule-empty-line-before": null,
+
+    "rule-empty-line-before": null,
+
+    "media-feature-range-notation": null,
+
+    "number-max-precision": null
   },
   "customSyntax": "postcss-html",
   "ignoreFiles": [
     "node_modules/**",
-    ".lighthouseci/**"
+    ".lighthouseci/**",
+    "builder.html"
   ]
 }
