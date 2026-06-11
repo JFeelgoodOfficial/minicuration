@@ -1,7 +1,8 @@
 # TEMPORARY diagnostic workflow — delete after the Vercel deploy failure is
-# resolved. Tests two hypotheses with full CLI output captured:
-#   FRESH: deploy full repo (including .claude) to the new minicuration-live
-#          project — READY means the old project is wedged.
+# resolved. Tests two hypotheses, selecting projects via the
+# VERCEL_PROJECT_ID env var the CLI expects:
+#   FRESH: deploy full repo (including .claude) to minicuration-live —
+#          READY means the old project is wedged.
 #   STRIPPED: deploy to the OLD project with .claude/ and .github/ removed —
 #          READY means content from PR #21 (June 9) is what Vercel rejects.
 # Preview-only on both; production untouched.
@@ -17,8 +18,6 @@ jobs:
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: team_Lbkrq0XowJ4UKneBKGtQFmTE
-      OLD_PROJECT_NAME: minicuration
-      NEW_PROJECT_NAME: minicuration-live
     steps:
       - uses: actions/checkout@v4
 
@@ -27,10 +26,11 @@ jobs:
           node-version: 20
 
       - name: "FRESH: full repo to minicuration-live"
+        env:
+          VERCEL_PROJECT_ID: prj_TZROZTu1jmkfHk1dDGX2Njsghjut
         run: |
           set +e
           if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN not set"; exit 0; fi
-          npx vercel link --yes --project "$NEW_PROJECT_NAME" --scope "$VERCEL_ORG_ID" --token="$VERCEL_TOKEN" 2>&1 | tail -3
           npx vercel pull --yes --environment=preview --token="$VERCEL_TOKEN" 2>&1 | tail -3
           npx vercel build --token="$VERCEL_TOKEN" 2>&1 | tail -2
           npx vercel deploy --prebuilt --token="$VERCEL_TOKEN" --yes >/tmp/fresh.txt 2>&1
@@ -45,11 +45,12 @@ jobs:
           exit 0
 
       - name: "STRIPPED: no .claude/.github to OLD project"
+        env:
+          VERCEL_PROJECT_ID: prj_Yy0vEgmuTLeYLxfYD8Jr14QA3gx2
         run: |
           set +e
           if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN not set"; exit 0; fi
           rm -rf .claude .github .vercel
-          npx vercel link --yes --project "$OLD_PROJECT_NAME" --scope "$VERCEL_ORG_ID" --token="$VERCEL_TOKEN" 2>&1 | tail -3
           npx vercel deploy --token="$VERCEL_TOKEN" --yes >/tmp/stripped.txt 2>&1
           echo "--- deploy output tail ---"; tail -8 /tmp/stripped.txt
           url=$(grep -oE 'https://[a-z0-9.-]+\.vercel\.app' /tmp/stripped.txt | tail -1)
