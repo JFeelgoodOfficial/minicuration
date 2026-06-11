@@ -1,10 +1,13 @@
 # TEMPORARY diagnostic workflow — delete after the Vercel deploy failure is
-# resolved. Established so far: vercel build succeeds locally, but even
-# `deploy --prebuilt` errors with "Resource provisioning failed" — so the
-# failing resource is the function runtime, not the build machine. The
-# project has fluid:true. This run: (A) disable Fluid Compute and redeploy;
-# (B) if still failing, deploy static-only (no api/) to isolate functions.
-# Preview-only; production untouched.
+# resolved. Established: even a static-only prebuilt deploy to the existing
+# project fails with "Resource provisioning failed" — the project itself is
+# wedged on Vercel's side. This run tests two hypotheses:
+#   FRESH: create a new project in the same team, copy env vars (values
+#          never printed), deploy the full repo there.
+#   STRIPPED: deploy to the OLD project with .claude/ and .github/ removed,
+#          testing whether content added in PR #21 (June 9, same day deploys
+#          began failing) is what Vercel chokes on.
+# Preview-only on both; production untouched.
 name: Vercel Debug Deploy
 
 on:
@@ -17,7 +20,8 @@ jobs:
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: team_Lbkrq0XowJ4UKneBKGtQFmTE
-      VERCEL_PROJECT_ID: prj_Yy0vEgmuTLeYLxfYD8Jr14QA3gx2
+      OLD_PROJECT_ID: prj_Yy0vEgmuTLeYLxfYD8Jr14QA3gx2
+      NEW_PROJECT_NAME: minicuration-live
     steps:
       - uses: actions/checkout@v4
 
@@ -25,46 +29,91 @@ jobs:
         with:
           node-version: 20
 
-      - name: "A: disable Fluid Compute, prebuilt deploy with functions"
+      - name: Create fresh project and copy env vars
         run: |
           set +e
           if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN not set"; exit 0; fi
+          cat > /tmp/fresh.py <<'EOF'
+          import json, os, urllib.request
 
-          echo "=== PATCH fluid:false ==="
-          curl -s -X PATCH -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" \
-            -d '{"resourceConfig":{"fluid":false}}' \
-            "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID?teamId=$VERCEL_ORG_ID" \
-            | python3 -c "import json,sys; j=json.load(sys.stdin); print('resourceConfig now:', json.dumps(j.get('resourceConfig', j)))"
+          token = os.environ['VERCEL_TOKEN']
+          team = os.environ['VERCEL_ORG_ID']
+          old = os.environ['OLD_PROJECT_ID']
+          new_name = os.environ['NEW_PROJECT_NAME']
 
+          def api(path, method='GET', body=None):
+              req = urllib.request.Request(
+                  f'https://api.vercel.com{path}', method=method,
+                  headers={'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'},
+                  data=json.dumps(body).encode() if body else None)
+              try:
+                  with urllib.request.urlopen(req) as r:
+                      return r.status, json.load(r)
+              except urllib.error.HTTPError as e:
+                  return e.code, json.loads(e.read() or b'{}')
+
+          # Create the new project if it doesn't exist
+          status, proj = api(f'/v9/projects/{new_name}?teamId={team}')
+          if status == 404:
+              status, proj = api(f'/v11/projects?teamId={team}', 'POST', {'name': new_name})
+              print('created project:', status, proj.get('id'))
+          else:
+              print('project exists:', proj.get('id'))
+          new_id = proj.get('id')
+
+          # List domains on both projects (names only)
+          for label, pid in (('old', old), ('new', new_id)):
+              s, d = api(f'/v9/projects/{pid}/domains?teamId={team}')
+              print(f'{label} project domains:', [x.get('name') for x in d.get('domains', [])])
+
+          # Copy env vars (values never printed)
+          s, envs = api(f'/v10/projects/{old}/env?teamId={team}&decrypt=true')
+          copied, failed = 0, 0
+          for e in envs.get('envs', []):
+              body = {'key': e['key'], 'value': e.get('value', ''), 'type': 'encrypted',
+                      'target': e.get('target', ['production', 'preview', 'development'])}
+              s2, r2 = api(f'/v10/projects/{new_id}/env?teamId={team}&upsert=true', 'POST', body)
+              if s2 < 300: copied += 1
+              else: failed += 1; print('env copy failed for key:', e['key'], s2)
+          print(f'env vars copied: {copied}, failed: {failed}')
+          print('NEW_PROJECT_ID=' + str(new_id))
+          EOF
+          python3 /tmp/fresh.py | tee /tmp/fresh.out
+          grep -o 'NEW_PROJECT_ID=prj_[A-Za-z0-9]*' /tmp/fresh.out | cut -d= -f2 > /tmp/new_project_id
+          exit 0
+
+      - name: Prebuilt deploy to fresh project
+        run: |
+          set +e
+          if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN not set"; exit 0; fi
+          NEW_ID=$(cat /tmp/new_project_id)
+          echo "deploying to project: $NEW_ID"
+          rm -rf .vercel
+          mkdir -p .vercel
+          printf '{"projectId":"%s","orgId":"%s"}' "$NEW_ID" "$VERCEL_ORG_ID" > .vercel/project.json
           npx vercel pull --yes --environment=preview --token="$VERCEL_TOKEN" >/dev/null 2>&1
           npx vercel build --token="$VERCEL_TOKEN" 2>&1 | tail -2
           url=$(npx vercel deploy --prebuilt --token="$VERCEL_TOKEN" --yes 2>&1 | grep -oE 'https://[a-z0-9.-]+\.vercel\.app' | tail -1)
-          echo "A_URL: $url"
+          echo "FRESH_URL: $url"
           if [ -n "$url" ]; then
             curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
               "https://api.vercel.com/v13/deployments/${url#https://}?teamId=$VERCEL_ORG_ID" \
-              | python3 -c "import json,sys; j=json.load(sys.stdin); print('A_STATE:', j.get('readyState'), '|', j.get('errorCode'), '|', j.get('errorMessage'))" \
-              | tee /tmp/a_state.txt
+              | python3 -c "import json,sys; j=json.load(sys.stdin); print('FRESH_STATE:', j.get('readyState'), '|', j.get('errorCode'), '|', j.get('errorMessage'))"
           fi
           exit 0
 
-      - name: "B: static-only prebuilt deploy (no api/ functions)"
+      - name: Stripped-content deploy to OLD project (no .claude/.github)
         run: |
           set +e
           if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN not set"; exit 0; fi
-          if grep -q "A_STATE: READY" /tmp/a_state.txt 2>/dev/null; then
-            echo "Attempt A succeeded — skipping static-only test"
-            exit 0
-          fi
-
-          echo "=== removing api/ and rebuilding static-only ==="
-          rm -rf api .vercel/output
-          npx vercel build --token="$VERCEL_TOKEN" 2>&1 | tail -2
-          url=$(npx vercel deploy --prebuilt --token="$VERCEL_TOKEN" --yes 2>&1 | grep -oE 'https://[a-z0-9.-]+\.vercel\.app' | tail -1)
-          echo "B_URL: $url"
+          rm -rf .claude .github .vercel
+          mkdir -p .vercel
+          printf '{"projectId":"%s","orgId":"%s"}' "$OLD_PROJECT_ID" "$VERCEL_ORG_ID" > .vercel/project.json
+          url=$(npx vercel deploy --token="$VERCEL_TOKEN" --yes 2>&1 | grep -oE 'https://[a-z0-9.-]+\.vercel\.app' | tail -1)
+          echo "STRIPPED_URL: $url"
           if [ -n "$url" ]; then
             curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
               "https://api.vercel.com/v13/deployments/${url#https://}?teamId=$VERCEL_ORG_ID" \
-              | python3 -c "import json,sys; j=json.load(sys.stdin); print('B_STATE:', j.get('readyState'), '|', j.get('errorCode'), '|', j.get('errorMessage'))"
+              | python3 -c "import json,sys; j=json.load(sys.stdin); print('STRIPPED_STATE:', j.get('readyState'), '|', j.get('errorCode'), '|', j.get('errorMessage'))"
           fi
           exit 0
