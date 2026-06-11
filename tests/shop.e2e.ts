@@ -38,33 +38,38 @@ test.describe('Shop catalog — /shop.html', () => {
   })
 
   test('all card front images load without broken src', async ({ page }) => {
-    const images = page.locator('.cf-front img')
+    // Shop cards render the artwork inside .sc-front (3D spin front face).
+    const images = page.locator('.sc-front img')
     const count = await images.count()
     expect(count, 'Expected front images on shop cards').toBeGreaterThan(0)
 
     for (let i = 0; i < count; i++) {
-      const img = images.nth(i)
-      const src = await img.getAttribute('src')
-      expect(src, `cf-front img[${i}] has empty or missing src`).toBeTruthy()
-
-      const loaded = await img.evaluate(
-        (el: HTMLImageElement) => el.complete && el.naturalWidth > 0,
-      )
-      expect(loaded, `cf-front img[${i}] with src="${src}" failed to load`).toBe(true)
+      const src = await images.nth(i).getAttribute('src')
+      expect(src, `sc-front img[${i}] has empty or missing src`).toBeTruthy()
     }
+
+    // Card images use loading="lazy" and never load without scrolling, so
+    // force eager loading and let decode() flag broken srcs.
+    const broken = await page.evaluate(async () => {
+      const imgs = Array.from(document.querySelectorAll<HTMLImageElement>('.sc-front img'))
+      imgs.forEach(img => { img.loading = 'eager' })
+      const results = await Promise.allSettled(imgs.map(img => img.decode()))
+      return imgs
+        .filter((img, i) => results[i].status === 'rejected' || img.naturalWidth === 0)
+        .map(img => img.getAttribute('src'))
+    })
+    expect(broken, `Card images failed to load: ${broken.join(', ')}`).toHaveLength(0)
   })
 
-  test('flip interaction works on first card (mobile touch)', async ({ page, isMobile }) => {
+  test('tapping a card opens its product page (mobile touch)', async ({ page, isMobile }) => {
     if (!isMobile) test.skip()
 
-    // Tap the Flip toggle button on the first card — stopPropagation keeps
-    // the card from navigating. The .card-flip-inner should receive class
-    // "flipped" which drives the CSS rotateY(180deg) transition.
+    // Cards navigate to their product page via openModal() → location.href.
     const firstCard = page.locator('.shop-card').first()
-    const flipBtn = firstCard.locator('.flip-toggle')
-    await flipBtn.tap()
+    const slug = await firstCard.getAttribute('data-slug')
+    await firstCard.locator('.card-flipper').tap()
 
-    const flipInner = firstCard.locator('.card-flip-inner')
-    await expect(flipInner).toHaveClass(/flipped/)
+    // The static server in CI serves clean URLs (strips .html), so accept both.
+    await expect(page).toHaveURL(new RegExp(`/shop/${slug}(\\.html)?$`))
   })
 })

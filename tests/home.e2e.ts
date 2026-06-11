@@ -13,16 +13,21 @@ test.describe('Homepage — /', () => {
     expect(count).toBeGreaterThan(0)
 
     for (let i = 0; i < count; i++) {
-      const img = images.nth(i)
-      const src = await img.getAttribute('src')
+      const src = await images.nth(i).getAttribute('src')
       expect(src, `img[${i}] has empty or missing src`).toBeTruthy()
-
-      // naturalWidth > 0 means the browser successfully decoded the image.
-      const loaded = await img.evaluate(
-        (el: HTMLImageElement) => el.complete && el.naturalWidth > 0,
-      )
-      expect(loaded, `img[${i}] with src="${src}" failed to load`).toBe(true)
     }
+
+    // Below-the-fold images use loading="lazy" and never load without
+    // scrolling, so force eager loading and let decode() flag broken srcs.
+    const broken = await page.evaluate(async () => {
+      const imgs = Array.from(document.images)
+      imgs.forEach(img => { img.loading = 'eager' })
+      const results = await Promise.allSettled(imgs.map(img => img.decode()))
+      return imgs
+        .filter((img, i) => results[i].status === 'rejected' || img.naturalWidth === 0)
+        .map(img => img.getAttribute('src'))
+    })
+    expect(broken, `Images failed to load: ${broken.join(', ')}`).toHaveLength(0)
   })
 
   test('zero console errors on load', async ({ page }) => {

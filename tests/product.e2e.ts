@@ -43,23 +43,21 @@ test.describe(`Product page — ${PRODUCT_URL}`, () => {
     const mediumText = await medium.textContent()
     expect(mediumText?.trim().length, '.product-medium is empty').toBeGreaterThan(0)
 
-    // Edition info is inside .product-details li items.
-    const detailItems = page.locator('.product-details li')
-    const count = await detailItems.count()
-    expect(count, 'No edition detail items found').toBeGreaterThan(0)
+    // Edition info lives in the Edition Details table rows.
+    const detailRows = page.locator('.edition-table tr')
+    const count = await detailRows.count()
+    expect(count, 'No edition detail rows found').toBeGreaterThan(0)
   })
 
-  test('flip card works on mobile touch', async ({ page, isMobile }) => {
-    if (!isMobile) test.skip()
+  test('card artwork and card back images are present', async ({ page }) => {
+    // Product pages show the card front and back as static .card-side images
+    // (the old #cardFlipper flip interaction was removed in the redesign).
+    const sides = page.locator('.card-sides .card-side')
+    await expect(sides).toHaveCount(2)
 
-    // Product pages use #cardFlipper (img-flip-inner) toggled by toggleFlip().
-    // Tapping the .flip-btn button adds the "flipped" class to #cardFlipper,
-    // which drives the CSS rotateY(180deg) transition to reveal the back face.
-    const flipBtn = page.locator('.flip-btn')
-    await expect(flipBtn).toBeVisible()
-    await flipBtn.tap()
-
-    const cardFlipper = page.locator('#cardFlipper')
-    await expect(cardFlipper).toHaveClass(/flipped/)
+    for (const side of await sides.all()) {
+      const src = await side.locator('img').getAttribute('src')
+      expect(src, 'card side image has empty or missing src').toBeTruthy()
+    }
   })
 })
