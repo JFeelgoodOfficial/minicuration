@@ -1,10 +1,8 @@
 # TEMPORARY diagnostic workflow — delete after the Vercel deploy failure is
 # resolved. Root error: BUILD_FAILED / "Resource provisioning failed" before
-# any build step. Team plan is hobby, project not paused, no custom build
-# machine. This run tries two remaining fixes, preview-only:
-#   1. Pin Node.js version to 22.x (project was on brand-new 24.x)
-#   2. Build locally on the runner and deploy --prebuilt, which skips
-#      Vercel's build machine provisioning entirely.
+# any build step. This run builds locally on the runner and deploys
+# --prebuilt, which skips Vercel build machine provisioning entirely.
+# Preview-only; production untouched.
 name: Vercel Debug Deploy
 
 on:
@@ -21,59 +19,31 @@ jobs:
         with:
           node-version: 20
 
-      - name: Pin project Node.js version to 22.x
+      - name: Local build + deploy --prebuilt (skips build machine)
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: team_Lbkrq0XowJ4UKneBKGtQFmTE
           VERCEL_PROJECT_ID: prj_Yy0vEgmuTLeYLxfYD8Jr14QA3gx2
         run: |
+          set +e
           if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN not set"; exit 0; fi
-          curl -s -X PATCH -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" \
-            -d '{"nodeVersion":"22.x"}' \
-            "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID?teamId=$VERCEL_ORG_ID" \
-            | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const j=JSON.parse(d);console.log('nodeVersion now:',j.nodeVersion??JSON.stringify(j).slice(0,300))})"
 
-      - name: "Attempt 1: regular deploy after Node pin"
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: team_Lbkrq0XowJ4UKneBKGtQFmTE
-          VERCEL_PROJECT_ID: prj_Yy0vEgmuTLeYLxfYD8Jr14QA3gx2
-        run: |
-          if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN not set"; exit 0; fi
-          url=$(npx vercel deploy --token="$VERCEL_TOKEN" --yes 2>&1 | tail -1) || true
-          echo "result: $url"
-          case "$url" in
-            https://*)
-              host="${url#https://}"
-              state=$(curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
-                "https://api.vercel.com/v13/deployments/$host?teamId=$VERCEL_ORG_ID" \
-                | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const j=JSON.parse(d);console.log(j.readyState+' '+(j.errorMessage||''))}")
-              echo "ATTEMPT1_STATE: $state"
-              ;;
-            *) echo "ATTEMPT1_STATE: NO_URL" ;;
-          esac
-
-      - name: "Attempt 2: local build + deploy --prebuilt (skips build machine)"
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: team_Lbkrq0XowJ4UKneBKGtQFmTE
-          VERCEL_PROJECT_ID: prj_Yy0vEgmuTLeYLxfYD8Jr14QA3gx2
-        run: |
-          if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN not set"; exit 0; fi
           echo "=== vercel pull ==="
           npx vercel pull --yes --environment=preview --token="$VERCEL_TOKEN" 2>&1 | tail -5
+
           echo "=== vercel build (on this runner) ==="
-          npx vercel build --token="$VERCEL_TOKEN" 2>&1 | tail -30
+          npx vercel build --token="$VERCEL_TOKEN" 2>&1 | tail -40
+
           echo "=== vercel deploy --prebuilt ==="
-          url=$(npx vercel deploy --prebuilt --token="$VERCEL_TOKEN" --yes 2>&1 | tail -1) || true
-          echo "result: $url"
-          case "$url" in
-            https://*)
-              host="${url#https://}"
-              curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
-                "https://api.vercel.com/v13/deployments/$host?teamId=$VERCEL_ORG_ID" \
-                | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const j=JSON.parse(d);console.log(JSON.stringify({readyState:j.readyState,errorCode:j.errorCode,errorMessage:j.errorMessage},null,2))})"
-              echo "PREVIEW_URL: $url"
-              ;;
-            *) echo "ATTEMPT2_STATE: NO_URL" ;;
-          esac
+          url=$(npx vercel deploy --prebuilt --token="$VERCEL_TOKEN" --yes 2>&1 | grep -oE 'https://[a-z0-9.-]+\.vercel\.app' | tail -1)
+          echo "PREVIEW_URL: $url"
+
+          if [ -n "$url" ]; then
+            host="${url#https://}"
+            curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
+              "https://api.vercel.com/v13/deployments/$host?teamId=$VERCEL_ORG_ID" \
+              | python3 -c "import json,sys; j=json.load(sys.stdin); print('FINAL_STATE:', j.get('readyState'), '| errorCode:', j.get('errorCode'), '| errorMessage:', j.get('errorMessage'))"
+          else
+            echo "FINAL_STATE: NO_URL"
+          fi
+          exit 0
