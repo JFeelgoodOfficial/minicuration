@@ -65,12 +65,11 @@ Two manual steps activate the analytics + post-purchase reclaim flows:
    custom events — `buy_click`, `begin_checkout`, `newsletter_signup`,
    `flip_back`, `sold_out_click` — and mirrors them to `window.dataLayer` for
    an optional GA4/GTM container.
-2. **Redirect Stripe Payment Links to `/thanks`.** Run once (and again after
-   adding any new link) so buyers land back on-site after paying:
-
-   ```
-   STRIPE_SECRET_KEY=sk_live_... node scripts/set-stripe-redirects.js   # add --dry to preview
-   ```
+2. **Redirect Stripe Payment Links to `/thanks`.** In the Stripe Dashboard,
+   edit each Payment Link → **After payment** → **Redirect customers to your
+   website** → `https://minicuration.com/thanks.html`. This returns buyers
+   on-site (newsletter capture + cross-sell) instead of Stripe's generic
+   receipt. Repeat for any new link.
 
 The Stripe webhook (`api/webhook.js`) enforces scarcity automatically: it
 deactivates a Payment Link when its edition hits zero, and auto-refunds +
