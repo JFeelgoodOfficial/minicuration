@@ -1,0 +1,44 @@
+# TEMPORARY diagnostic workflow — delete after the Vercel deploy failure is
+# resolved. Creates a PREVIEW deployment (never touches production) and dumps
+# the full error detail that the dashboard hides from API tokens.
+name: Vercel Debug Deploy
+
+on:
+  push:
+    branches: [claude/home-pricing-correction-u7e9hx]
+
+jobs:
+  debug-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Preview deploy with full error capture
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: team_Lbkrq0XowJ4UKneBKGtQFmTE
+          VERCEL_PROJECT_ID: prj_Yy0vEgmuTLeYLxfYD8Jr14QA3gx2
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN not set"; exit 0; fi
+
+          echo "=== vercel deploy (preview) ==="
+          url=$(npx vercel deploy --token="$VERCEL_TOKEN" --yes 2>deploy-stderr.txt) || true
+          echo "deployment url: $url"
+          echo "=== stderr from deploy ==="
+          cat deploy-stderr.txt || true
+
+          if [ -n "$url" ]; then
+            echo "=== vercel inspect ==="
+            npx vercel inspect "$url" --token="$VERCEL_TOKEN" 2>&1 || true
+            echo "=== vercel inspect --logs ==="
+            npx vercel inspect "$url" --logs --token="$VERCEL_TOKEN" 2>&1 | tail -300 || true
+            echo "=== REST API deployment record (errorCode/errorMessage) ==="
+            host="${url#https://}"
+            curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
+              "https://api.vercel.com/v13/deployments/$host?teamId=$VERCEL_ORG_ID" \
+              | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const j=JSON.parse(d);console.log(JSON.stringify({readyState:j.readyState,errorCode:j.errorCode,errorMessage:j.errorMessage,errorStep:j.errorStep,errorLink:j.errorLink},null,2))})"
+          fi
