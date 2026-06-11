@@ -1,11 +1,8 @@
-# TEMPORARY diagnostic workflow — delete after the Vercel deploy failure is
-# resolved. Tests two hypotheses, selecting projects via the
-# VERCEL_PROJECT_ID env var the CLI expects:
-#   FRESH: deploy full repo (including .claude) to minicuration-live —
-#          READY means the old project is wedged.
-#   STRIPPED: deploy to the OLD project with .claude/ and .github/ removed —
-#          READY means content from PR #21 (June 9) is what Vercel rejects.
-# Preview-only on both; production untouched.
+# TEMPORARY workflow — delete after the Vercel deploy failure is resolved.
+# Vercel deploys recovered (both fresh-project and old-project preview
+# deploys went READY). This run ships PRODUCTION: deploys main (which
+# contains the $23 price fix) to the original minicuration project that
+# serves minicuration.com, then verifies the live site.
 name: Vercel Debug Deploy
 
 on:
@@ -13,51 +10,43 @@ on:
     branches: [claude/home-pricing-correction-u7e9hx]
 
 jobs:
-  debug-deploy:
+  ship-production:
     runs-on: ubuntu-latest
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: team_Lbkrq0XowJ4UKneBKGtQFmTE
+      VERCEL_PROJECT_ID: prj_Yy0vEgmuTLeYLxfYD8Jr14QA3gx2
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: "FRESH: full repo to minicuration-live"
-        env:
-          VERCEL_PROJECT_ID: prj_TZROZTu1jmkfHk1dDGX2Njsghjut
+      - name: Production deploy of main to minicuration.com
         run: |
           set +e
           if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN not set"; exit 0; fi
-          npx vercel pull --yes --environment=preview --token="$VERCEL_TOKEN" 2>&1 | tail -3
-          npx vercel build --token="$VERCEL_TOKEN" 2>&1 | tail -2
-          npx vercel deploy --prebuilt --token="$VERCEL_TOKEN" --yes >/tmp/fresh.txt 2>&1
-          echo "--- deploy output tail ---"; tail -8 /tmp/fresh.txt
-          url=$(grep -oE 'https://[a-z0-9.-]+\.vercel\.app' /tmp/fresh.txt | tail -1)
-          echo "FRESH_URL: $url"
+          echo "deploying commit: $(git rev-parse --short HEAD) — $(git log -1 --format=%s)"
+          npx vercel deploy --prod --token="$VERCEL_TOKEN" --yes >/tmp/prod.txt 2>&1
+          echo "--- deploy output tail ---"; tail -8 /tmp/prod.txt
+          url=$(grep -oE 'https://[a-z0-9.-]+\.vercel\.app' /tmp/prod.txt | tail -1)
+          echo "PROD_URL: $url"
           if [ -n "$url" ]; then
             curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
               "https://api.vercel.com/v13/deployments/${url#https://}?teamId=$VERCEL_ORG_ID" \
-              | python3 -c "import json,sys; j=json.load(sys.stdin); print('FRESH_STATE:', j.get('readyState'), '|', j.get('errorCode'), '|', j.get('errorMessage'))"
+              | python3 -c "import json,sys; j=json.load(sys.stdin); print('PROD_STATE:', j.get('readyState'), '|', j.get('errorCode'), '|', j.get('errorMessage'))"
           fi
           exit 0
 
-      - name: "STRIPPED: no .claude/.github to OLD project"
-        env:
-          VERCEL_PROJECT_ID: prj_Yy0vEgmuTLeYLxfYD8Jr14QA3gx2
+      - name: Verify live site shows $23
         run: |
           set +e
-          if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN not set"; exit 0; fi
-          rm -rf .claude .github .vercel
-          npx vercel deploy --token="$VERCEL_TOKEN" --yes >/tmp/stripped.txt 2>&1
-          echo "--- deploy output tail ---"; tail -8 /tmp/stripped.txt
-          url=$(grep -oE 'https://[a-z0-9.-]+\.vercel\.app' /tmp/stripped.txt | tail -1)
-          echo "STRIPPED_URL: $url"
-          if [ -n "$url" ]; then
-            curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
-              "https://api.vercel.com/v13/deployments/${url#https://}?teamId=$VERCEL_ORG_ID" \
-              | python3 -c "import json,sys; j=json.load(sys.stdin); print('STRIPPED_STATE:', j.get('readyState'), '|', j.get('errorCode'), '|', j.get('errorMessage'))"
-          fi
+          sleep 20
+          html=$(curl -sL https://minicuration.com)
+          echo "occurrences of \$23: $(echo "$html" | grep -o '\$23' | wc -l)"
+          echo "occurrences of \$24: $(echo "$html" | grep -o '\$24' | wc -l)"
+          echo "$html" | grep -oE '<title>[^<]*</title>'
           exit 0
