@@ -1,7 +1,9 @@
 # TEMPORARY diagnostic workflow — delete after the Vercel deploy failure is
-# resolved. Root error: BUILD_FAILED / "Resource provisioning failed" before
-# any build step. This run builds locally on the runner and deploys
-# --prebuilt, which skips Vercel build machine provisioning entirely.
+# resolved. Established so far: vercel build succeeds locally, but even
+# `deploy --prebuilt` errors with "Resource provisioning failed" — so the
+# failing resource is the function runtime, not the build machine. The
+# project has fluid:true. This run: (A) disable Fluid Compute and redeploy;
+# (B) if still failing, deploy static-only (no api/) to isolate functions.
 # Preview-only; production untouched.
 name: Vercel Debug Deploy
 
@@ -12,6 +14,10 @@ on:
 jobs:
   debug-deploy:
     runs-on: ubuntu-latest
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: team_Lbkrq0XowJ4UKneBKGtQFmTE
+      VERCEL_PROJECT_ID: prj_Yy0vEgmuTLeYLxfYD8Jr14QA3gx2
     steps:
       - uses: actions/checkout@v4
 
@@ -19,31 +25,46 @@ jobs:
         with:
           node-version: 20
 
-      - name: Local build + deploy --prebuilt (skips build machine)
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: team_Lbkrq0XowJ4UKneBKGtQFmTE
-          VERCEL_PROJECT_ID: prj_Yy0vEgmuTLeYLxfYD8Jr14QA3gx2
+      - name: "A: disable Fluid Compute, prebuilt deploy with functions"
         run: |
           set +e
           if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN not set"; exit 0; fi
 
-          echo "=== vercel pull ==="
-          npx vercel pull --yes --environment=preview --token="$VERCEL_TOKEN" 2>&1 | tail -5
+          echo "=== PATCH fluid:false ==="
+          curl -s -X PATCH -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" \
+            -d '{"resourceConfig":{"fluid":false}}' \
+            "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID?teamId=$VERCEL_ORG_ID" \
+            | python3 -c "import json,sys; j=json.load(sys.stdin); print('resourceConfig now:', json.dumps(j.get('resourceConfig', j)))"
 
-          echo "=== vercel build (on this runner) ==="
-          npx vercel build --token="$VERCEL_TOKEN" 2>&1 | tail -40
-
-          echo "=== vercel deploy --prebuilt ==="
+          npx vercel pull --yes --environment=preview --token="$VERCEL_TOKEN" >/dev/null 2>&1
+          npx vercel build --token="$VERCEL_TOKEN" 2>&1 | tail -2
           url=$(npx vercel deploy --prebuilt --token="$VERCEL_TOKEN" --yes 2>&1 | grep -oE 'https://[a-z0-9.-]+\.vercel\.app' | tail -1)
-          echo "PREVIEW_URL: $url"
-
+          echo "A_URL: $url"
           if [ -n "$url" ]; then
-            host="${url#https://}"
             curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
-              "https://api.vercel.com/v13/deployments/$host?teamId=$VERCEL_ORG_ID" \
-              | python3 -c "import json,sys; j=json.load(sys.stdin); print('FINAL_STATE:', j.get('readyState'), '| errorCode:', j.get('errorCode'), '| errorMessage:', j.get('errorMessage'))"
-          else
-            echo "FINAL_STATE: NO_URL"
+              "https://api.vercel.com/v13/deployments/${url#https://}?teamId=$VERCEL_ORG_ID" \
+              | python3 -c "import json,sys; j=json.load(sys.stdin); print('A_STATE:', j.get('readyState'), '|', j.get('errorCode'), '|', j.get('errorMessage'))" \
+              | tee /tmp/a_state.txt
+          fi
+          exit 0
+
+      - name: "B: static-only prebuilt deploy (no api/ functions)"
+        run: |
+          set +e
+          if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN not set"; exit 0; fi
+          if grep -q "A_STATE: READY" /tmp/a_state.txt 2>/dev/null; then
+            echo "Attempt A succeeded — skipping static-only test"
+            exit 0
+          fi
+
+          echo "=== removing api/ and rebuilding static-only ==="
+          rm -rf api .vercel/output
+          npx vercel build --token="$VERCEL_TOKEN" 2>&1 | tail -2
+          url=$(npx vercel deploy --prebuilt --token="$VERCEL_TOKEN" --yes 2>&1 | grep -oE 'https://[a-z0-9.-]+\.vercel\.app' | tail -1)
+          echo "B_URL: $url"
+          if [ -n "$url" ]; then
+            curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
+              "https://api.vercel.com/v13/deployments/${url#https://}?teamId=$VERCEL_ORG_ID" \
+              | python3 -c "import json,sys; j=json.load(sys.stdin); print('B_STATE:', j.get('readyState'), '|', j.get('errorCode'), '|', j.get('errorMessage'))"
           fi
           exit 0
