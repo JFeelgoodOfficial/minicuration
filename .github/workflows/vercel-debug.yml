@@ -1,12 +1,9 @@
 # TEMPORARY diagnostic workflow — delete after the Vercel deploy failure is
-# resolved. Established: even a static-only prebuilt deploy to the existing
-# project fails with "Resource provisioning failed" — the project itself is
-# wedged on Vercel's side. This run tests two hypotheses:
-#   FRESH: create a new project in the same team, copy env vars (values
-#          never printed), deploy the full repo there.
-#   STRIPPED: deploy to the OLD project with .claude/ and .github/ removed,
-#          testing whether content added in PR #21 (June 9, same day deploys
-#          began failing) is what Vercel chokes on.
+# resolved. Tests two hypotheses with full CLI output captured:
+#   FRESH: deploy full repo (including .claude) to the new minicuration-live
+#          project — READY means the old project is wedged.
+#   STRIPPED: deploy to the OLD project with .claude/ and .github/ removed —
+#          READY means content from PR #21 (June 9) is what Vercel rejects.
 # Preview-only on both; production untouched.
 name: Vercel Debug Deploy
 
@@ -20,7 +17,7 @@ jobs:
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: team_Lbkrq0XowJ4UKneBKGtQFmTE
-      OLD_PROJECT_ID: prj_Yy0vEgmuTLeYLxfYD8Jr14QA3gx2
+      OLD_PROJECT_NAME: minicuration
       NEW_PROJECT_NAME: minicuration-live
     steps:
       - uses: actions/checkout@v4
@@ -29,71 +26,16 @@ jobs:
         with:
           node-version: 20
 
-      - name: Create fresh project and copy env vars
+      - name: "FRESH: full repo to minicuration-live"
         run: |
           set +e
           if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN not set"; exit 0; fi
-          cat > /tmp/fresh.py <<'EOF'
-          import json, os, urllib.request
-
-          token = os.environ['VERCEL_TOKEN']
-          team = os.environ['VERCEL_ORG_ID']
-          old = os.environ['OLD_PROJECT_ID']
-          new_name = os.environ['NEW_PROJECT_NAME']
-
-          def api(path, method='GET', body=None):
-              req = urllib.request.Request(
-                  f'https://api.vercel.com{path}', method=method,
-                  headers={'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'},
-                  data=json.dumps(body).encode() if body else None)
-              try:
-                  with urllib.request.urlopen(req) as r:
-                      return r.status, json.load(r)
-              except urllib.error.HTTPError as e:
-                  return e.code, json.loads(e.read() or b'{}')
-
-          # Create the new project if it doesn't exist
-          status, proj = api(f'/v9/projects/{new_name}?teamId={team}')
-          if status == 404:
-              status, proj = api(f'/v11/projects?teamId={team}', 'POST', {'name': new_name})
-              print('created project:', status, proj.get('id'))
-          else:
-              print('project exists:', proj.get('id'))
-          new_id = proj.get('id')
-
-          # List domains on both projects (names only)
-          for label, pid in (('old', old), ('new', new_id)):
-              s, d = api(f'/v9/projects/{pid}/domains?teamId={team}')
-              print(f'{label} project domains:', [x.get('name') for x in d.get('domains', [])])
-
-          # Copy env vars (values never printed)
-          s, envs = api(f'/v10/projects/{old}/env?teamId={team}&decrypt=true')
-          copied, failed = 0, 0
-          for e in envs.get('envs', []):
-              body = {'key': e['key'], 'value': e.get('value', ''), 'type': 'encrypted',
-                      'target': e.get('target', ['production', 'preview', 'development'])}
-              s2, r2 = api(f'/v10/projects/{new_id}/env?teamId={team}&upsert=true', 'POST', body)
-              if s2 < 300: copied += 1
-              else: failed += 1; print('env copy failed for key:', e['key'], s2)
-          print(f'env vars copied: {copied}, failed: {failed}')
-          print('NEW_PROJECT_ID=' + str(new_id))
-          EOF
-          python3 /tmp/fresh.py | tee /tmp/fresh.out
-          grep -o 'NEW_PROJECT_ID=prj_[A-Za-z0-9]*' /tmp/fresh.out | cut -d= -f2 > /tmp/new_project_id
-          exit 0
-
-      - name: Prebuilt deploy to fresh project
-        run: |
-          set +e
-          if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN not set"; exit 0; fi
-          NEW_ID=$(cat /tmp/new_project_id)
-          echo "deploying to project: $NEW_ID"
-          rm -rf .vercel
-          mkdir -p .vercel
-          printf '{"projectId":"%s","orgId":"%s"}' "$NEW_ID" "$VERCEL_ORG_ID" > .vercel/project.json
-          npx vercel pull --yes --environment=preview --token="$VERCEL_TOKEN" >/dev/null 2>&1
+          npx vercel link --yes --project "$NEW_PROJECT_NAME" --scope "$VERCEL_ORG_ID" --token="$VERCEL_TOKEN" 2>&1 | tail -3
+          npx vercel pull --yes --environment=preview --token="$VERCEL_TOKEN" 2>&1 | tail -3
           npx vercel build --token="$VERCEL_TOKEN" 2>&1 | tail -2
-          url=$(npx vercel deploy --prebuilt --token="$VERCEL_TOKEN" --yes 2>&1 | grep -oE 'https://[a-z0-9.-]+\.vercel\.app' | tail -1)
+          npx vercel deploy --prebuilt --token="$VERCEL_TOKEN" --yes >/tmp/fresh.txt 2>&1
+          echo "--- deploy output tail ---"; tail -8 /tmp/fresh.txt
+          url=$(grep -oE 'https://[a-z0-9.-]+\.vercel\.app' /tmp/fresh.txt | tail -1)
           echo "FRESH_URL: $url"
           if [ -n "$url" ]; then
             curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
@@ -102,14 +44,15 @@ jobs:
           fi
           exit 0
 
-      - name: Stripped-content deploy to OLD project (no .claude/.github)
+      - name: "STRIPPED: no .claude/.github to OLD project"
         run: |
           set +e
           if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN not set"; exit 0; fi
           rm -rf .claude .github .vercel
-          mkdir -p .vercel
-          printf '{"projectId":"%s","orgId":"%s"}' "$OLD_PROJECT_ID" "$VERCEL_ORG_ID" > .vercel/project.json
-          url=$(npx vercel deploy --token="$VERCEL_TOKEN" --yes 2>&1 | grep -oE 'https://[a-z0-9.-]+\.vercel\.app' | tail -1)
+          npx vercel link --yes --project "$OLD_PROJECT_NAME" --scope "$VERCEL_ORG_ID" --token="$VERCEL_TOKEN" 2>&1 | tail -3
+          npx vercel deploy --token="$VERCEL_TOKEN" --yes >/tmp/stripped.txt 2>&1
+          echo "--- deploy output tail ---"; tail -8 /tmp/stripped.txt
+          url=$(grep -oE 'https://[a-z0-9.-]+\.vercel\.app' /tmp/stripped.txt | tail -1)
           echo "STRIPPED_URL: $url"
           if [ -n "$url" ]; then
             curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
