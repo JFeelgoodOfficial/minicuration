@@ -5,9 +5,15 @@
    no PII collected. */
 (function () {
   // Vercel Web Analytics queue stub + loader (auto-tracks pageviews).
+  // The insights script is only served by Vercel's edge, so load it only on
+  // Vercel-hosted domains — otherwise it 404s on localhost/CI (and trips the
+  // "zero console errors" e2e test). The va() stub + event tracking below still
+  // work everywhere; events simply queue harmlessly off-Vercel.
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments) }
   window.dataLayer = window.dataLayer || []
-  if (!document.querySelector('script[src*="/_vercel/insights/script.js"]')) {
+  const host = location.hostname
+  const onVercel = host === 'minicuration.com' || host === 'www.minicuration.com' || /\.vercel\.app$/.test(host)
+  if (onVercel && !document.querySelector('script[src*="/_vercel/insights/script.js"]')) {
     const s = document.createElement('script')
     s.defer = true
     s.src = '/_vercel/insights/script.js'
