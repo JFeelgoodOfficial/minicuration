@@ -35,6 +35,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content
 .price-note{font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);font-weight:300;vertical-align:middle;}
 .btn-buy{display:block;width:100%;padding:14px;background:var(--crimson);color:var(--text);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:13px;letter-spacing:.15em;text-transform:uppercase;border-radius:2px;text-align:center;transition:background .3s;}
 .btn-buy:hover{background:#a82020;}
+.btn-buy.sold{background:#222;color:var(--muted);cursor:not-allowed;pointer-events:none;}
+.trust-row{margin-top:12px;font-size:11px;letter-spacing:.03em;color:var(--muted);text-align:center;line-height:1.7;}
+.trust-row .sep{opacity:.4;margin:0 7px;}
+.next-drop{margin-top:18px;padding:18px 20px;border:1px solid var(--border);border-radius:4px;background:var(--surface);}
+.next-drop-label{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:12px;}
+.next-drop-form{display:flex;}
+.next-drop-form input[type=email]{flex:1;min-width:0;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-right:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;border-radius:2px 0 0 2px;transition:border-color .3s;}
+.next-drop-form input[type=email]:focus{border-color:var(--crimson);}
+.next-drop-form button{padding:11px 18px;background:var(--crimson);color:var(--text);border:none;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:0 2px 2px 0;transition:background .3s;}
+.next-drop-form button:hover{background:#a82020;}
 .section-label{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--crimson);margin-bottom:10px;padding-top:24px;border-top:1px solid var(--border);margin-top:4px;}
 .content-section{margin-top:4px;}
 .content-section p{font-size:13px;color:var(--muted);line-height:1.7;}

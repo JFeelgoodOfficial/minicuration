@@ -116,17 +116,35 @@
       font-size:10px;letter-spacing:.2em;text-transform:uppercase;padding:4px 40px;
       transform:rotate(45deg);z-index:2;}
     .flip-toggle{position:absolute;bottom:10px;right:10px;z-index:5;
-      background:rgb(0 0 0 / 65%);color:var(--muted);border:1px solid var(--border);
-      padding:5px 10px;font-size:11px;border-radius:3px;cursor:pointer;
+      background:rgb(0 0 0 / 65%);color:var(--text);border:1px solid var(--border);
+      padding:6px 12px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+      border-radius:3px;cursor:pointer;font-family:'DM Sans',sans-serif;
       transition:color .3s,border-color .3s;backdrop-filter:blur(4px);}
-    .flip-toggle:hover{color:var(--text);border-color:var(--crimson);}
+    .flip-toggle:hover,.flip-toggle:focus-visible{color:var(--text);border-color:var(--crimson);}
+
+    /* Sold-out next-drop capture */
+    .next-drop-mini{padding:0 18px 18px;}
+    .next-drop-mini p{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:8px;}
+    .next-drop-mini form{display:flex;}
+    .next-drop-mini input{flex:1;min-width:0;padding:9px 11px;background:var(--bg);
+      border:1px solid var(--border);border-right:none;color:var(--text);
+      font-family:'DM Sans',sans-serif;font-size:12px;outline:none;border-radius:2px 0 0 2px;}
+    .next-drop-mini input:focus{border-color:var(--crimson);}
+    .next-drop-mini button{padding:9px 14px;background:var(--crimson);color:var(--text);
+      border:none;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:.1em;
+      text-transform:uppercase;cursor:pointer;border-radius:0 2px 2px 0;}
+    .next-drop-mini button:hover{background:#a82020;}
 
     /* Spinning card (shop grid — portrait 5:7 and landscape 7:5) */
     .sc-spin-wrap{position:relative;width:100%;aspect-ratio:5/7;}
     .sc-spin-wrap.landscape{aspect-ratio:7/5;}
     .sc-spin-scene{perspective:800px;position:absolute;inset:0;}
-    .sc-spin-3d{will-change:transform;width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:none;transform:rotateY(0deg);}
+    .sc-spin-3d{will-change:transform;width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:none;transform:rotateY(0deg);transition:transform .6s cubic-bezier(.4,0,.2,1);}
     .sc-spin-3d:hover{animation:sc-spin 14s linear infinite;}
+
+    /* Tap-to-flip (touch + click): show the card back without relying on hover */
+    .sc-spin-3d.show-back{animation:none!important;transform:rotateY(180deg);}
+    .sc-spin-wrap.flipped .sc-spin-3d:hover{animation:none;}
     .sc-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;overflow:hidden;}
     .sc-front{transform:rotateY(0deg);background:#fff;}
     .sc-back{transform:rotateY(180deg);background:#1e1e1e;}
@@ -155,6 +173,8 @@
       text-decoration:none;transition:background .3s;}
     .btn-buy:hover{background:#a82020;}
     .btn-buy.sold{background:#222;color:var(--muted);cursor:not-allowed;}
+    .card-trust{font-size:10px;color:var(--muted);text-align:center;margin-top:8px;letter-spacing:.02em;line-height:1.5;}
+    .shop-card[data-status="sold"] .card-trust{display:none;}
 
     /* FOOTER */
     footer{padding:40px 48px;display:flex;justify-content:space-between;align-items:center;
@@ -182,10 +202,6 @@
   .shop-card[data-status="loading"] .btn-buy{background:#2a2a2a;color:transparent;pointer-events:none;position:relative;}
   .shop-card[data-status="loading"] .btn-buy::after{content:'Loading\2026';color:var(--muted);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;letter-spacing:.1em;}
   </style>
-  <script>
-    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-  </script>
-  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -203,7 +219,7 @@
   <div class="page-header">
     <p class="eyebrow">The Collection</p>
     <h1>50 prints. Pocket-sized.</h1>
-    <p>Limited edition reproductions of original paintings, magnetically sealed in an acrylic case. Hover over any card to pause the spin and see the artwork up close. &mdash; $23 each &middot; $5 US shipping</p>
+    <p>Limited edition reproductions of original paintings, magnetically sealed in an acrylic case. Hover any card to set it spinning &mdash; or tap <strong>Flip</strong> to read the artist's story on the back. &mdash; $23 each &middot; $5 US shipping</p>
     <div class="divider"></div>
   </div>
 
@@ -233,9 +249,10 @@
         </div>
         <div class="avail-dot"></div>
         <div class="cf-overlay"><span>View Details</span></div>
+        <button type="button" class="flip-toggle" aria-label="Flip card to read the artist's story on the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition">Ltd. Ed. &mdash; 01 of 50</span></div>
+        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span></div>
         <h2 class="card-title">Dreamfall</h2>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Acrylic, Spray Paint, Ink on Canvas</p>
@@ -247,6 +264,7 @@
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
         <a href="https://buy.stripe.com/28E8wI3if9Xa8dgdTYaVa02" class="btn-buy">Buy Now &mdash; $23</a>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
     <div class="shop-card" data-slug="dream-mountain" data-status="available" onclick="openModal('dreammountain')">
@@ -265,9 +283,10 @@
         </div>
         <div class="avail-dot"></div>
         <div class="cf-overlay"><span>View Details</span></div>
+        <button type="button" class="flip-toggle" aria-label="Flip card to read the artist's story on the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition">Ltd. Ed. &mdash; 01 of 50</span></div>
+        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span></div>
         <h2 class="card-title">Dream Mountain</h2>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Acrylic on Canvas</p>
@@ -279,6 +298,7 @@
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
         <a href="https://buy.stripe.com/5kQ7sEaKH3yM514dTYaVa03" class="btn-buy">Buy Now &mdash; $23</a>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
     <div class="shop-card" data-slug="sky-miles" data-status="available" onclick="openModal('skymiles')">
@@ -297,9 +317,10 @@
         </div>
         <div class="avail-dot"></div>
         <div class="cf-overlay"><span>View Details</span></div>
+        <button type="button" class="flip-toggle" aria-label="Flip card to read the artist's story on the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition">Ltd. Ed. &mdash; 01 of 50</span></div>
+        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span></div>
         <h2 class="card-title">Sky Miles</h2>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Acrylic, Latex, Silver Plane Miniature, Epoxy Resin on Canvas, Framed</p>
@@ -311,6 +332,7 @@
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
         <a href="https://buy.stripe.com/3cIcMY9GD0mA79c6rwaVa04" class="btn-buy">Buy Now &mdash; $23</a>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
 <div class="shop-card" data-slug="a-simple-meditation" data-status="available" onclick="openModal('asimplemeditation')">
@@ -329,9 +351,10 @@
         </div>
         <div class="avail-dot"></div>
         <div class="cf-overlay"><span>View Details</span></div>
+        <button type="button" class="flip-toggle" aria-label="Flip card to read the artist's story on the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition">Ltd. Ed. &mdash; 01 of 50</span></div>
+        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span></div>
         <h2 class="card-title">A Simple Meditation</h2>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Acrylic on Canvas</p>
@@ -343,6 +366,7 @@
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
         <a href="https://buy.stripe.com/00wcMY4mj2uI2SWaHMaVa06" class="btn-buy">Buy Now &mdash; $23</a>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
 <div class="shop-card" data-slug="veritas" data-status="available" onclick="openModal('veritas')">
@@ -361,9 +385,10 @@
         </div>
         <div class="avail-dot"></div>
         <div class="cf-overlay"><span>View Details</span></div>
+        <button type="button" class="flip-toggle" aria-label="Flip card to read the artist's story on the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition">Ltd. Ed. &mdash; 01 of 50</span></div>
+        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span></div>
         <h2 class="card-title">Veritas</h2>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Acrylic on Canvas</p>
@@ -375,6 +400,7 @@
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
         <a href="https://buy.stripe.com/bJecMY9GD3yMdxA6rwaVa09" class="btn-buy">Buy Now &mdash; $23</a>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
 
@@ -394,9 +420,10 @@
         </div>
         <div class="avail-dot"></div>
         <div class="cf-overlay"><span>View Details</span></div>
+        <button type="button" class="flip-toggle" aria-label="Flip card to read the artist's story on the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition">Ltd. Ed. &mdash; 01 of 50</span></div>
+        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span></div>
         <h2 class="card-title">Sweet Dreams</h2>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Acrylic, Joint Compound, Spray Paint on Wood Panel</p>
@@ -408,6 +435,7 @@
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
         <a href="https://buy.stripe.com/dRm3co6ur9XabpsdTYaVa0e" class="btn-buy">Buy Now &mdash; $23</a>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
   </div>
@@ -447,10 +475,15 @@ window.openModal = function(id) {
       document.querySelectorAll('.shop-card[data-slug]').forEach(function(card) {
         const slug = card.dataset.slug
         if (!inventory[slug]) return
+        const stock = inventory[slug].stock
+        const sold = 50 - stock
+        const editionEl = card.querySelector('.card-edition')
+        const stockEl = card.querySelector('.card-stock-count')
+
         if (inventory[slug].soldOut) {
           card.dataset.status = 'sold'
           const btn = card.querySelector('.btn-buy')
-          if (btn) { btn.classList.add('sold'); btn.style.pointerEvents = 'none'; btn.setAttribute('aria-disabled', 'true'); btn.textContent = 'Sold Out' }
+          if (btn) { btn.classList.add('sold'); btn.style.pointerEvents = 'none'; btn.setAttribute('aria-disabled', 'true'); btn.removeAttribute('href'); btn.textContent = 'Sold Out' }
           const dot = card.querySelector('.avail-dot')
           if (dot) dot.style.display = 'none'
           const flipper = card.querySelector('.card-flipper')
@@ -460,18 +493,29 @@ window.openModal = function(id) {
             badge.textContent = 'Sold Out'
             flipper.appendChild(badge)
           }
+          if (editionEl) editionEl.textContent = 'Ltd. Ed. — 50 of 50'
+          if (stockEl) { stockEl.textContent = '50 of 50 sold'; stockEl.classList.add('low-stock') }
+          // Capture "join the next drop" emails on sold-out cards.
+          const wrap = card.querySelector('.stripe-wrap')
+          if (wrap && !card.querySelector('.next-drop-mini')) {
+            const cap = document.createElement('div')
+            cap.className = 'next-drop-mini'
+            cap.setAttribute('onclick', 'event.stopPropagation()')
+            cap.innerHTML =
+              '<p>This edition is gone. Get first access to the next drop.</p>' +
+              '<form data-newsletter-source="sold-out-grid" data-slug="' + slug + '" ' +
+              'action="https://formspree.io/f/mzdwrrpa" method="POST">' +
+              '<input type="hidden" name="interest" value="' + slug + ' — next drop"/>' +
+              '<input type="email" name="email" placeholder="your@email.com" aria-label="Email address" required/>' +
+              '<button type="submit">Notify</button></form>'
+            wrap.parentNode.insertBefore(cap, wrap.nextSibling)
+          }
         } else {
           card.dataset.status = 'available'
-        }
-        const stockEl = card.querySelector('.card-stock-count')
-        if (stockEl && inventory[slug]) {
-          const sold = 50 - inventory[slug].stock
-          if (inventory[slug].soldOut) {
-            stockEl.textContent = '50 of 50 sold'
-            stockEl.classList.add('low-stock')
-          } else if (sold > 0) {
+          if (editionEl) editionEl.textContent = 'Ltd. Ed. — Edition ' + (sold + 1) + ' of 50'
+          if (stockEl && sold > 0) {
             stockEl.textContent = sold + ' of 50 sold'
-            if (inventory[slug].stock <= 10) stockEl.classList.add('low-stock')
+            if (stock <= 10) stockEl.classList.add('low-stock')
           }
         }
       })
@@ -483,9 +527,25 @@ window.openModal = function(id) {
         card.style.display = (status === 'all' || card.dataset.status === status) ? '' : 'none'
       })
     }
-    window.toggleFlip = function(id) {
-      document.getElementById('flip-' + id).classList.toggle('flipped')
-    }
+    // Tap/click "Flip" to reveal the card back (the artist's story) — works on
+    // touch, where hover-to-spin never fires. Stops the click from opening the
+    // product page.
+    document.addEventListener('click', function(e) {
+      const toggle = e.target.closest('.flip-toggle')
+      if (!toggle) return
+      e.preventDefault()
+      e.stopPropagation()
+      const wrap = toggle.closest('.card-flipper').querySelector('.sc-spin-wrap')
+      const spinner = toggle.closest('.card-flipper').querySelector('.sc-spin-3d')
+      if (!spinner) return
+      const showing = spinner.classList.toggle('show-back')
+      if (wrap) wrap.classList.toggle('flipped', showing)
+      toggle.textContent = showing ? 'Front ↻' : 'Flip ↻'
+      if (showing && window.mcTrack) {
+        const card = toggle.closest('.shop-card')
+        window.mcTrack('flip_back', { slug: card && card.dataset.slug })
+      }
+    })
     // Pause animations on cards outside the viewport to reduce GPU load
     if ('IntersectionObserver' in window) {
       const spinObserver = new IntersectionObserver(function(entries) {
@@ -502,6 +562,7 @@ window.openModal = function(id) {
 
   
 
+  <script defer src="/js/analytics.js"></script>
   <script src="/js/nav.js"></script>
 </body>
 </html>

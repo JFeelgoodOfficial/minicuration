@@ -28,6 +28,17 @@ const PRODUCT_NAMES = {
   'sweet-dreams':        'Sweet Dreams',
 }
 
+// ── Deactivate a Payment Link so it can no longer be purchased ────────────────
+async function deactivatePaymentLink(linkId) {
+  if (!linkId) return
+  try {
+    await stripe().paymentLinks.update(linkId, { active: false })
+    console.log(`Payment link deactivated: ${linkId}`)
+  } catch (err) {
+    console.error(`Failed to deactivate payment link ${linkId}:`, err.message)
+  }
+}
+
 // ── Raw body reader (required for Stripe signature verification) ──────────────
 function getRawBody(req) {
   return new Promise((resolve, reject) => {
@@ -80,12 +91,32 @@ async function handler(req, res) {
   }
 
   if (data === -1) {
-    // RPC returned -1: stock was already 0 when this purchase hit
-    console.error(`OVERSELL BLOCKED: ${slug} was already sold out`)
-    return res.status(200).json({ received: true, warning: 'sold_out' })
+    // RPC returned -1: stock was already 0 when this purchase hit.
+    // Close the link so it can't be hit again, and auto-refund this buyer
+    // instead of leaving the charge for a manual refund.
+    console.error(`OVERSELL BLOCKED: ${slug} was already sold out — closing link and refunding ${session.id}`)
+    await deactivatePaymentLink(session.payment_link)
+    if (session.payment_intent) {
+      try {
+        await stripe().refunds.create({
+          payment_intent: session.payment_intent,
+          reason: 'requested_by_customer',
+        })
+        console.log(`Auto-refunded oversell: ${session.payment_intent}`)
+      } catch (refundErr) {
+        console.error('Auto-refund failed (needs manual refund):', refundErr.message)
+      }
+    }
+    return res.status(200).json({ received: true, warning: 'sold_out_refunded' })
   }
 
   const editionNumber = 50 - data  // remaining stock after decrement → edition number
+
+  // If this purchase took the edition to zero, deactivate the Payment Link so
+  // the next visitor can't buy a sold-out edition (the root cause of oversells).
+  if (data === 0) {
+    await deactivatePaymentLink(session.payment_link)
+  }
 
   // 4. Append to permanent sales ledger
   const { error: ledgerError } = await supabase().from('sales').insert({
