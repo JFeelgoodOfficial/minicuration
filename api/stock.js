@@ -9,7 +9,20 @@ function supabase() {
   )
 }
 
+// Sister sites allowed to read inventory cross-origin (jfeelgood.com "Collect" section)
+const ALLOWED_ORIGINS = [
+  'https://jfeelgood.com',
+  'https://www.jfeelgood.com',
+  'https://jfeelgoodofficial.github.io',
+]
+
 module.exports = async function handler(req, res) {
+  const origin = req.headers.origin
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin)
+  }
+  res.setHeader('Vary', 'Origin')
+
   if (req.method !== 'GET') return res.status(405).end()
 
   const { data, error } = await supabase()
