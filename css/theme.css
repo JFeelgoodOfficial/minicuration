@@ -1,0 +1,28 @@
+/* ── DESIGN TOKENS ──
+   Single source of truth for the site palette.
+   Loaded before every other stylesheet on every page.
+   Legacy names (--crimson, --crimson-glow, --sky) are aliases kept for
+   older rules and js/store.js — new rules should use the semantic names. */
+:root{
+  --bg:#0a0a0a;
+  --surface:#111111;
+  --surface-2:#1a1a1a;
+  --text:#f0ebe3;
+  --muted:#888;
+  --accent:#8b1a1a;
+  --accent-strong:#a82020;
+  --accent-soft:rgb(139 26 26 / 40%);
+  --link:#5fc4e0;
+  --border:rgb(255 255 255 / 8%);
+  --nav-idle:#c8bfb4;
+  --nav-bg:rgb(10 10 10 / 92%);
+  --success:#3ecf5a;
+  --sold:#555;
+  --sold-bg:#1a1a1a;
+  --sold-border:#333;
+  --scrim:rgb(0 0 0 / 60%);
+  --shadow-color:rgb(0 0 0 / 50%);
+  --crimson:var(--accent);
+  --crimson-glow:var(--accent-soft);
+  --sky:var(--link);
+}

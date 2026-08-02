@@ -5,7 +5,7 @@
 
 /* ── RESET ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{--bg:#0a0a0a;--surface:#111111;--crimson:#8b1a1a;--crimson-glow:rgba(139,26,26,.4);--sky:#5fc4e0;--text:#f0ebe3;--muted:#888;--border:rgba(255,255,255,.08);}
+/* Palette tokens live in /css/theme.css — loaded before this file on every page. */
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
 
