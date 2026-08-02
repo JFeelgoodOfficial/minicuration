@@ -28,6 +28,15 @@ test.describe(`Product page — ${PRODUCT_URL}`, () => {
     ).toMatch(/^https:\/\/buy\.stripe\.com\//)
   })
 
+  test('sale pricing: $10 with struck-through $23 regular price', async ({ page }) => {
+    const price = page.locator('.product-price')
+    await expect(price).toContainText('$10')
+    await expect(price.locator('s.price-was')).toContainText('$23')
+
+    const buyBtn = page.locator('a.btn-buy')
+    await expect(buyBtn).toContainText('$10')
+  })
+
   test('artist statement copy is present and non-empty', async ({ page }) => {
     // .product-quote holds the artist's italic statement on every product page.
     const quote = page.locator('.product-quote')

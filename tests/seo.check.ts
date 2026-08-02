@@ -1,14 +1,16 @@
 import { test, expect } from '@playwright/test'
 
 // All 6 product page slugs — keep in sync with /shop/*.html files.
-const PRODUCT_SLUGS = [
-  'dreamfall',
-  'dream-mountain',
-  'sky-miles',
-  'a-simple-meditation',
-  'veritas',
-  'sweet-dreams',
-]
+// Prices reflect the summer sale ($10, regularly $23); Sweet Dreams is $8.
+const PRODUCTS: Record<string, string> = {
+  'dreamfall': '10.00',
+  'dream-mountain': '10.00',
+  'sky-miles': '10.00',
+  'a-simple-meditation': '10.00',
+  'veritas': '10.00',
+  'sweet-dreams': '8.00',
+}
+const PRODUCT_SLUGS = Object.keys(PRODUCTS)
 
 for (const slug of PRODUCT_SLUGS) {
   test.describe(`SEO — /shop/${slug}.html`, () => {
@@ -68,6 +70,31 @@ for (const slug of PRODUCT_SLUGS) {
         hasProductSchema,
         'No <script type="application/ld+json"> with @type:"Product" found',
       ).toBe(true)
+    })
+
+    test('og:price and JSON-LD offer price match the expected price', async ({ page }) => {
+      const expected = PRODUCTS[slug]
+
+      const ogPrice = page.locator('meta[property="og:price:amount"]')
+      await expect(ogPrice).toHaveCount(1)
+      expect(await ogPrice.getAttribute('content')).toBe(expected)
+
+      const jsonLdPrice = await page.evaluate(() => {
+        const scripts = Array.from(
+          document.querySelectorAll('script[type="application/ld+json"]'),
+        )
+        for (const s of scripts) {
+          try {
+            const data = JSON.parse(s.textContent || '')
+            const nodes = Array.isArray(data['@graph']) ? data['@graph'] : [data]
+            for (const node of nodes) {
+              if (node['@type'] === 'Product') return node.offers?.price ?? null
+            }
+          } catch { /* fall through */ }
+        }
+        return null
+      })
+      expect(jsonLdPrice, 'JSON-LD Product offers.price').toBe(expected)
     })
 
     test('page <title> contains "Minicuration"', async ({ page }) => {
