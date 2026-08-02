@@ -6,6 +6,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="theme-color" content="#f5efe4"/>
   <title>JFeelgood — Artist | Minicuration</title>
   <meta name="description" content="JFeelgood is an independent mixed-media painter working in acrylic, latex, epoxy resin, and gold leaf. Browse all 6 of his limited edition ACEO prints on Minicuration.">
   <meta name="robots" content="index, follow">
@@ -23,6 +24,7 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"ProfilePage","name":"JFeelgood — Artist","url":"https://minicuration.com/artists/jfeelgood.html","breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://minicuration.com/"},{"@type":"ListItem","position":2,"name":"Artists","item":"https://minicuration.com/artists/index.html"},{"@type":"ListItem","position":3,"name":"JFeelgood"}]}},{"@type":"Person","name":"JFeelgood","url":"https://jfeelgood.com","sameAs":["https://jfeelgood.com"],"description":"Independent mixed-media painter working in acrylic, latex, epoxy resin, gold leaf, crackle medium, and found objects on canvas and wood panel.","hasOfferCatalog":{"@type":"OfferCatalog","name":"Minicuration Collection","url":"https://minicuration.com/shop.html"}}]}
   </script>
+  <link rel="stylesheet" href="/css/theme.css"/>
   <link rel="stylesheet" href="/css/base.css"/>
 
   <style>
@@ -43,7 +45,7 @@
     .portfolio h2{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,3vw,40px);font-weight:300;margin-bottom:36px;}
     .portfolio-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
     .p-card{text-decoration:none;color:var(--text);border:1px solid var(--border);border-radius:6px;overflow:hidden;transition:border-color .3s,transform .3s;}
-    .p-card:hover{border-color:rgba(139,26,26,.4);transform:translateY(-4px);}
+    .p-card:hover{border-color:rgb(158 43 24 / 45%);transform:translateY(-4px);}
     .p-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
     .sc-spin-wrap{position:relative;width:100%;aspect-ratio:5/7;}
     .sc-spin-wrap.landscape{aspect-ratio:7/5;}
@@ -52,7 +54,7 @@
     .sc-spin-3d:hover{animation:sc-spin 14s linear infinite;}
     .sc-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;overflow:hidden;}
     .sc-front{transform:rotateY(0deg);background:#fff;}
-    .sc-back{transform:rotateY(180deg);background:#1e1e1e;}
+    .sc-back{transform:rotateY(180deg);background:var(--card-back);}
     .sc-face img{width:100%;height:100%;object-fit:cover;display:block;}
     @keyframes sc-spin{0%{transform:rotateY(0deg);}100%{transform:rotateY(360deg);}}
     .p-card-body{padding:12px 14px;}
@@ -64,6 +66,7 @@
   </style>
 </head>
 <body>
+  <div class="sale-banner"><span>Summer Sale &mdash; prints now $10</span><span class="sb-detail">&nbsp;&middot; was $23 &middot; through Aug 31</span></div>
   <nav>
     <a href="../index.html" class="nav-logo">minicuration</a>
     <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>

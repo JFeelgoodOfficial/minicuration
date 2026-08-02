@@ -1,0 +1,48 @@
+/* ── DESIGN TOKENS ──
+   Single source of truth for the site palette.
+   Loaded before every other stylesheet on every page.
+
+   Direction: warm paper / print-studio. Ivory sheet, ink text, one
+   letterpress-red accent. Product photos are shot on dark velvet and are
+   treated as framed plates (see the mat rules in base/product css).
+
+   Legacy names (--crimson, --crimson-glow, --sky) are aliases kept for
+   older rules and js/store.js — new rules should use the semantic names. */
+:root{
+  --banner-h:36px;
+  --bg:#f5efe4;
+  --surface:#fcf8f0;
+  --surface-2:#ece3d3;
+  --text:#211d18;
+  --muted:#6d6154;
+  --accent:#9e2b18;
+  --accent-strong:#7c2011;
+  --accent-soft:rgb(158 43 24 / 12%);
+  --link:#2f5d7c;
+  --border:rgb(33 29 24 / 14%);
+  --nav-idle:#7a6f60;
+  --nav-bg:rgb(245 239 228 / 92%);
+  --success:#2e6b3f;
+  --sold:#8a8175;
+  --sold-bg:#ece3d3;
+  --sold-border:#d5c9b5;
+  --scrim:rgb(20 16 12 / 55%);
+  --shadow-color:rgb(75 60 40 / 20%);
+  /* text/borders that sit on the accent or over dark photos */
+  --on-accent:#fcf6ea;
+  --on-dark:#f0ebe3;
+  /* card backs behind photo scans stay dark */
+  --card-back:#1e1e1e;
+  --crimson:var(--accent);
+  --crimson-glow:var(--accent-soft);
+  --sky:var(--link);
+}
+
+/* ── SUMMER SALE ── remove by deleting the .sale-banner markup on each
+   page and setting --banner-h back to 0. */
+body{padding-top:var(--banner-h);}
+.sale-banner{position:fixed;top:0;left:0;right:0;height:var(--banner-h);z-index:101;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--on-accent);font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:0 12px;white-space:nowrap;overflow:hidden;}
+.sale-banner s{text-decoration-color:rgb(252 246 234 / 65%);opacity:.75;}
+.price-was{color:var(--muted);font-size:.68em;font-family:'DM Sans',sans-serif;font-weight:300;text-decoration-color:rgb(158 43 24 / 55%);margin-left:2px;vertical-align:middle;}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
+@media(max-width:640px){.sb-detail{display:none;}.sale-banner{font-size:10px;letter-spacing:.08em;}}

@@ -3,22 +3,23 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#f5efe4"/>
   <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
   <title>Shop Art Prints — 50 Limited Editions | Minicuration</title>
-  <meta name="description" content="Browse 6 limited edition ACEO-sized art prints by JFeelgood. Each design limited to 50 numbered prints, sealed in an acrylic collector's case. $23 + $5 US shipping."/>
+  <meta name="description" content="Browse 6 limited edition ACEO-sized art prints by JFeelgood. Each design limited to 50 numbered prints, sealed in an acrylic collector's case. Summer sale: $10 (was $23) + $5 US shipping."/>
   <meta name="robots" content="index, follow"/>
   <link rel="canonical" href="https://minicuration.com/shop.html"/>
   <meta property="og:type" content="website"/>
   <meta property="og:title" content="Shop Limited Edition Mini Art Prints — 50 Editions Each | Minicuration"/>
-  <meta property="og:description" content="Browse 6 limited edition ACEO-sized art prints by JFeelgood. Each design limited to 50 numbered prints, sealed in an acrylic collector's case. $23 + $5 US shipping."/>
+  <meta property="og:description" content="Browse 6 limited edition ACEO-sized art prints by JFeelgood. Each design limited to 50 numbered prints, sealed in an acrylic collector's case. Summer sale: $10 (was $23) + $5 US shipping."/>
   <meta property="og:image" content="https://minicuration.com/image/sweetdreams-case1.webp"/>
   <meta property="og:url" content="https://minicuration.com/shop.html"/>
   <meta property="og:site_name" content="Minicuration"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="Shop Limited Edition Mini Art Prints — 50 Editions Each | Minicuration"/>
-  <meta name="twitter:description" content="6 limited edition ACEO-sized art prints by JFeelgood. 50 numbered editions each, sealed in an acrylic collector's case. $23 + $5 US shipping."/>
+  <meta name="twitter:description" content="6 limited edition ACEO-sized art prints by JFeelgood. 50 numbered editions each, sealed in an acrylic collector's case. Summer sale: $10 (was $23) + $5 US shipping."/>
   <meta name="twitter:image" content="https://minicuration.com/image/sweetdreams-case1.webp"/>
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"CollectionPage","name":"Shop — Minicuration","url":"https://minicuration.com/shop.html","description":"Browse 6 limited edition ACEO-sized art prints by JFeelgood. Each design limited to 50 numbered prints, sealed in a magnetic acrylic collector's case with display stand.","breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://minicuration.com/"},{"@type":"ListItem","position":2,"name":"Shop","item":"https://minicuration.com/shop.html"}]}}
@@ -30,24 +31,21 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/theme.css"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    :root{
-      --bg:#0a0a0a;--surface:#111;--crimson:#8b1a1a;
-      --crimson-glow:rgb(139 26 26 / 40%);--sky:#5fc4e0;
-      --text:#f0ebe3;--muted:#888;--border:rgb(255 255 255 / 8%);
-    }
     html{scroll-behavior:smooth;}
     body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;}
+    body::after{content:"";position:fixed;inset:0;z-index:2000;pointer-events:none;opacity:4.5%;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
 
     /* NAV */
-    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;
-      align-items:center;padding:20px 48px;background:rgb(10 10 10 / 92%);
+    nav{position:fixed;top:var(--banner-h);left:0;right:0;z-index:100;display:flex;justify-content:space-between;
+      align-items:center;padding:20px 48px;background:var(--nav-bg);
       backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
     .nav-logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;
       letter-spacing:.22em;text-transform:lowercase;color:var(--text);text-decoration:none;}
     .nav-links{display:flex;gap:36px;list-style:none;}
-    .nav-links a{color:#c8bfb4;text-decoration:none;font-size:15px;letter-spacing:.1em;
+    .nav-links a{color:var(--nav-idle);text-decoration:none;font-size:15px;letter-spacing:.1em;
       text-transform:uppercase;transition:color .3s;}
     .nav-links a:hover,.nav-links a.active{color:var(--text);}
 
@@ -62,11 +60,11 @@
 
     /* STRIPE NOTICE */
     .stripe-notice-wrap{max-width:1200px;margin:32px auto 0;padding:0 48px;}
-    .stripe-notice{background:rgb(95 196 224 / 5%);border:1px solid rgb(95 196 224 / 18%);
+    .stripe-notice{background:rgb(47 93 124 / 6%);border:1px solid rgb(47 93 124 / 22%);
       border-radius:4px;padding:16px 20px;display:flex;gap:14px;align-items:flex-start;}
     .stripe-notice p{font-size:13px;color:var(--muted);line-height:1.6;}
     .stripe-notice strong{color:var(--sky);}
-    .stripe-notice code{background:rgb(255 255 255 / 7%);padding:2px 6px;border-radius:3px;
+    .stripe-notice code{background:rgb(33 29 24 / 7%);padding:2px 6px;border-radius:3px;
       font-size:11px;font-family:monospace;color:var(--text);}
 
     /* FILTER */
@@ -74,8 +72,8 @@
     .filter-btn{padding:8px 20px;background:transparent;border:1px solid var(--border);
       color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:.1em;
       text-transform:uppercase;border-radius:2px;cursor:pointer;transition:all .3s;}
-    .filter-btn:hover,.filter-btn.active{border-color:var(--crimson);color:var(--text);
-      background:rgb(139 26 26 / 10%);}
+    .filter-btn:hover,.filter-btn.active{border-color:var(--accent);color:var(--text);
+      background:var(--accent-soft);}
 
     /* GRID */
     .shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
@@ -86,8 +84,8 @@
       overflow:hidden;cursor:pointer;
       transition:transform .3s,box-shadow .3s,border-color .3s;}
     .shop-card:hover{transform:translateY(-6px);
-      box-shadow:0 20px 50px rgb(0 0 0 / 50%),0 0 30px var(--crimson-glow);
-      border-color:rgb(139 26 26 / 40%);}
+      box-shadow:0 20px 50px var(--shadow-color);
+      border-color:rgb(158 43 24 / 45%);}
 
     /* FLIP */
     .card-flipper{position:relative;perspective:800px;}
@@ -97,30 +95,30 @@
     .cf-front,.cf-back{backface-visibility:hidden;position:relative;}
     .cf-back{position:absolute;top:0;left:0;width:100%;transform:rotateY(180deg);}
     .cf-front img,.cf-back img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
-    .cf-overlay{position:absolute;inset:0;background:rgb(0 0 0 / 60%);display:flex;
+    .cf-overlay{position:absolute;inset:0;background:var(--scrim);display:flex;
       align-items:center;justify-content:center;opacity:0%;transition:opacity .3s;}
     .shop-card:hover .cf-overlay{opacity:100%;}
     .cf-overlay span{font-size:12px;letter-spacing:.2em;text-transform:uppercase;
-      border:1px solid var(--text);padding:9px 22px;border-radius:2px;}
+      color:var(--on-dark);border:1px solid var(--on-dark);padding:9px 22px;border-radius:2px;}
     .avail-dot{position:absolute;top:12px;left:12px;width:8px;height:8px;border-radius:50%;
-      background:#3ecf5a;box-shadow:0 0 8px rgb(62 207 90 / 60%);z-index:2;}
+      background:var(--success);box-shadow:0 0 8px rgb(46 107 63 / 45%);z-index:2;}
     .shop-card[data-status="sold"] .cf-front img,
     .shop-card[data-status="sold"] .cf-back img{opacity:45%;filter:grayscale(.4);}
-    .shop-card[data-status="sold"] .avail-dot{background:#555;box-shadow:none;display:none;}
+    .shop-card[data-status="sold"] .avail-dot{background:var(--sold);box-shadow:none;display:none;}
     .sold-badge{display:none;position:absolute;top:12px;left:12px;font-size:9px;letter-spacing:.18em;
-      text-transform:uppercase;background:#1a1a1a;color:var(--muted);border:1px solid #333;
+      text-transform:uppercase;background:var(--sold-bg);color:var(--sold);border:1px solid var(--sold-border);
       padding:3px 9px;border-radius:2px;z-index:3;}
     .shop-card[data-status="sold"] .sold-badge{display:block;}
     
-    .sold-ribbon{position:absolute;top:18px;right:-28px;background:#333;color:var(--muted);
+    .sold-ribbon{position:absolute;top:18px;right:-28px;background:var(--sold-border);color:var(--text);
       font-size:10px;letter-spacing:.2em;text-transform:uppercase;padding:4px 40px;
       transform:rotate(45deg);z-index:2;}
     .flip-toggle{position:absolute;bottom:10px;right:10px;z-index:5;
-      background:rgb(0 0 0 / 65%);color:var(--text);border:1px solid var(--border);
+      background:rgb(20 16 12 / 65%);color:var(--on-dark);border:1px solid rgb(240 235 227 / 25%);
       padding:6px 12px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
       border-radius:3px;cursor:pointer;font-family:'DM Sans',sans-serif;
       transition:color .3s,border-color .3s;backdrop-filter:blur(4px);}
-    .flip-toggle:hover,.flip-toggle:focus-visible{color:var(--text);border-color:var(--crimson);}
+    .flip-toggle:hover,.flip-toggle:focus-visible{color:var(--on-dark);border-color:var(--accent);}
 
     /* Sold-out next-drop capture */
     .next-drop-mini{padding:0 18px 18px;}
@@ -130,10 +128,10 @@
       border:1px solid var(--border);border-right:none;color:var(--text);
       font-family:'DM Sans',sans-serif;font-size:12px;outline:none;border-radius:2px 0 0 2px;}
     .next-drop-mini input:focus{border-color:var(--crimson);}
-    .next-drop-mini button{padding:9px 14px;background:var(--crimson);color:var(--text);
+    .next-drop-mini button{padding:9px 14px;background:var(--accent);color:var(--on-accent);
       border:none;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:.1em;
       text-transform:uppercase;cursor:pointer;border-radius:0 2px 2px 0;}
-    .next-drop-mini button:hover{background:#a82020;}
+    .next-drop-mini button:hover{background:var(--accent-strong);}
 
     /* Spinning card (shop grid — portrait 5:7 and landscape 7:5) */
     .sc-spin-wrap{position:relative;width:100%;aspect-ratio:5/7;}
@@ -147,7 +145,7 @@
     .sc-spin-wrap.flipped .sc-spin-3d:hover{animation:none;}
     .sc-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;overflow:hidden;}
     .sc-front{transform:rotateY(0deg);background:#fff;}
-    .sc-back{transform:rotateY(180deg);background:#1e1e1e;}
+    .sc-back{transform:rotateY(180deg);background:var(--card-back);}
     .sc-face img{width:100%;height:100%;object-fit:cover;display:block;}
     @keyframes sc-spin{0%{transform:rotateY(0deg);}100%{transform:rotateY(360deg);}}
 
@@ -167,12 +165,12 @@
     .card-stock-count.low-stock{color:var(--crimson);}
     .sold-price{color:var(--muted);}
     .stripe-wrap{padding:0 18px 18px;}
-    .btn-buy{display:block;width:100%;padding:12px;background:var(--crimson);color:var(--text);
+    .btn-buy{display:block;width:100%;padding:12px;background:var(--accent);color:var(--on-accent);
       border:none;font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:.15em;
       text-transform:uppercase;border-radius:2px;cursor:pointer;text-align:center;
       text-decoration:none;transition:background .3s;}
-    .btn-buy:hover{background:#a82020;}
-    .btn-buy.sold{background:#222;color:var(--muted);cursor:not-allowed;}
+    .btn-buy:hover{background:var(--accent-strong);}
+    .btn-buy.sold{background:var(--sold-bg);color:var(--sold);cursor:not-allowed;}
     .card-trust{font-size:10px;color:var(--muted);text-align:center;margin-top:8px;letter-spacing:.02em;line-height:1.5;}
     .shop-card[data-status="sold"] .card-trust{display:none;}
 
@@ -199,11 +197,12 @@
   @media(prefers-reduced-motion:reduce){
   .sc-spin-3d,.hc-3d,.card-3d,.sc-spin-3d:hover{animation:none;transform:rotateY(0deg);}
 }
-  .shop-card[data-status="loading"] .btn-buy{background:#2a2a2a;color:transparent;pointer-events:none;position:relative;}
+  .shop-card[data-status="loading"] .btn-buy{background:var(--surface-2);color:transparent;pointer-events:none;position:relative;}
   .shop-card[data-status="loading"] .btn-buy::after{content:'Loading\2026';color:var(--muted);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;letter-spacing:.1em;}
   </style>
 </head>
 <body>
+  <div class="sale-banner"><span>Summer Sale &mdash; prints now $10</span><span class="sb-detail">&nbsp;&middot; was $23 &middot; through Aug 31</span></div>
 
   <nav>
     <a href="index.html" class="nav-logo">minicuration</a>
@@ -219,7 +218,7 @@
   <div class="page-header">
     <p class="eyebrow">The Collection</p>
     <h1>50 prints. Pocket-sized.</h1>
-    <p>Limited edition reproductions of original paintings, magnetically sealed in an acrylic case. Hover any card to set it spinning &mdash; or tap <strong>Flip</strong> to read the artist's story on the back. &mdash; $23 each &middot; $5 US shipping</p>
+    <p>Limited edition reproductions of original paintings, magnetically sealed in an acrylic case. Hover any card to set it spinning &mdash; or tap <strong>Flip</strong> to read the artist's story on the back. &mdash; now $10 each <s class="price-was"><span class="sr-only">regular price </span>$23</s> &middot; $5 US shipping</p>
     <div class="divider"></div>
   </div>
 
@@ -258,12 +257,12 @@
         <p class="card-medium">Acrylic, Spray Paint, Ink on Canvas</p>
         <p class="card-concept">"I wanted to paint what it felt to be near beauty."</p>
         <div class="card-price-row">
-          <span class="card-price">$23</span>
+          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <a href="https://buy.stripe.com/28E8wI3if9Xa8dgdTYaVa02" class="btn-buy">Buy Now &mdash; $23</a>
+        <a href="https://buy.stripe.com/dRm8wIaKHedqbps7vAaVa0m" class="btn-buy">Buy Now &mdash; $10</a>
         <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
@@ -292,12 +291,12 @@
         <p class="card-medium">Acrylic on Canvas</p>
         <p class="card-concept">"I want to show you the hills and valleys of my imagination."</p>
         <div class="card-price-row">
-          <span class="card-price">$23</span>
+          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <a href="https://buy.stripe.com/5kQ7sEaKH3yM514dTYaVa03" class="btn-buy">Buy Now &mdash; $23</a>
+        <a href="https://buy.stripe.com/8x23co3ifedq5149DIaVa0n" class="btn-buy">Buy Now &mdash; $10</a>
         <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
@@ -326,12 +325,12 @@
         <p class="card-medium">Acrylic, Latex, Silver Plane Miniature, Epoxy Resin on Canvas, Framed</p>
         <p class="card-concept">"Navigating emotions is to know the water from the winds."</p>
         <div class="card-price-row">
-          <span class="card-price">$23</span>
+          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <a href="https://buy.stripe.com/3cIcMY9GD0mA79c6rwaVa04" class="btn-buy">Buy Now &mdash; $23</a>
+        <a href="https://buy.stripe.com/5kQeV6dWTb1ealo9DIaVa0o" class="btn-buy">Buy Now &mdash; $10</a>
         <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
@@ -360,12 +359,12 @@
         <p class="card-medium">Acrylic on Canvas</p>
         <p class="card-concept">"I wanted to be closer to my craft. I painted straight from the tubes, faster than the influence of intention, and gave myself the time of Paganini's Caprice No. 24"</p>
         <div class="card-price-row">
-          <span class="card-price">$23</span>
+          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <a href="https://buy.stripe.com/00wcMY4mj2uI2SWaHMaVa06" class="btn-buy">Buy Now &mdash; $23</a>
+        <a href="https://buy.stripe.com/aFa5kw4mj0mAbps8zEaVa0p" class="btn-buy">Buy Now &mdash; $10</a>
         <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
@@ -394,12 +393,12 @@
         <p class="card-medium">Acrylic on Canvas</p>
         <p class="card-concept">"One can begin to lose themselves in presenting for others."</p>
         <div class="card-price-row">
-          <span class="card-price">$23</span>
+          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <a href="https://buy.stripe.com/bJecMY9GD3yMdxA6rwaVa09" class="btn-buy">Buy Now &mdash; $23</a>
+        <a href="https://buy.stripe.com/eVq28k6urfhu1OS17caVa0q" class="btn-buy">Buy Now &mdash; $10</a>
         <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>

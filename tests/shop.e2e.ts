@@ -61,6 +61,26 @@ test.describe('Shop catalog — /shop.html', () => {
     expect(broken, `Card images failed to load: ${broken.join(', ')}`).toHaveLength(0)
   })
 
+  test('summer sale banner is visible', async ({ page }) => {
+    const banner = page.locator('.sale-banner')
+    await expect(banner).toBeVisible()
+    await expect(banner).toContainText('$10')
+  })
+
+  test('sale pricing: 5 cards at $10 with struck $23, Sweet Dreams plain $8', async ({ page }) => {
+    const saleCards = page.locator('.shop-card:not([data-slug="sweet-dreams"])')
+    await expect(saleCards).toHaveCount(5)
+    for (const card of await saleCards.all()) {
+      const price = card.locator('.card-price')
+      await expect(price).toContainText('$10')
+      await expect(price.locator('s.price-was')).toContainText('$23')
+    }
+
+    const sweetDreams = page.locator('.shop-card[data-slug="sweet-dreams"] .card-price')
+    await expect(sweetDreams).toContainText('$8')
+    await expect(sweetDreams.locator('s.price-was')).toHaveCount(0)
+  })
+
   test('tapping a card opens its product page (mobile touch)', async ({ page, isMobile }) => {
     if (!isMobile) test.skip()
 

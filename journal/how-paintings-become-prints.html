@@ -6,6 +6,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="theme-color" content="#f5efe4"/>
   <title>How JFeelgood's Paintings Survive Being Shrunk to a Trading Card | Minicuration</title>
   <meta name="description" content="Not every painting earns its reduction to 2.5×3.5 inches. A look at what makes JFeelgood's six Minicuration works survive — and in some cases improve — at card scale.">
   <meta name="robots" content="index, follow">
@@ -23,6 +24,7 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Article","headline":"How JFeelgood's Paintings Survive Being Shrunk to a Trading Card","description":"Not every painting earns its reduction to 2.5×3.5 inches. A look at what makes JFeelgood's six Minicuration works survive — and in some cases improve — at card scale.","url":"https://minicuration.com/journal/how-paintings-become-prints.html","image":"https://minicuration.com/image/dreamfall-case1.webp","datePublished":"2026-05-16","dateModified":"2026-05-16","author":{"@type":"Organization","name":"Minicuration","url":"https://minicuration.com/"},"publisher":{"@type":"Organization","name":"Minicuration","url":"https://minicuration.com/"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://minicuration.com/"},{"@type":"ListItem","position":2,"name":"Journal","item":"https://minicuration.com/journal.html"},{"@type":"ListItem","position":3,"name":"How Paintings Become Prints"}]},"mainEntityOfPage":{"@type":"WebPage","@id":"https://minicuration.com/journal/how-paintings-become-prints.html"},"about":[{"@type":"Person","name":"JFeelgood","url":"https://jfeelgood.com"},{"@type":"VisualArtwork","name":"Dreamfall","url":"https://minicuration.com/shop/dreamfall.html"},{"@type":"VisualArtwork","name":"Dream Mountain","url":"https://minicuration.com/shop/dream-mountain.html"},{"@type":"VisualArtwork","name":"Sky Miles","url":"https://minicuration.com/shop/sky-miles.html"},{"@type":"VisualArtwork","name":"A Simple Meditation","url":"https://minicuration.com/shop/a-simple-meditation.html"},{"@type":"VisualArtwork","name":"Veritas","url":"https://minicuration.com/shop/veritas.html"},{"@type":"VisualArtwork","name":"Sweet Dreams","url":"https://minicuration.com/shop/sweet-dreams.html"}]}
   </script>
+  <link rel="stylesheet" href="/css/theme.css"/>
   <link rel="stylesheet" href="/css/base.css"/>
 
   <style>
@@ -45,7 +47,7 @@
     /* WORK CARDS — inline product mentions */
     .works-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:40px 0;}
     .work-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:20px;text-decoration:none;color:var(--text);transition:border-color .3s,transform .3s;display:block;}
-    .work-card:hover{border-color:rgba(139,26,26,.4);transform:translateY(-3px);}
+    .work-card:hover{border-color:rgb(158 43 24 / 45%);transform:translateY(-3px);}
     .work-card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;margin-bottom:6px;}
     .work-card-medium{font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5;}
     .work-card-quote{font-size:12px;color:var(--muted);font-style:italic;line-height:1.6;border-left:2px solid var(--crimson);padding-left:10px;}
@@ -59,8 +61,8 @@
     .article-cta{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:64px 48px;text-align:center;margin-top:60px;}
     .article-cta h2{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,46px);font-weight:300;margin-bottom:14px;}
     .article-cta p{color:var(--muted);font-size:15px;margin-bottom:32px;max-width:440px;margin-left:auto;margin-right:auto;}
-    .btn-cta{display:inline-block;background:var(--crimson);color:var(--text);text-decoration:none;padding:14px 36px;font-size:13px;letter-spacing:.15em;text-transform:uppercase;border-radius:2px;transition:background .3s;}
-    .btn-cta:hover{background:#a82020;}
+    .btn-cta{display:inline-block;background:var(--accent);color:var(--on-accent);text-decoration:none;padding:14px 36px;font-size:13px;letter-spacing:.15em;text-transform:uppercase;border-radius:2px;transition:background .3s;}
+    .btn-cta:hover{background:var(--accent-strong);}
 
     /* RELATED */
     .related{padding:60px 48px 80px;}
@@ -68,7 +70,7 @@
     .related h2{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,3vw,34px);font-weight:300;margin-bottom:36px;}
     .related-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;max-width:860px;background:var(--border);border:1px solid var(--border);}
     .related-card{background:var(--surface);padding:32px 28px;text-decoration:none;color:var(--text);transition:background .3s;}
-    .related-card:hover{background:#161616;}
+    .related-card:hover{background:var(--surface-2);}
     .related-tag{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--crimson);margin-bottom:12px;}
     .related-card h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;line-height:1.25;margin-bottom:10px;}
     .related-card p{font-size:12px;color:var(--muted);line-height:1.65;}
@@ -84,6 +86,7 @@
   </style>
 </head>
 <body>
+  <div class="sale-banner"><span>Summer Sale &mdash; prints now $10</span><span class="sb-detail">&nbsp;&middot; was $23 &middot; through Aug 31</span></div>
 
   <nav>
     <a href="../index.html" class="nav-logo">minicuration</a>
@@ -183,7 +186,7 @@
 
     <p>All six passed that test. The fact that they passed for different reasons — immediacy in one case, graphic structure in another, compositional logic in a third — is what makes the collection coherent rather than arbitrary. They're not six random works by the same artist. They're six different proofs of the same argument: that a painting built around a genuine idea survives reduction in a way that a painting built around technique or detail does not.</p>
 
-    <p>The full collection is available at the <a href="../shop.html">Minicuration shop</a>. All six prints, 50 editions each, all $23. The artist's statement on the back of each card tells the story behind the work — the medium, the constraint, the concept. That part doesn't compress.</p>
+    <p>The full collection is available at the <a href="../shop.html">Minicuration shop</a>. All six prints, 50 editions each, all $10 during the summer sale (regularly $23). The artist's statement on the back of each card tells the story behind the work — the medium, the constraint, the concept. That part doesn't compress.</p>
 
   </div>
 

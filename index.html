@@ -6,33 +6,35 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#f5efe4"/>
   <meta name="google-site-verification" content="d_atGra2L8M-arxYO05aALPKJfhXHzMsKA556g-o_3g" />
   <title>Minicuration — ACEO Limited Edition Art Prints | Trading Card Sized</title>
-  <meta name="description" content="Limited edition ACEO art prints — original paintings on 2.5×3.5-inch trading cards. 50 numbered editions, sealed in a magnetic acrylic case. $23."/>
+  <meta name="description" content="Limited edition ACEO art prints — original paintings on 2.5×3.5-inch trading cards. 50 numbered editions, sealed in a magnetic acrylic case. Summer sale: $10 (was $23)."/>
   <meta name="robots" content="index, follow"/>
   <link rel="canonical" href="https://minicuration.com/"/>
   <meta property="og:type" content="website"/>
   <meta property="og:title" content="Minicuration — ACEO Limited Edition Art Prints | Trading Card Sized"/>
-  <meta property="og:description" content="Museum-quality reproductions of original paintings on 2.5×3.5-inch trading cards. 50 numbered editions per design, sealed in a magnetic acrylic case. $23."/>
+  <meta property="og:description" content="Museum-quality reproductions of original paintings on 2.5×3.5-inch trading cards. 50 numbered editions per design, sealed in a magnetic acrylic case. Summer sale: $10 (was $23)."/>
   <meta property="og:image" content="https://minicuration.com/image/sweetdreams-case1.webp"/>
   <meta property="og:url" content="https://minicuration.com/"/>
   <meta property="og:site_name" content="Minicuration"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="Minicuration — ACEO Limited Edition Art Prints | Trading Card Sized"/>
-  <meta name="twitter:description" content="Museum-quality reproductions of original paintings on 2.5×3.5-inch trading cards. 50 numbered editions, sealed in a magnetic acrylic case. $23."/>
+  <meta name="twitter:description" content="Museum-quality reproductions of original paintings on 2.5×3.5-inch trading cards. 50 numbered editions, sealed in a magnetic acrylic case. Summer sale: $10 (was $23)."/>
   <meta name="twitter:image" content="https://minicuration.com/image/sweetdreams-case1.webp"/>
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"Minicuration","url":"https://minicuration.com/","logo":"https://minicuration.com/image/sweetdreams-case1.webp","description":"Limited edition ACEO-sized art prints — museum-quality reproductions of original paintings by JFeelgood, sealed in magnetic acrylic collector's cases.","sameAs":["https://jfeelgood.com"]},{"@type":"WebSite","name":"Minicuration","url":"https://minicuration.com/"}]}
   </script>
   <link rel="preload" as="image" href="image/spin/dreamfall_artwork.webp"/>
+  <link rel="stylesheet" href="/css/theme.css"/>
   <link rel="stylesheet" href="/css/base.css"/>
 
   <style>
     
-    .btn-primary { display: inline-block; background: var(--crimson); color: var(--text);
+    .btn-primary { display: inline-block; background: var(--accent); color: var(--on-accent);
       text-decoration: none; padding: 14px 36px; font-size: 13px; letter-spacing: .15em;
       text-transform: uppercase; border-radius: 2px; transition: background .3s, transform .2s; }
-    .btn-primary:hover { background: #a82020; transform: translateY(-2px); }
+    .btn-primary:hover { background: var(--accent-strong); transform: translateY(-2px); }
     .section-label { font-size: 10px; letter-spacing: .4em; text-transform: uppercase;
       color: var(--crimson); margin-bottom: 16px; }
     
@@ -66,7 +68,7 @@
     .hc-face { position:absolute; width:100%; height:100%; border-radius:6px;
       backface-visibility:hidden; overflow:hidden; }
     .hc-front { transform:rotateY(0deg); background:#fff; }
-    .hc-back  { transform:rotateY(180deg); background:#1e1e1e; }
+    .hc-back  { transform:rotateY(180deg); background:var(--card-back); }
     .hc-face img { width:100%; height:100%; object-fit:cover; display:block; border-radius:6px; }
     @keyframes hc-spin { 0%{transform:rotateY(0deg);} 100%{transform:rotateY(360deg);} }
 
@@ -93,15 +95,15 @@
 
     /* ── SPINNING CARD ── */
     .spin-wrap{position:relative;display:inline-block;}
-    .card-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgb(201 169 110 / 12%) 0%,transparent 70%);pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse 8s ease-in-out infinite;z-index:0;}
-    .shadow-wrap{border-radius:14px;box-shadow:0 30px 80px rgb(0 0 0 / 80%);position:relative;z-index:1;}
+    .card-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgb(201 169 110 / 28%) 0%,transparent 70%);pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse 8s ease-in-out infinite;z-index:0;}
+    .shadow-wrap{border-radius:14px;box-shadow:0 30px 80px var(--shadow-color);position:relative;z-index:1;}
     .scene{perspective:1200px;width:240px;height:336px;}
     .card-3d{will-change:transform;width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:none;transform:rotateY(0deg);}
     @keyframes spin{0%{transform:rotateY(0deg);}100%{transform:rotateY(360deg);}}
     .card-3d:hover{animation:spin 14s linear infinite;cursor:pointer;}
     .face{position:absolute;width:100%;height:100%;border-radius:14px;backface-visibility:hidden;overflow:hidden;}
     .face.front{transform:rotateY(0deg);background:#fff;}
-    .face.back{transform:rotateY(180deg);background:#1e1e1e;}
+    .face.back{transform:rotateY(180deg);background:var(--card-back);}
     .face img{width:100%;height:100%;object-fit:cover;display:block;border-radius:14px;}
     @keyframes pulse{0%,100%{opacity:60%;transform:translate(-50%,-50%) scale(1);}50%{opacity:100%;transform:translate(-50%,-50%) scale(1.15);}}
     .spotlight-text h2 { font-family:'Cormorant Garamond',serif;
@@ -141,11 +143,11 @@
       font-family:'DM Sans',sans-serif; font-size:14px; outline:none;
       border-radius:2px 0 0 2px; transition:border-color .3s; }
     .email-form input:focus { border-color:var(--crimson); }
-    .email-form button { padding:13px 22px; background:var(--crimson); color:var(--text);
+    .email-form button { padding:13px 22px; background:var(--accent); color:var(--on-accent);
       border:none; font-family:'DM Sans',sans-serif; font-size:12px;
       letter-spacing:.15em; text-transform:uppercase; cursor:pointer;
       border-radius:0 2px 2px 0; transition:background .3s; }
-    .email-form button:hover { background:#a82020; }
+    .email-form button:hover { background:var(--accent-strong); }
     .email-fine { font-size:11px; color:var(--muted); margin-top:12px; }
 
     @media(max-width:768px){
@@ -162,10 +164,63 @@
     }
     .why-collect-grid > div { border:1px solid var(--border); border-radius:4px; padding:32px 28px; transition:border-color .3s; }
     .why-collect-grid > div:hover { border-color:var(--crimson); }
-    .journal-card:hover { background: #111; }
+    .journal-card:hover { background: var(--surface-2); }
+
+    /* ── BUNDLE ADVERT ── the complete set, all six prints ── */
+    .bundle { background:var(--surface-2); border-top:1px solid var(--border);
+      border-bottom:1px solid var(--border); padding:88px 48px; overflow:hidden; }
+    .bundle-inner { max-width:1100px; margin:0 auto; display:grid;
+      grid-template-columns:1.05fr .95fr; gap:72px; align-items:center; }
+
+    /* fanned stack of all six card faces */
+    .bundle-fan { display:flex; justify-content:center; padding:24px 0; }
+    .bundle-card { width:104px; aspect-ratio:5/7; background:var(--surface);
+      padding:5px; border:1px solid var(--border); border-radius:3px;
+      box-shadow:0 10px 26px var(--shadow-color); margin-right:-30px;
+      transform-origin:bottom center; transition:transform .45s cubic-bezier(.4,0,.2,1); }
+    .bundle-card:last-child { margin-right:0; }
+    .bundle-card img { width:100%; height:100%; object-fit:cover; display:block; border-radius:2px; }
+    .bundle-card:nth-child(1){ transform:rotate(-9deg) translateY(6px); }
+    .bundle-card:nth-child(2){ transform:rotate(-5.4deg) translateY(1px); }
+    .bundle-card:nth-child(3){ transform:rotate(-1.8deg); z-index:2; }
+    .bundle-card:nth-child(4){ transform:rotate(1.8deg); z-index:2; }
+    .bundle-card:nth-child(5){ transform:rotate(5.4deg) translateY(1px); }
+    .bundle-card:nth-child(6){ transform:rotate(9deg) translateY(6px); }
+    .bundle-fan:hover .bundle-card:nth-child(1){ transform:rotate(-14deg) translate(-16px,-4px); }
+    .bundle-fan:hover .bundle-card:nth-child(2){ transform:rotate(-8.4deg) translate(-8px,-9px); }
+    .bundle-fan:hover .bundle-card:nth-child(3){ transform:rotate(-2.8deg) translateY(-12px); }
+    .bundle-fan:hover .bundle-card:nth-child(4){ transform:rotate(2.8deg) translateY(-12px); }
+    .bundle-fan:hover .bundle-card:nth-child(5){ transform:rotate(8.4deg) translate(8px,-9px); }
+    .bundle-fan:hover .bundle-card:nth-child(6){ transform:rotate(14deg) translate(16px,-4px); }
+    .bundle-rule { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+    .bundle-rule span { font-size:10px; letter-spacing:.4em; text-transform:uppercase;
+      color:var(--accent); white-space:nowrap; }
+    .bundle-rule::after { content:""; flex:1; height:1px; background:var(--border); }
+    .bundle h2 { font-family:'Cormorant Garamond',serif; font-size:clamp(34px,4.4vw,54px);
+      font-weight:300; line-height:1.1; margin-bottom:16px; }
+    .bundle h2 em { font-style:italic; color:var(--accent); }
+    .bundle-copy { font-size:15px; color:var(--muted); line-height:1.8; margin-bottom:26px; max-width:44ch; }
+    .bundle-price-row { display:flex; align-items:baseline; gap:14px; margin-bottom:8px; }
+    .bundle-price { font-family:'Cormorant Garamond',serif; font-size:56px; font-weight:400; line-height:1; }
+    .bundle-ship { font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+    .bundle-note { font-size:12px; color:var(--muted); margin-bottom:26px; }
+    .bundle-terms { font-size:11px; color:var(--muted); margin-top:12px; opacity:85%; }
+    @media(max-width:860px){
+      .bundle { padding:64px 20px; }
+      .bundle-inner { grid-template-columns:1fr; gap:40px; }
+      .bundle-card { width:76px; margin-right:-22px; }
+      .bundle-price { font-size:46px; }
+    }
+
+    /* Keep the fan (6 cards + their rotation) inside the viewport on phones. */
+    @media(max-width:480px){
+      .bundle-card { width:60px; margin-right:-16px; }
+    }
+    @media(prefers-reduced-motion:reduce){ .bundle-card { transition:none; } }
   </style>
 </head>
 <body>
+  <div class="sale-banner"><span>Summer Sale &mdash; prints now $10</span><span class="sb-detail">&nbsp;&middot; was $23 &middot; through Aug 31</span></div>
   <nav>
     <a href="index.html" class="nav-logo">minicuration</a>
     <button type="button" class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
@@ -181,8 +236,35 @@
   <section class="hero">
     <p class="hero-eyebrow">ACEO &mdash; Trading Card Sized Art Prints</p>
     <h1>Limited Edition.<br/><em>Small Format, Real Art.</em></h1>
-    <p class="hero-sub">Museum-quality prints of original paintings, sealed in a collector's acrylic case. Only 50 of each. <strong>$23.</strong></p>
+    <p class="hero-sub">Museum-quality prints of original paintings, sealed in a collector's acrylic case. Only 50 of each. <strong>Summer sale: $10.</strong> <s class="price-was"><span class="sr-only">regular price </span>$23</s></p>
     <a href="shop.html" class="btn-primary">Shop the Collection</a>
+  </section>
+
+  <!-- BUNDLE: the complete six-print set -->
+  <section class="bundle" id="bundle" aria-labelledby="bundle-heading">
+    <div class="bundle-inner">
+      <div class="bundle-fan" aria-hidden="true">
+        <div class="bundle-card"><img width="500" height="700" src="image/spin/dreamfall_artwork.webp" alt="" loading="lazy" decoding="async"/></div>
+        <div class="bundle-card"><img width="500" height="700" src="image/spin/dream-mountain_artwork.webp" alt="" loading="lazy" decoding="async"/></div>
+        <div class="bundle-card"><img width="500" height="700" src="image/spin/skymiles_artwork.webp" alt="" loading="lazy" decoding="async"/></div>
+        <div class="bundle-card"><img width="500" height="700" src="image/spin/asimplemeditation_artwork.webp" alt="" loading="lazy" decoding="async"/></div>
+        <div class="bundle-card"><img width="500" height="700" src="image/spin/veritas_artwork.webp" alt="" loading="lazy" decoding="async"/></div>
+        <div class="bundle-card"><img width="500" height="700" src="image/spin/sweet-dreams_artwork.webp" alt="" loading="lazy" decoding="async"/></div>
+      </div>
+
+      <div class="bundle-text">
+        <p class="bundle-rule"><span>The Six-Pack</span></p>
+        <h2 id="bundle-heading">Take the <em>whole collection</em> home.</h2>
+        <p class="bundle-copy">Every design currently in print &mdash; Dreamfall, Dream Mountain, Sky Miles, A Simple Meditation, Veritas, and Sweet Dreams &mdash; each numbered, each sealed in its own magnetic acrylic case with a stand.</p>
+        <div class="bundle-price-row">
+          <span class="bundle-price">$60</span>
+          <span class="bundle-ship">Shipping free</span>
+        </div>
+        <p class="bundle-note">Six prints &middot; one of each design &middot; one order</p>
+        <a href="https://buy.stripe.com/9B69AMaKH8T679c4joaVa0r" class="btn-primary">Buy the Six-Pack &mdash; $60</a>
+        <p class="bundle-terms">Available while all six editions remain open. Secure checkout via Stripe &middot; Ships in 5&ndash;7 days &middot; 14-day guarantee.</p>
+      </div>
+    </div>
   </section>
 
   <!-- WHY COLLECT -->
@@ -232,7 +314,7 @@
         <h2>A Simple Meditation</h2>
         <p class="meta-row">by JFeelgood &nbsp;·&nbsp; Acrylic on Canvas</p>
         <p class="concept">"I wanted to be closer to my craft. I painted straight from the tubes, faster than the influence of intention,and gave myself the time of Paganini's Caprice No.24."</p>
-        <div class="price">$23</div>
+        <div class="price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></div>
         <a href="shop/a-simple-meditation.html" class="btn-primary">Shop A Simple Meditation</a>
       </div>
     </div>
@@ -263,7 +345,7 @@
         <h2>Sky Miles</h2>
         <p class="meta-row">by JFeelgood &nbsp;·&nbsp; Acrylic, latex, oil, stainless steel airplane model, epoxy resin on Canvas</p>
         <p class="concept">"Navigating emotions is to know the water from the winds."</p>
-        <div class="price">$23</div>
+        <div class="price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></div>
         <a href="shop/sky-miles.html" class="btn-primary">Shop Sky Miles</a>
       </div>
     </div>
