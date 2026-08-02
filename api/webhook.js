@@ -15,6 +15,15 @@ function resend()    { return _resend    ||= new Resend(process.env.RESEND_API_K
 // Stripe product name, which survives re-pricing. Old IDs stay listed so
 // checkouts started before a price change still resolve.
 const PRICE_TO_SLUG = {
+  // Current prices — summer sale ($10 each; Sweet Dreams $8)
+  'price_1U07n72mxhfkNl2YELQTDBFG':           'dreamfall',
+  'price_1U07r12mxhfkNl2YYDCWyXNP':      'dream-mountain',
+  'price_1U07sJ2mxhfkNl2YQgM1WlS6':           'sky-miles',
+  'price_1U07sv2mxhfkNl2YiIr52Kb7': 'a-simple-meditation',
+  'price_1U07tq2mxhfkNl2YeiHKsdF9':             'veritas',
+  'price_1TzPZE2mxhfkNl2YTUVsFRVh':        'sweet-dreams',
+  // Superseded prices — kept mapped so checkouts opened before a price
+  // change still decrement stock instead of being logged as unrecognised.
   'price_1TYe162mxhfkNl2YfTEeMam4':           'dreamfall',
   'price_1TYe0Z2mxhfkNl2YQly65K69':      'dream-mountain',
   'price_1TYdzt2mxhfkNl2Y5DazJzes':           'sky-miles',
@@ -22,6 +31,11 @@ const PRICE_TO_SLUG = {
   'price_1TYdyF2mxhfkNl2Y6YezO7rQ':             'veritas',
   'price_1TYGcr2mxhfkNl2YAUNVRpw4':        'sweet-dreams',
 }
+
+// Prices that sell every edition in one checkout (the $60 six-pack).
+const BUNDLE_PRICE_IDS = new Set([
+  'price_1U07vq2mxhfkNl2Y8cgwskpF',
+])
 
 const PRODUCT_NAMES = {
   'dreamfall':           'Dreamfall',
@@ -50,7 +64,8 @@ function slugFromName(name) {
 // slug per line item.
 function resolveSlugs(lineItems) {
   const isBundle = lineItems.some(item =>
-    BUNDLE_PATTERN.test(item.description || item.price?.product?.name || ''))
+    BUNDLE_PRICE_IDS.has(item.price?.id)
+    || BUNDLE_PATTERN.test(item.description || item.price?.product?.name || ''))
   if (isBundle) return { slugs: [...ALL_SLUGS], isBundle: true }
 
   const slugs = lineItems

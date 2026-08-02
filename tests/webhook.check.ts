@@ -26,9 +26,32 @@ test.describe('webhook — product resolution', () => {
     expect(slugFromName('Totally Unknown Print')).toBeNull()
   })
 
-  test('legacy price IDs still resolve', () => {
+  test('current sale price IDs resolve to their product', () => {
+    const CURRENT: Record<string, string> = {
+      'price_1U07n72mxhfkNl2YELQTDBFG': 'dreamfall',
+      'price_1U07r12mxhfkNl2YYDCWyXNP': 'dream-mountain',
+      'price_1U07sJ2mxhfkNl2YQgM1WlS6': 'sky-miles',
+      'price_1U07sv2mxhfkNl2YiIr52Kb7': 'a-simple-meditation',
+      'price_1U07tq2mxhfkNl2YeiHKsdF9': 'veritas',
+      'price_1TzPZE2mxhfkNl2YTUVsFRVh': 'sweet-dreams',
+    }
+    for (const [priceId, slug] of Object.entries(CURRENT)) {
+      expect(resolveSlugs([{ price: { id: priceId } }]), `${slug} price ID`)
+        .toEqual({ slugs: [slug], isBundle: false })
+    }
+  })
+
+  test('superseded price IDs still resolve (in-flight checkouts)', () => {
     expect(resolveSlugs([{ price: { id: 'price_1TYe162mxhfkNl2YfTEeMam4' } }]))
       .toEqual({ slugs: ['dreamfall'], isBundle: false })
+    expect(resolveSlugs([{ price: { id: 'price_1TYGcr2mxhfkNl2YAUNVRpw4' } }]))
+      .toEqual({ slugs: ['sweet-dreams'], isBundle: false })
+  })
+
+  test('the six-pack price ID consumes all six editions', () => {
+    const result = resolveSlugs([{ price: { id: 'price_1U07vq2mxhfkNl2Y8cgwskpF' } }])
+    expect(result.isBundle).toBe(true)
+    expect(result.slugs.sort()).toEqual([...ALL_SLUGS].sort())
   })
 
   test('a price ID absent from the map resolves via product name', () => {
