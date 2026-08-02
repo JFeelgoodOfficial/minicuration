@@ -75,7 +75,7 @@ function parseProductHTML(html) {
     artist: text(".product-meta a") || "JFeelgood",
     catalogNumber,
     yearReleased,
-    price: priceRaw || "45",
+    price: priceRaw || "10",
     slug,
     cardQuote: quoteRaw,
     expandedNote: text(".expanded-note p"),
@@ -100,7 +100,7 @@ const defaultData = {
   artist: "JFeelgood",
   catalogNumber: "",
   yearReleased: "2026",
-  price: "45",
+  price: "10",
   slug: "",
   cardQuote: "",
   expandedNote: "",
@@ -199,7 +199,7 @@ function Preview({ d }) {
       "@type": "Offer",
       url: canonicalUrl,
       priceCurrency: "USD",
-      price: d.price || "45.00",
+      price: d.price || "10.00",
       availability: "https://schema.org/InStock",
       itemCondition: "https://schema.org/NewCondition",
     },
@@ -237,10 +237,10 @@ function Preview({ d }) {
         </div>
       )}
 
-      <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "36px", fontWeight: 400, marginBottom: "16px" }}>${d.price || "45"}</div>
+      <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "36px", fontWeight: 400, marginBottom: "16px" }}>${d.price || "10"}</div>
 
       <div style={{ display: "block", width: "100%", padding: "12px", background: "#8b1a1a", color: "#f0ebe3", fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", borderRadius: "2px", textAlign: "center", marginBottom: "24px", boxSizing: "border-box" }}>
-        Buy Now — ${d.price || "45"}
+        Buy Now — ${d.price || "10"}
       </div>
 
       {assembledSentence && (
@@ -363,7 +363,7 @@ function MiniCurationBuilder() {
     const title = data.title || "Untitled";
     const artist = data.artist || "JFeelgood";
     const medium = data.medium || "";
-    const price = data.price || "45";
+    const price = data.price || "10";
 
     const assembledSentence = data.title && data.medium && data.yearPainted
       ? `The original ${data.title} is ${data.medium}${data.dimensions ? ", " + data.dimensions : ""}, painted in ${data.yearPainted}. It currently ${data.originalStatus.toLowerCase()}${data.originalForSale === "Yes" ? " and is available — contact for pricing" : " and is not for sale"}.`
@@ -588,7 +588,7 @@ function MiniCurationBuilder() {
               <Field label="Artist"><Input value={data.artist} onChange={set("artist")} placeholder="JFeelgood" /></Field>
               <Field label="Catalog Number (SKU)"><Input value={data.catalogNumber} onChange={set("catalogNumber")} placeholder="MC-XXX" /></Field>
               <Field label="Year Released"><Input value={data.yearReleased} onChange={set("yearReleased")} placeholder="2026" /></Field>
-              <Field label="Price (USD)"><Input value={data.price} onChange={set("price")} placeholder="45" /></Field>
+              <Field label="Price (USD)"><Input value={data.price} onChange={set("price")} placeholder="10" /></Field>
               <Field label="URL Slug"><Input value={data.slug} onChange={set("slug")} placeholder="lowercase-hyphenated-title" /></Field>
               {data.slug && (
                 <div style={{ fontSize: "10px", color: "#555", background: "#111", padding: "6px 10px", borderRadius: "3px", border: "1px solid rgba(255,255,255,0.06)", wordBreak: "break-all" }}>
