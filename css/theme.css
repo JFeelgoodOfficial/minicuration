@@ -1,27 +1,37 @@
 /* ── DESIGN TOKENS ──
    Single source of truth for the site palette.
    Loaded before every other stylesheet on every page.
+
+   Direction: warm paper / print-studio. Ivory sheet, ink text, one
+   letterpress-red accent. Product photos are shot on dark velvet and are
+   treated as framed plates (see the mat rules in base/product css).
+
    Legacy names (--crimson, --crimson-glow, --sky) are aliases kept for
    older rules and js/store.js — new rules should use the semantic names. */
 :root{
-  --bg:#0a0a0a;
-  --surface:#111111;
-  --surface-2:#1a1a1a;
-  --text:#f0ebe3;
-  --muted:#888;
-  --accent:#8b1a1a;
-  --accent-strong:#a82020;
-  --accent-soft:rgb(139 26 26 / 40%);
-  --link:#5fc4e0;
-  --border:rgb(255 255 255 / 8%);
-  --nav-idle:#c8bfb4;
-  --nav-bg:rgb(10 10 10 / 92%);
-  --success:#3ecf5a;
-  --sold:#555;
-  --sold-bg:#1a1a1a;
-  --sold-border:#333;
-  --scrim:rgb(0 0 0 / 60%);
-  --shadow-color:rgb(0 0 0 / 50%);
+  --bg:#f5efe4;
+  --surface:#fcf8f0;
+  --surface-2:#ece3d3;
+  --text:#211d18;
+  --muted:#6d6154;
+  --accent:#9e2b18;
+  --accent-strong:#7c2011;
+  --accent-soft:rgb(158 43 24 / 12%);
+  --link:#2f5d7c;
+  --border:rgb(33 29 24 / 14%);
+  --nav-idle:#7a6f60;
+  --nav-bg:rgb(245 239 228 / 92%);
+  --success:#2e6b3f;
+  --sold:#8a8175;
+  --sold-bg:#ece3d3;
+  --sold-border:#d5c9b5;
+  --scrim:rgb(20 16 12 / 55%);
+  --shadow-color:rgb(75 60 40 / 20%);
+  /* text/borders that sit on the accent or over dark photos */
+  --on-accent:#fcf6ea;
+  --on-dark:#f0ebe3;
+  /* card backs behind photo scans stay dark */
+  --card-back:#1e1e1e;
   --crimson:var(--accent);
   --crimson-glow:var(--accent-soft);
   --sky:var(--link);
