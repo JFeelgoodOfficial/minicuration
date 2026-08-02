@@ -165,6 +165,58 @@
     .why-collect-grid > div { border:1px solid var(--border); border-radius:4px; padding:32px 28px; transition:border-color .3s; }
     .why-collect-grid > div:hover { border-color:var(--crimson); }
     .journal-card:hover { background: var(--surface-2); }
+
+    /* ── BUNDLE ADVERT ── the complete set, all six prints ── */
+    .bundle { background:var(--surface-2); border-top:1px solid var(--border);
+      border-bottom:1px solid var(--border); padding:88px 48px; overflow:hidden; }
+    .bundle-inner { max-width:1100px; margin:0 auto; display:grid;
+      grid-template-columns:1.05fr .95fr; gap:72px; align-items:center; }
+
+    /* fanned stack of all six card faces */
+    .bundle-fan { display:flex; justify-content:center; padding:24px 0; }
+    .bundle-card { width:104px; aspect-ratio:5/7; background:var(--surface);
+      padding:5px; border:1px solid var(--border); border-radius:3px;
+      box-shadow:0 10px 26px var(--shadow-color); margin-right:-30px;
+      transform-origin:bottom center; transition:transform .45s cubic-bezier(.4,0,.2,1); }
+    .bundle-card:last-child { margin-right:0; }
+    .bundle-card img { width:100%; height:100%; object-fit:cover; display:block; border-radius:2px; }
+    .bundle-card:nth-child(1){ transform:rotate(-9deg) translateY(6px); }
+    .bundle-card:nth-child(2){ transform:rotate(-5.4deg) translateY(1px); }
+    .bundle-card:nth-child(3){ transform:rotate(-1.8deg); z-index:2; }
+    .bundle-card:nth-child(4){ transform:rotate(1.8deg); z-index:2; }
+    .bundle-card:nth-child(5){ transform:rotate(5.4deg) translateY(1px); }
+    .bundle-card:nth-child(6){ transform:rotate(9deg) translateY(6px); }
+    .bundle-fan:hover .bundle-card:nth-child(1){ transform:rotate(-14deg) translate(-16px,-4px); }
+    .bundle-fan:hover .bundle-card:nth-child(2){ transform:rotate(-8.4deg) translate(-8px,-9px); }
+    .bundle-fan:hover .bundle-card:nth-child(3){ transform:rotate(-2.8deg) translateY(-12px); }
+    .bundle-fan:hover .bundle-card:nth-child(4){ transform:rotate(2.8deg) translateY(-12px); }
+    .bundle-fan:hover .bundle-card:nth-child(5){ transform:rotate(8.4deg) translate(8px,-9px); }
+    .bundle-fan:hover .bundle-card:nth-child(6){ transform:rotate(14deg) translate(16px,-4px); }
+    .bundle-rule { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+    .bundle-rule span { font-size:10px; letter-spacing:.4em; text-transform:uppercase;
+      color:var(--accent); white-space:nowrap; }
+    .bundle-rule::after { content:""; flex:1; height:1px; background:var(--border); }
+    .bundle h2 { font-family:'Cormorant Garamond',serif; font-size:clamp(34px,4.4vw,54px);
+      font-weight:300; line-height:1.1; margin-bottom:16px; }
+    .bundle h2 em { font-style:italic; color:var(--accent); }
+    .bundle-copy { font-size:15px; color:var(--muted); line-height:1.8; margin-bottom:26px; max-width:44ch; }
+    .bundle-price-row { display:flex; align-items:baseline; gap:14px; margin-bottom:8px; }
+    .bundle-price { font-family:'Cormorant Garamond',serif; font-size:56px; font-weight:400; line-height:1; }
+    .bundle-ship { font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); }
+    .bundle-note { font-size:12px; color:var(--muted); margin-bottom:26px; }
+    .bundle-terms { font-size:11px; color:var(--muted); margin-top:12px; opacity:85%; }
+    @media(max-width:860px){
+      .bundle { padding:64px 20px; }
+      .bundle-inner { grid-template-columns:1fr; gap:40px; }
+      .bundle-card { width:76px; margin-right:-22px; }
+      .bundle-price { font-size:46px; }
+    }
+
+    /* Keep the fan (6 cards + their rotation) inside the viewport on phones. */
+    @media(max-width:480px){
+      .bundle-card { width:60px; margin-right:-16px; }
+    }
+    @media(prefers-reduced-motion:reduce){ .bundle-card { transition:none; } }
   </style>
 </head>
 <body>
@@ -186,6 +238,33 @@
     <h1>Limited Edition.<br/><em>Small Format, Real Art.</em></h1>
     <p class="hero-sub">Museum-quality prints of original paintings, sealed in a collector's acrylic case. Only 50 of each. <strong>Summer sale: $10.</strong> <s class="price-was"><span class="sr-only">regular price </span>$23</s></p>
     <a href="shop.html" class="btn-primary">Shop the Collection</a>
+  </section>
+
+  <!-- BUNDLE: the complete six-print set -->
+  <section class="bundle" id="bundle" aria-labelledby="bundle-heading">
+    <div class="bundle-inner">
+      <div class="bundle-fan" aria-hidden="true">
+        <div class="bundle-card"><img width="500" height="700" src="image/spin/dreamfall_artwork.webp" alt="" loading="lazy" decoding="async"/></div>
+        <div class="bundle-card"><img width="500" height="700" src="image/spin/dream-mountain_artwork.webp" alt="" loading="lazy" decoding="async"/></div>
+        <div class="bundle-card"><img width="500" height="700" src="image/spin/skymiles_artwork.webp" alt="" loading="lazy" decoding="async"/></div>
+        <div class="bundle-card"><img width="500" height="700" src="image/spin/asimplemeditation_artwork.webp" alt="" loading="lazy" decoding="async"/></div>
+        <div class="bundle-card"><img width="500" height="700" src="image/spin/veritas_artwork.webp" alt="" loading="lazy" decoding="async"/></div>
+        <div class="bundle-card"><img width="500" height="700" src="image/spin/sweet-dreams_artwork.webp" alt="" loading="lazy" decoding="async"/></div>
+      </div>
+
+      <div class="bundle-text">
+        <p class="bundle-rule"><span>The Six-Pack</span></p>
+        <h2 id="bundle-heading">Take the <em>whole collection</em> home.</h2>
+        <p class="bundle-copy">Every design currently in print &mdash; Dreamfall, Dream Mountain, Sky Miles, A Simple Meditation, Veritas, and Sweet Dreams &mdash; each numbered, each sealed in its own magnetic acrylic case with a stand.</p>
+        <div class="bundle-price-row">
+          <span class="bundle-price">$60</span>
+          <span class="bundle-ship">Shipping free</span>
+        </div>
+        <p class="bundle-note">Six prints &middot; one of each design &middot; one order</p>
+        <a href="https://buy.stripe.com/9B69AMaKH8T679c4joaVa0r" class="btn-primary">Buy the Six-Pack &mdash; $60</a>
+        <p class="bundle-terms">Available while all six editions remain open. Secure checkout via Stripe &middot; Ships in 5&ndash;7 days &middot; 14-day guarantee.</p>
+      </div>
+    </div>
   </section>
 
   <!-- WHY COLLECT -->
