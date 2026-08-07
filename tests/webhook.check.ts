@@ -6,7 +6,7 @@ import { test, expect } from '@playwright/test'
 // purchase must consume all six editions, not one.
 //
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { resolveSlugs, slugFromName } = require('../api/webhook.js')
+const { resolveSlugs, slugFromName, orderNumberFrom } = require('../api/webhook.js')
 
 const ALL_SLUGS = [
   'dreamfall',
@@ -76,5 +76,24 @@ test.describe('webhook — product resolution', () => {
 
   test('unrecognised checkouts resolve to nothing rather than guessing', () => {
     expect(resolveSlugs([{ description: 'Mystery Box' }]).slugs).toEqual([])
+  })
+})
+
+// Order numbers go in the buyer's confirmation and the owner's alert, so they
+// have to be stable, unique per checkout, and traceable back to Stripe.
+test.describe('webhook — order numbers', () => {
+  test('derives a readable order number from the session ID', () => {
+    expect(orderNumberFrom('cs_live_a1b2c3d4e5f6')).toBe('MC-C3D4E5F6')
+    expect(orderNumberFrom('cs_test_a1b2c3d4e5f6')).toMatch(/^MC-[A-Z0-9]{8}$/)
+  })
+
+  test('the same session always yields the same number', () => {
+    const id = 'cs_live_b1PmTeSt00000000zzzz'
+    expect(orderNumberFrom(id)).toBe(orderNumberFrom(id))
+  })
+
+  test('different sessions yield different numbers', () => {
+    expect(orderNumberFrom('cs_live_00000000aaaaaaaa'))
+      .not.toBe(orderNumberFrom('cs_live_00000000bbbbbbbb'))
   })
 })

@@ -9,6 +9,12 @@ function stripe()    { return _stripe    ||= new Stripe(process.env.STRIPE_SECRE
 function supabase()  { return _supabase  ||= createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY) }
 function resend()    { return _resend    ||= new Resend(process.env.RESEND_API_KEY) }
 
+// ── Email addresses ──────────────────────────────────────────────────────────
+// support@ is the only real mailbox on the domain, so buyers replying to a
+// fulfillment email actually reach someone.
+const STORE_EMAIL = 'Minicuration <support@minicuration.com>'
+function notifyEmail() { return process.env.ORDER_NOTIFY_EMAIL || 'support@minicuration.com' }
+
 // ── Stripe price ID → product slug ───────────────────────────────────────────
 // Price IDs change every time a product is re-priced (e.g. the summer sale), so
 // this map is a fast path only — resolveSlugs() falls back to matching the
@@ -87,6 +93,52 @@ async function deactivatePaymentLink(linkId) {
   }
 }
 
+// ── Order numbers ─────────────────────────────────────────────────────────────
+// Derived from the Stripe session rather than a counter: no extra table, no
+// race between concurrent checkouts, and the number always traces back to one
+// session. cs_live_a1b2c3d4e5f6 → MC-C3D4E5F6.
+function orderNumberFrom(sessionId) {
+  return 'MC-' + String(sessionId || '').slice(-8).toUpperCase()
+}
+
+// ── Email ─────────────────────────────────────────────────────────────────────
+// A failed send must never fail the webhook: Stripe would retry the delivery
+// and the stock decrement would run a second time.
+async function sendMail({ to, subject, html }) {
+  if (!process.env.RESEND_API_KEY || !to) return
+  try {
+    await resend().emails.send({ from: STORE_EMAIL, to, subject, html })
+  } catch (err) {
+    console.error(`Email failed (${subject}):`, err.message)
+  }
+}
+
+function formatAmount(session) {
+  if (session.amount_total == null) return 'unknown'
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: (session.currency || 'usd').toUpperCase(),
+  }).format(session.amount_total / 100)
+}
+
+// Payment Links put the shipping address in collected_information; older
+// sessions carry it on shipping_details, and digital-only ones only have the
+// billing address.
+function formatAddress(session) {
+  const details = session.collected_information?.shipping_details
+    || session.shipping_details
+    || session.customer_details
+  const addr = details?.address
+  if (!addr) return 'No address collected'
+  return [
+    details.name,
+    addr.line1,
+    addr.line2,
+    [addr.city, addr.state, addr.postal_code].filter(Boolean).join(' '),
+    addr.country,
+  ].filter(Boolean).join('<br>')
+}
+
 // ── Raw body reader (required for Stripe signature verification) ──────────────
 function getRawBody(req) {
   return new Promise((resolve, reject) => {
@@ -120,16 +172,32 @@ async function handler(req, res) {
     return res.status(200).json({ received: true })
   }
 
-  const session   = event.data.object
-  const lineItems = await stripe().checkout.sessions.listLineItems(session.id, {
+  const session     = event.data.object
+  const orderNumber = orderNumberFrom(session.id)
+  const lineItems   = await stripe().checkout.sessions.listLineItems(session.id, {
     limit: 10,
     expand: ['data.price.product'],
   })
   const { slugs, isBundle } = resolveSlugs(lineItems.data)
 
   if (!slugs.length) {
-    console.warn('Unrecognised checkout — no product matched:',
-      lineItems.data.map(item => item.description || item.price?.id).join(', '))
+    const items = lineItems.data.map(item => item.description || item.price?.id).join(', ')
+    console.warn('Unrecognised checkout — no product matched:', items)
+    // Money changed hands but nothing was fulfilled — this must not sit in a log.
+    await sendMail({
+      to:      notifyEmail(),
+      subject: `ACTION NEEDED — order ${orderNumber} matched no product`,
+      html: `
+        <p>A checkout completed but the webhook could not match it to any print,
+           so no stock was decremented and no confirmation was sent.</p>
+        <p><strong>Order:</strong> ${orderNumber}<br>
+           <strong>Line items:</strong> ${items || 'none'}<br>
+           <strong>Total:</strong> ${formatAmount(session)}<br>
+           <strong>Buyer:</strong> ${session.customer_details?.email || 'unknown'}<br>
+           <strong>Stripe session:</strong> ${session.id}</p>
+        <p>Fulfil this order by hand and add its price ID to PRICE_TO_SLUG.</p>
+      `,
+    })
     return res.status(200).json({ received: true })
   }
 
@@ -164,24 +232,57 @@ async function handler(req, res) {
       // Never auto-refund a whole six-pack: the other editions in it are valid
       // and shipping. Refund amount is a judgement call, so escalate instead.
       console.error(
-        `MANUAL REVIEW — six-pack ${session.id} included sold-out edition(s): ${soldOut.join(', ')}. ` +
+        `MANUAL REVIEW — six-pack ${orderNumber} included sold-out edition(s): ${soldOut.join(', ')}. ` +
         `Fulfilled: ${sold.map(s => s.slug).join(', ') || 'none'}. Partial refund required.`)
+      await sendMail({
+        to:      notifyEmail(),
+        subject: `ACTION NEEDED — six-pack ${orderNumber} needs a partial refund`,
+        html: `
+          <p>A six-pack sold, but ${soldOut.length} edition(s) in it were already gone.
+             Nothing was refunded automatically — the rest of the set is valid and shipping.</p>
+          <p><strong>Order:</strong> ${orderNumber}<br>
+             <strong>Sold out:</strong> ${soldOut.join(', ')}<br>
+             <strong>Fulfilled:</strong> ${sold.map(s => `${s.slug} #${s.editionNumber}`).join(', ') || 'none'}<br>
+             <strong>Total paid:</strong> ${formatAmount(session)}<br>
+             <strong>Buyer:</strong> ${session.customer_details?.email || 'unknown'}<br>
+             <strong>Stripe session:</strong> ${session.id}</p>
+          <p>Issue a partial refund in Stripe and tell the buyer what shipped.</p>
+        `,
+      })
       return res.status(200).json({ received: true, warning: 'bundle_partial_sold_out', soldOut })
     }
 
     // Single print that was already gone: close the link and refund in full.
     console.error(`OVERSELL BLOCKED: ${soldOut.join(', ')} already sold out — refunding ${session.id}`)
+    let refunded = false
     if (session.payment_intent) {
       try {
         await stripe().refunds.create({
           payment_intent: session.payment_intent,
           reason: 'requested_by_customer',
         })
+        refunded = true
         console.log(`Auto-refunded oversell: ${session.payment_intent}`)
       } catch (refundErr) {
         console.error('Auto-refund failed (needs manual refund):', refundErr.message)
       }
     }
+    await sendMail({
+      to:      notifyEmail(),
+      subject: refunded
+        ? `Order ${orderNumber} refunded — ${soldOut.join(', ')} was already sold out`
+        : `ACTION NEEDED — order ${orderNumber} oversold and the refund failed`,
+      html: `
+        <p>Someone bought <strong>${soldOut.join(', ')}</strong> after it sold out.
+           ${refunded
+             ? 'It was refunded automatically and the payment link is now closed.'
+             : '<strong>The automatic refund failed — refund this in Stripe by hand.</strong>'}</p>
+        <p><strong>Order:</strong> ${orderNumber}<br>
+           <strong>Total:</strong> ${formatAmount(session)}<br>
+           <strong>Buyer:</strong> ${session.customer_details?.email || 'unknown'}<br>
+           <strong>Stripe session:</strong> ${session.id}</p>
+      `,
+    })
     return res.status(200).json({ received: true, warning: 'sold_out_refunded' })
   }
 
@@ -196,40 +297,48 @@ async function handler(req, res) {
     })))
   if (ledgerError) console.error('Ledger insert failed:', ledgerError.message)
 
-  console.log(`Sold${isBundle ? ' (six-pack)' : ''}: ` +
+  console.log(`Sold${isBundle ? ' (six-pack)' : ''} ${orderNumber}: ` +
     sold.map(s => `${s.slug} edition ${s.editionNumber}/50`).join(', ') +
     ` → ${session.customer_details?.email}`)
 
-  // 5. Fulfillment email (skipped if RESEND_API_KEY not set)
-  if (process.env.RESEND_API_KEY && session.customer_details?.email) {
-    const editionList = sold
-      .map(({ slug, editionNumber }) =>
-        `<li><strong>${PRODUCT_NAMES[slug]}</strong> — edition <strong>${editionNumber} of 50</strong></li>`)
-      .join('')
-    try {
-      await resend().emails.send({
-        from:    'Minicuration <hello@minicuration.com>',
-        to:      session.customer_details.email,
-        subject: isBundle
-          ? 'Your Minicuration six-pack — all six editions'
-          : `Your Minicuration print — edition ${sold[0].editionNumber} of 50`,
-        html: `
-          <p>Thank you for your order.</p>
-          <p>You own${isBundle ? ' the complete collection:' : ':'}</p>
-          <ul>${editionList}</ul>
-          <p>${sold.length > 1 ? 'These numbers are' : 'This number is'} yours alone.
-             No other collector holds ${sold.length > 1 ? 'this set of editions' : 'this edition'}.</p>
-          <p>Your ${sold.length > 1 ? 'prints ship' : 'print ships'} within 5–7 business days.
-             Reply to this email with any questions.</p>
-        `,
-      })
-    } catch (emailErr) {
-      console.error('Fulfillment email failed:', emailErr.message)
-      // Don't fail the webhook — email is non-critical
-    }
-  }
+  const editionList = sold
+    .map(({ slug, editionNumber }) =>
+      `<li><strong>${PRODUCT_NAMES[slug]}</strong> — edition <strong>${editionNumber} of 50</strong></li>`)
+    .join('')
 
-  return res.status(200).json({ received: true, isBundle, sold })
+  // 5. Tell the buyer their order is on its way
+  await sendMail({
+    to:      session.customer_details?.email,
+    subject: isBundle
+      ? `Order ${orderNumber} — your Minicuration six-pack is on its way`
+      : `Order ${orderNumber} — your Minicuration print is on its way`,
+    html: `
+      <p>Thank you for your order. Your order number is <strong>${orderNumber}</strong>.</p>
+      <p>You own${isBundle ? ' the complete collection:' : ':'}</p>
+      <ul>${editionList}</ul>
+      <p>${sold.length > 1 ? 'These numbers are' : 'This number is'} yours alone.
+         No other collector holds ${sold.length > 1 ? 'this set of editions' : 'this edition'}.</p>
+      <p>Your ${sold.length > 1 ? 'prints ship' : 'print ships'} within 5–7 business days.
+         Reply to this email with any questions and quote ${orderNumber}.</p>
+    `,
+  })
+
+  // 6. Tell the shop owner there is something to pack
+  await sendMail({
+    to:      notifyEmail(),
+    subject: `New order ${orderNumber} — ${sold.map(s => PRODUCT_NAMES[s.slug]).join(', ')}`,
+    html: `
+      <p><strong>${orderNumber}</strong>${isBundle ? ' — six-pack' : ''}</p>
+      <ul>${editionList}</ul>
+      <p><strong>Paid:</strong> ${formatAmount(session)}<br>
+         <strong>Buyer:</strong> ${session.customer_details?.name || 'unknown'}
+         &lt;${session.customer_details?.email || 'no email'}&gt;</p>
+      <p><strong>Ship to:</strong><br>${formatAddress(session)}</p>
+      <p><strong>Stripe session:</strong> ${session.id}</p>
+    `,
+  })
+
+  return res.status(200).json({ received: true, orderNumber, isBundle, sold })
 }
 
 // Disable Vercel's body parser so we can read the raw body for Stripe verification
@@ -239,3 +348,4 @@ module.exports = handler
 // Exported for unit tests — resolution must keep working across re-pricing.
 module.exports.resolveSlugs = resolveSlugs
 module.exports.slugFromName = slugFromName
+module.exports.orderNumberFrom = orderNumberFrom
