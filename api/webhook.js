@@ -1,19 +1,12 @@
 'use strict'
-const Stripe     = require('stripe')
-const { createClient } = require('@supabase/supabase-js')
-const { Resend } = require('resend')
+const Stripe = require('stripe')
+const {
+  supabase, sendMail, notifyEmail, orderNumberFrom, PRODUCT_NAMES, EDITION_SIZE,
+} = require('./_lib.js')
 
-// ── Lazy singletons (re-used across warm invocations) ────────────────────────
-let _stripe, _supabase, _resend
-function stripe()    { return _stripe    ||= new Stripe(process.env.STRIPE_SECRET_KEY) }
-function supabase()  { return _supabase  ||= createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY) }
-function resend()    { return _resend    ||= new Resend(process.env.RESEND_API_KEY) }
-
-// ── Email addresses ──────────────────────────────────────────────────────────
-// support@ is the only real mailbox on the domain, so buyers replying to a
-// fulfillment email actually reach someone.
-const STORE_EMAIL = 'Minicuration <support@minicuration.com>'
-function notifyEmail() { return process.env.ORDER_NOTIFY_EMAIL || 'support@minicuration.com' }
+// ── Lazy singleton (re-used across warm invocations) ─────────────────────────
+let _stripe
+function stripe() { return _stripe ||= new Stripe(process.env.STRIPE_SECRET_KEY) }
 
 // ── Stripe price ID → product slug ───────────────────────────────────────────
 // Price IDs change every time a product is re-priced (e.g. the summer sale), so
@@ -42,15 +35,6 @@ const PRICE_TO_SLUG = {
 const BUNDLE_PRICE_IDS = new Set([
   'price_1U07vq2mxhfkNl2Y8cgwskpF',
 ])
-
-const PRODUCT_NAMES = {
-  'dreamfall':           'Dreamfall',
-  'dream-mountain':      'Dream Mountain',
-  'sky-miles':           'Sky Miles',
-  'a-simple-meditation': 'A Simple Meditation',
-  'veritas':             'Veritas',
-  'sweet-dreams':        'Sweet Dreams',
-}
 
 const ALL_SLUGS = Object.keys(PRODUCT_NAMES)
 
@@ -90,26 +74,6 @@ async function deactivatePaymentLink(linkId) {
     console.log(`Payment link deactivated: ${linkId}`)
   } catch (err) {
     console.error(`Failed to deactivate payment link ${linkId}:`, err.message)
-  }
-}
-
-// ── Order numbers ─────────────────────────────────────────────────────────────
-// Derived from the Stripe session rather than a counter: no extra table, no
-// race between concurrent checkouts, and the number always traces back to one
-// session. cs_live_a1b2c3d4e5f6 → MC-C3D4E5F6.
-function orderNumberFrom(sessionId) {
-  return 'MC-' + String(sessionId || '').slice(-8).toUpperCase()
-}
-
-// ── Email ─────────────────────────────────────────────────────────────────────
-// A failed send must never fail the webhook: Stripe would retry the delivery
-// and the stock decrement would run a second time.
-async function sendMail({ to, subject, html }) {
-  if (!process.env.RESEND_API_KEY || !to) return
-  try {
-    await resend().emails.send({ from: STORE_EMAIL, to, subject, html })
-  } catch (err) {
-    console.error(`Email failed (${subject}):`, err.message)
   }
 }
 
@@ -286,11 +250,16 @@ async function handler(req, res) {
     return res.status(200).json({ received: true, warning: 'sold_out_refunded' })
   }
 
-  // 4. Append to permanent sales ledger — one row per edition sold
+  // 4. Append to permanent sales ledger — one row per edition sold.
+  // edition_number here is PROVISIONAL: it assumes prints leave in counter
+  // order, which a missed webhook or a hand-packed print breaks. The number
+  // the buyer is told is set in api/ship.js when the print is actually packed,
+  // which is also when shipped_at stops being NULL.
   const { error: ledgerError } = await supabase().from('sales').insert(
     sold.map(({ slug, editionNumber }) => ({
       slug,
       edition_number: editionNumber,
+      order_number:   orderNumber,
       buyer_email:    session.customer_details?.email,
       buyer_name:     session.customer_details?.name,
       stripe_session: session.id,
@@ -298,27 +267,31 @@ async function handler(req, res) {
   if (ledgerError) console.error('Ledger insert failed:', ledgerError.message)
 
   console.log(`Sold${isBundle ? ' (six-pack)' : ''} ${orderNumber}: ` +
-    sold.map(s => `${s.slug} edition ${s.editionNumber}/50`).join(', ') +
+    sold.map(s => `${s.slug} (provisional edition ${s.editionNumber}/${EDITION_SIZE})`).join(', ') +
     ` → ${session.customer_details?.email}`)
 
-  const editionList = sold
-    .map(({ slug, editionNumber }) =>
-      `<li><strong>${PRODUCT_NAMES[slug]}</strong> — edition <strong>${editionNumber} of 50</strong></li>`)
+  const productList = sold
+    .map(({ slug }) => `<li><strong>${PRODUCT_NAMES[slug]}</strong></li>`)
     .join('')
 
-  // 5. Tell the buyer their order is on its way
+  // 5. Confirm the order to the buyer. Deliberately no edition number: it is
+  // not known until the print is picked, and a number stated here that later
+  // turns out wrong is worse than one stated a day later and correct.
   await sendMail({
     to:      session.customer_details?.email,
     subject: isBundle
-      ? `Order ${orderNumber} — your Minicuration six-pack is on its way`
-      : `Order ${orderNumber} — your Minicuration print is on its way`,
+      ? `Order ${orderNumber} — your Minicuration six-pack is confirmed`
+      : `Order ${orderNumber} — your Minicuration print is confirmed`,
     html: `
       <p>Thank you for your order. Your order number is <strong>${orderNumber}</strong>.</p>
-      <p>You own${isBundle ? ' the complete collection:' : ':'}</p>
-      <ul>${editionList}</ul>
-      <p>${sold.length > 1 ? 'These numbers are' : 'This number is'} yours alone.
-         No other collector holds ${sold.length > 1 ? 'this set of editions' : 'this edition'}.</p>
-      <p>Your ${sold.length > 1 ? 'prints ship' : 'print ships'} within 5–7 business days.
+      <p>You ordered${isBundle ? ' the complete collection:' : ':'}</p>
+      <ul>${productList}</ul>
+      <p>${sold.length > 1 ? 'Each print is' : 'Your print is'} hand-numbered from an
+         edition of ${EDITION_SIZE}. We confirm
+         ${sold.length > 1 ? 'your exact edition numbers' : 'your exact edition number'}
+         by email the moment ${sold.length > 1 ? 'they are' : 'it is'} packed —
+         ${sold.length > 1 ? 'those numbers are' : 'that number is'} yours alone.</p>
+      <p>${sold.length > 1 ? 'Prints ship' : 'Your print ships'} within 5–7 business days.
          Reply to this email with any questions and quote ${orderNumber}.</p>
     `,
   })
@@ -329,12 +302,18 @@ async function handler(req, res) {
     subject: `New order ${orderNumber} — ${sold.map(s => PRODUCT_NAMES[s.slug]).join(', ')}`,
     html: `
       <p><strong>${orderNumber}</strong>${isBundle ? ' — six-pack' : ''}</p>
-      <ul>${editionList}</ul>
+      <ul>${sold.map(({ slug, editionNumber }) =>
+        `<li><strong>${PRODUCT_NAMES[slug]}</strong> — next unsold is
+         <strong>${editionNumber}</strong> (provisional)</li>`).join('')}</ul>
       <p><strong>Paid:</strong> ${formatAmount(session)}<br>
          <strong>Buyer:</strong> ${session.customer_details?.name || 'unknown'}
          &lt;${session.customer_details?.email || 'no email'}&gt;</p>
       <p><strong>Ship to:</strong><br>${formatAddress(session)}</p>
       <p><strong>Stripe session:</strong> ${session.id}</p>
+      <p>The buyer has <em>not</em> been given an edition number yet. Enter the
+         number actually written on the print at
+         <a href="https://minicuration.com/admin.html">minicuration.com/admin.html</a>
+         to confirm it to them.</p>
     `,
   })
 
