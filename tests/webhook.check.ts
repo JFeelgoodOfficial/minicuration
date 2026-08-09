@@ -7,6 +7,8 @@ import { test, expect } from '@playwright/test'
 //
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { resolveSlugs, slugFromName, orderNumberFrom } = require('../api/webhook.js')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { parseEditionNumber } = require('../api/_lib.js')
 
 const ALL_SLUGS = [
   'dreamfall',
@@ -95,5 +97,28 @@ test.describe('webhook — order numbers', () => {
   test('different sessions yield different numbers', () => {
     expect(orderNumberFrom('cs_live_00000000aaaaaaaa'))
       .not.toBe(orderNumberFrom('cs_live_00000000bbbbbbbb'))
+  })
+})
+
+// The edition number is written on a physical print and told to a buyer as a
+// permanent claim, so a bad one must never reach the ledger or an email.
+test.describe('ship — edition number validation', () => {
+  test('accepts any number within the edition', () => {
+    expect(parseEditionNumber(1)).toEqual({ ok: true, editionNumber: 1 })
+    expect(parseEditionNumber(50)).toEqual({ ok: true, editionNumber: 50 })
+    // The admin form submits strings.
+    expect(parseEditionNumber('27')).toEqual({ ok: true, editionNumber: 27 })
+  })
+
+  test('rejects numbers outside 1–50', () => {
+    for (const bad of [0, -1, 51, 999]) {
+      expect(parseEditionNumber(bad).ok, `${bad} should be rejected`).toBe(false)
+    }
+  })
+
+  test('rejects anything that is not a whole number', () => {
+    for (const bad of [1.5, 'two', '', null, undefined, NaN, {}]) {
+      expect(parseEditionNumber(bad as never).ok, `${String(bad)} should be rejected`).toBe(false)
+    }
   })
 })
