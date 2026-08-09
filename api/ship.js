@@ -102,8 +102,9 @@ module.exports = async function handler(req, res) {
     `,
   })
 
+  // Order number only — no buyer name or address. See api/webhook.js.
   console.log(`Shipped ${sale.order_number}: ${sale.slug} edition ` +
-    `${sale.edition_number}/${EDITION_SIZE} → ${sale.buyer_email}` +
+    `${sale.edition_number}/${EDITION_SIZE}` +
     `${emailed ? '' : ' (EMAIL NOT SENT)'}`)
 
   return res.status(200).json({ shipped: sale, emailed })
