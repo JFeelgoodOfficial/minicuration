@@ -266,9 +266,10 @@ async function handler(req, res) {
     })))
   if (ledgerError) console.error('Ledger insert failed:', ledgerError.message)
 
+  // No buyer name or address in logs — the order number is enough to find the
+  // sale in Supabase or Stripe, and log retention is not the place for PII.
   console.log(`Sold${isBundle ? ' (six-pack)' : ''} ${orderNumber}: ` +
-    sold.map(s => `${s.slug} (provisional edition ${s.editionNumber}/${EDITION_SIZE})`).join(', ') +
-    ` → ${session.customer_details?.email}`)
+    sold.map(s => `${s.slug} (provisional edition ${s.editionNumber}/${EDITION_SIZE})`).join(', '))
 
   const productList = sold
     .map(({ slug }) => `<li><strong>${PRODUCT_NAMES[slug]}</strong></li>`)
