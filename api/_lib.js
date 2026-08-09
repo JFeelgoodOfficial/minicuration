@@ -1,7 +1,9 @@
 'use strict'
-// Shared by api/webhook.js (records the sale) and api/ship.js (assigns the
-// edition number and tells the buyer). Underscore prefix keeps Vercel from
-// exposing this as a route of its own.
+// Shared by api/webhook.js (records the sale), api/ship.js (assigns the
+// edition number and tells the buyer) and api/editions.js (the admin
+// inventory grid). Underscore prefix keeps Vercel from exposing this as a
+// route of its own.
+const crypto = require('crypto')
 const { createClient } = require('@supabase/supabase-js')
 const { Resend } = require('resend')
 
@@ -28,6 +30,34 @@ const PRODUCT_NAMES = {
 }
 
 const EDITION_SIZE = 50
+
+// The admin grid's click cycle, in order: each click on a box advances to the
+// next status and the last wraps back to available. admin.html keeps its own
+// copy (browser JS cannot require CommonJS) — change both together.
+const EDITION_STATUSES = ['available', 'sold', 'gifted', 'relisted']
+
+// ── Admin auth ────────────────────────────────────────────────────────────────
+// Shared by api/ship.js and api/editions.js. Timing-safe so the token can't be
+// recovered by measuring response times.
+function checkAdminToken(supplied) {
+  const expected = process.env.ADMIN_TOKEN
+  if (!expected || !supplied) return false
+  const a = Buffer.from(String(supplied))
+  const b = Buffer.from(expected)
+  return a.length === b.length && crypto.timingSafeEqual(a, b)
+}
+
+function readJsonBody(req) {
+  if (req.body && typeof req.body === 'object') return Promise.resolve(req.body)
+  return new Promise(resolve => {
+    let raw = ''
+    req.on('data', chunk => { raw += chunk })
+    req.on('end', () => {
+      try { resolve(JSON.parse(raw || '{}')) } catch { resolve(null) }
+    })
+    req.on('error', () => resolve(null))
+  })
+}
 
 // ── Order numbers ─────────────────────────────────────────────────────────────
 // Derived from the Stripe session rather than a counter: no extra table, no
@@ -71,7 +101,10 @@ module.exports = {
   notifyEmail,
   orderNumberFrom,
   parseEditionNumber,
+  checkAdminToken,
+  readJsonBody,
   STORE_EMAIL,
   PRODUCT_NAMES,
   EDITION_SIZE,
+  EDITION_STATUSES,
 }

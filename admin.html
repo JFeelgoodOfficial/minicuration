@@ -12,6 +12,7 @@
   <style>
     .admin{max-width:840px;margin:0 auto;padding:60px 24px 100px;}
     .admin h1{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,4vw,46px);font-weight:300;margin-bottom:8px;}
+    .admin h2{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,3vw,34px);font-weight:300;margin:48px 0 8px;}
     .admin .lede{color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:32px;max-width:60ch;}
     .admin label{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
     .admin input{padding:11px 14px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;border-radius:2px;}
@@ -25,22 +26,44 @@
     .order-num{font-size:12px;letter-spacing:.12em;color:var(--crimson);}
     .order h3{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:400;margin-bottom:4px;}
     .order .meta{font-size:13px;color:var(--muted);margin-bottom:14px;}
-    .ship-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
+    .ship-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:10px;}
     .ship-row input{width:110px;}
+    .ship-row .item-name{min-width:180px;font-size:14px;padding-bottom:12px;}
     .hint{font-size:12px;color:var(--muted);margin-top:10px;}
+    .conflicts{font-size:13px;color:var(--crimson);margin-top:10px;line-height:1.6;}
     .status{padding:12px 16px;border-radius:4px;font-size:13px;margin-bottom:20px;}
     .status.err{border:1px solid var(--crimson);color:var(--crimson);}
     .status.ok{border:1px solid var(--border);color:var(--muted);}
     .empty{color:var(--muted);font-size:14px;padding:30px 0;}
+
+    /* Inventory grid: one card per design, 50 boxes cycling through statuses */
+    .design{border:1px solid var(--border);border-radius:6px;padding:18px 20px;margin-bottom:14px;}
+    .design-head{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:baseline;margin-bottom:12px;}
+    .design h3{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:400;}
+    .tally{font-size:12px;color:var(--muted);letter-spacing:.04em;}
+    .boxes{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;}
+    .admin .boxes button{padding:0;height:34px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:12px;letter-spacing:0;text-transform:none;border-radius:3px;}
+    .admin .boxes button:hover{border-color:var(--crimson);background:var(--bg);}
+    .admin .boxes button.st-sold{background:#2e7d43;border-color:#2e7d43;color:#fff;}
+    .admin .boxes button.st-gifted{background:#2b5fa8;border-color:#2b5fa8;color:#fff;}
+    .admin .boxes button.st-relisted{background:#e0b93a;border-color:#e0b93a;color:#3a3122;}
+    .admin .boxes button.reserved{border-style:dashed;border-color:var(--crimson);}
+    .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:20px;}
+    .legend .chip{display:inline-block;width:12px;height:12px;border-radius:2px;border:1px solid var(--border);vertical-align:-1px;margin-right:5px;}
+    .legend .chip.st-sold{background:#2e7d43;border-color:#2e7d43;}
+    .legend .chip.st-gifted{background:#2b5fa8;border-color:#2b5fa8;}
+    .legend .chip.st-relisted{background:#e0b93a;border-color:#e0b93a;}
+    .legend .chip.reserved{border-style:dashed;border-color:var(--crimson);}
   </style>
 </head>
 <body>
   <main class="admin">
     <h1>Pack &amp; ship</h1>
     <p class="lede">
-      Enter the edition number actually written on the print you are packing.
-      That number — not the stock counter — is what the buyer is told, and the
-      email goes out the moment you save it. Each order can only be shipped once.
+      Enter the edition numbers actually written on the prints you are packing.
+      Those numbers — not the reservation — are what the buyer is told, and the
+      email goes out the moment you save them. A six-pack ships as one order
+      and one email. Each order can only be shipped once.
     </p>
 
     <div class="token-row">
@@ -53,6 +76,22 @@
 
     <div id="status" hidden></div>
     <div id="orders"></div>
+
+    <h2>Inventory</h2>
+    <p class="lede">
+      One box per print. Click a box to cycle its status; every click saves.
+      Shipping an order marks its editions sold automatically. Clicking a
+      reserved box offers to release its reservation — do that only if the
+      order was refunded or cancelled.
+    </p>
+    <div class="legend">
+      <span><span class="chip"></span>Available</span>
+      <span><span class="chip st-sold"></span>Sold</span>
+      <span><span class="chip st-gifted"></span>Gifted</span>
+      <span><span class="chip st-relisted"></span>Relisted</span>
+      <span><span class="chip reserved"></span>Reserved (paid, not packed)</span>
+    </div>
+    <div id="grid"></div>
   </main>
 
   <script>
@@ -60,7 +99,10 @@
     const tokenInput = document.getElementById('token')
     const statusEl   = document.getElementById('status')
     const ordersEl   = document.getElementById('orders')
+    const gridEl     = document.getElementById('grid')
     const STORAGE    = 'mc_admin_token'
+    // Mirrors EDITION_STATUSES in api/_lib.js — change both together.
+    const CYCLE      = ['available', 'sold', 'gifted', 'relisted']
 
     const saved = localStorage.getItem(STORAGE)
     if (saved) tokenInput.value = saved
@@ -71,11 +113,11 @@
       statusEl.textContent = msg
     }
 
-    function request(method, body) {
+    function request(path, method, body) {
       const token = tokenInput.value.trim()
       if (!token) { say('Enter the admin token first.', 'err'); return Promise.reject() }
       localStorage.setItem(STORAGE, token)
-      return fetch('/api/ship', {
+      return fetch(path, {
         method: method,
         headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
         body: body ? JSON.stringify(body) : undefined,
@@ -84,58 +126,100 @@
           if (!r.ok) {
             const msg = r.status === 401 ? 'Token rejected.'
             : (data.detail || data.error || ('Request failed (' + r.status + ')'))
-            throw new Error(msg)
+            const err = new Error(msg)
+            err.data = data
+            throw err
           }
           return data
         })
       })
     }
 
-    function render(pending, editionSize) {
+    // ── Pack & ship queue ─────────────────────────────────────────────────────
+    function renderOrders(orders, editionSize) {
       ordersEl.innerHTML = ''
-      if (!pending.length) {
+      if (!orders.length) {
         ordersEl.innerHTML = '<p class="empty">Nothing waiting to be packed.</p>'
         return
       }
-      pending.forEach(function (o) {
+      orders.forEach(function (o) {
         const card = document.createElement('div')
         card.className = 'order'
 
-        const ordered = o.created_at ? new Date(o.created_at).toLocaleDateString() : ''
+        const ordered = o.createdAt ? new Date(o.createdAt).toLocaleDateString() : ''
         card.innerHTML =
-          '<div class="order-head"><span class="order-num">' + o.order_number + '</span>' +
+          '<div class="order-head"><span class="order-num">' + o.orderNumber +
+          (o.isBundle ? ' · six-pack' : '') + '</span>' +
           '<span class="order-num">' + ordered + '</span></div>' +
-          '<h3></h3><p class="meta"></p>' +
-          '<div class="ship-row">' +
-          '<div><label>Edition number</label>' +
-          '<input type="number" min="1" max="' + editionSize + '" step="1"/></div>' +
-          '<button type="button">Mark shipped &amp; email buyer</button></div>' +
-          '<p class="hint">Counter suggests ' + o.edition_number + ' — change it if the ' +
-          'print in your hand says otherwise.</p>'
+          '<p class="meta"></p>'
 
         // textContent for buyer-supplied values so a name can't inject markup
-        card.querySelector('h3').textContent = o.productName
         card.querySelector('.meta').textContent =
-          (o.buyer_name || 'Unknown buyer') + ' · ' + (o.buyer_email || 'no email')
+          (o.buyerName || 'Unknown buyer') + ' · ' + (o.buyerEmail || 'no email')
 
-        const input = card.querySelector('input')
-        const btn   = card.querySelector('button')
-        input.value = o.edition_number || ''
+        const inputs = []
+        o.items.forEach(function (item) {
+          const row = document.createElement('div')
+          row.className = 'ship-row'
+          row.innerHTML =
+            '<span class="item-name"></span>' +
+            '<div><label>Edition number</label>' +
+            '<input type="number" min="1" max="' + editionSize + '" step="1"/></div>'
+          row.querySelector('.item-name').textContent = item.productName
+          const input = row.querySelector('input')
+          input.value = item.suggestedEdition || ''
+          inputs.push({ item: item, input: input })
+          card.appendChild(row)
+        })
 
+        const btn = document.createElement('button')
+        btn.type = 'button'
+        btn.textContent = o.isBundle
+          ? 'Mark all shipped & email buyer' : 'Mark shipped & email buyer'
+        card.appendChild(btn)
+
+        const hint = document.createElement('p')
+        hint.className = 'hint'
+        hint.textContent = 'Reserved box' + (o.isBundle ? 'es are' : ' is') +
+          ' prefilled — change any number if the print in your hand says otherwise.'
+        card.appendChild(hint)
+
+        const conflictsEl = document.createElement('p')
+        conflictsEl.className = 'conflicts'
+        conflictsEl.hidden = true
+        card.appendChild(conflictsEl)
+
+        let force = false
         btn.addEventListener('click', function () {
-          const n = Number(input.value)
-          if (!Number.isInteger(n) || n < 1 || n > editionSize) {
-            say('Edition number must be a whole number from 1 to ' + editionSize + '.', 'err')
-            return
+          const items = []
+          for (const pair of inputs) {
+            const n = Number(pair.input.value)
+            if (!Number.isInteger(n) || n < 1 || n > editionSize) {
+              say('Every edition number must be a whole number from 1 to ' + editionSize + '.', 'err')
+              return
+            }
+            items.push({ id: pair.item.id, editionNumber: n })
           }
           btn.disabled = true
-          request('POST', { id: o.id, editionNumber: n }).then(function (data) {
-            say('Sent ' + data.shipped.order_number + ' — edition ' + data.shipped.edition_number +
+          request('/api/ship', 'POST', { items: items, force: force }).then(function (data) {
+            say('Sent ' + o.orderNumber + ' — ' +
+                data.shipped.map(function (s) { return 'edition ' + s.edition_number }).join(', ') +
                 (data.emailed ? '. Buyer emailed.' : '. NOTE: email did not send, check Resend.'), 'ok')
             load()
           }).catch(function (err) {
             btn.disabled = false
-            if (err && err.message) say(err.message, 'err')
+            if (err && err.data && err.data.error === 'edition_conflict') {
+              conflictsEl.hidden = false
+              conflictsEl.textContent = err.data.conflicts.map(function (c) {
+                return c.productName + ' #' + c.edition + ' is already ' +
+                  (c.reservedOrder ? 'reserved for ' + c.reservedOrder : 'marked ' + c.status)
+              }).join(' · ')
+              force = true
+              btn.textContent = 'Ship anyway'
+              say('Edition conflict — check the numbers, or ship anyway to override.', 'err')
+            } else if (err && err.message) {
+              say(err.message, 'err')
+            }
           })
         })
 
@@ -143,9 +227,107 @@
       })
     }
 
+    // ── Inventory grid ────────────────────────────────────────────────────────
+    function tallyText(boxes) {
+      const counts = { available: 0, sold: 0, gifted: 0, relisted: 0 }
+      boxes.forEach(function (b) { counts[b.dataset.status] += 1 })
+      return counts.available + ' open · ' + counts.sold + ' sold · ' +
+             counts.gifted + ' gifted · ' + counts.relisted + ' relisted'
+    }
+
+    function applyStatus(btn, status) {
+      btn.dataset.status = status
+      btn.className = (status === 'available' ? '' : 'st-' + status) +
+                      (btn.dataset.reserved ? ' reserved' : '')
+      const label = btn.dataset.name + ' #' + btn.dataset.n + ' — ' + status +
+        (btn.dataset.reserved ? ' (reserved for ' + btn.dataset.reserved + ')' : '')
+      btn.setAttribute('aria-label', label)
+      btn.title = label
+    }
+
+    function renderGrid(grid, names) {
+      gridEl.innerHTML = ''
+      Object.keys(grid).forEach(function (slug) {
+        const boxes = grid[slug]
+        if (!boxes.length) return
+        const card = document.createElement('div')
+        card.className = 'design'
+        card.innerHTML = '<div class="design-head"><h3></h3>' +
+          '<span class="tally"></span></div><div class="boxes"></div>'
+
+        const name = (names && names[slug]) || slug
+        card.querySelector('h3').textContent = name
+
+        const boxesEl = card.querySelector('.boxes')
+        const tallyEl = card.querySelector('.tally')
+        const btns = []
+
+        boxes.forEach(function (box) {
+          const btn = document.createElement('button')
+          btn.type = 'button'
+          btn.textContent = box.n
+          btn.dataset.n = box.n
+          btn.dataset.name = name
+          if (box.reservedOrder) btn.dataset.reserved = box.reservedOrder
+          applyStatus(btn, box.status)
+          btns.push(btn)
+
+          btn.addEventListener('click', function () {
+            // A reserved box means someone has paid for a print that is not
+            // packed yet — offer to release, never silently cycle over it.
+            if (btn.dataset.reserved) {
+              const ok = window.confirm('Box ' + box.n + ' of ' + name + ' is reserved for order ' +
+                btn.dataset.reserved + '. Release the reservation? Only do this if the order ' +
+                'was refunded or cancelled.')
+              if (!ok) return
+              btn.disabled = true
+              request('/api/editions', 'POST', { action: 'release', slug: slug, edition: box.n })
+                .then(function () {
+                  delete btn.dataset.reserved
+                  btn.disabled = false
+                  applyStatus(btn, btn.dataset.status)
+                  say(name + ' #' + box.n + ' — reservation released.', 'ok')
+                }).catch(function (err) {
+                  btn.disabled = false
+                  if (err && err.message) say(err.message, 'err')
+                })
+              return
+            }
+
+            const prev = btn.dataset.status
+            const next = CYCLE[(CYCLE.indexOf(prev) + 1) % CYCLE.length]
+            // Optimistic: paint first, save after; revert if the save fails.
+            // Disabled while in flight so a double-click can't skip a state.
+            applyStatus(btn, next)
+            tallyEl.textContent = tallyText(btns)
+            btn.disabled = true
+            request('/api/editions', 'POST', { slug: slug, edition: box.n, status: next })
+              .then(function () {
+                btn.disabled = false
+              }).catch(function (err) {
+                applyStatus(btn, prev)
+                tallyEl.textContent = tallyText(btns)
+                btn.disabled = false
+                if (err && err.message) say(err.message, 'err')
+              })
+          })
+
+          boxesEl.appendChild(btn)
+        })
+
+        tallyEl.textContent = tallyText(btns)
+        gridEl.appendChild(card)
+      })
+    }
+
     function load() {
-      request('GET').then(function (data) {
-        render(data.pending || [], data.editionSize || 50)
+      request('/api/ship', 'GET').then(function (data) {
+        renderOrders(data.orders || [], data.editionSize || 50)
+      }).catch(function (err) {
+        if (err && err.message) say(err.message, 'err')
+      })
+      request('/api/editions', 'GET').then(function (data) {
+        renderGrid(data.grid || {}, data.names || {})
       }).catch(function (err) {
         if (err && err.message) say(err.message, 'err')
       })

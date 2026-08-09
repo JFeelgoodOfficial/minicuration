@@ -165,23 +165,31 @@ async function handler(req, res) {
     return res.status(200).json({ received: true })
   }
 
-  // 3. Atomic stock decrement per edition (Postgres RPC prevents race conditions)
-  const sold      = []  // { slug, editionNumber }
-  const soldOut   = []  // already at zero when this purchase landed
+  // 3. Atomically reserve one edition per slug (Postgres RPC prevents race
+  // conditions). claim_edition reserves the lowest available box for this
+  // session — the box only turns "sold" in the grid at pack time, when the
+  // real number is known. The claim is idempotent per session, so a Stripe
+  // retry after our 500 below cannot reserve a second print.
+  const sold      = []  // { slug, editionNumber } — editionNumber is provisional
+  const soldOut   = []  // nothing left to reserve when this purchase landed
   let   emptiedAn = false
 
   for (const slug of slugs) {
-    const { data, error } = await supabase().rpc('decrement_stock', { product_slug: slug })
+    const { data, error } = await supabase().rpc('claim_edition', {
+      product_slug: slug,
+      session_id:   session.id,
+    })
+    const row = Array.isArray(data) ? data[0] : data
 
-    if (error || data === null) {
-      console.error(`Stock decrement failed for ${slug}:`, error?.message)
+    if (error || !row) {
+      console.error(`Edition claim failed for ${slug}:`, error?.message)
       return res.status(500).json({ error: 'stock_update_failed', slug })
     }
 
-    if (data === -1) { soldOut.push(slug); continue }
+    if (row.claimed == null) { soldOut.push(slug); continue }
 
-    sold.push({ slug, editionNumber: 50 - data })  // remaining after decrement → edition number
-    if (data === 0) emptiedAn = true
+    sold.push({ slug, editionNumber: row.claimed })
+    if (row.remaining === 0) emptiedAn = true
   }
 
   // A sold-out edition also makes the six-pack unfulfillable, so close that link
@@ -251,10 +259,10 @@ async function handler(req, res) {
   }
 
   // 4. Append to permanent sales ledger — one row per edition sold.
-  // edition_number here is PROVISIONAL: it assumes prints leave in counter
-  // order, which a missed webhook or a hand-packed print breaks. The number
-  // the buyer is told is set in api/ship.js when the print is actually packed,
-  // which is also when shipped_at stops being NULL.
+  // edition_number here is PROVISIONAL: it is the box claim_edition reserved,
+  // but the owner may pack a different print. The number the buyer is told is
+  // set in api/ship.js when the print is actually packed, which is also when
+  // shipped_at stops being NULL and the reservation is released.
   const { error: ledgerError } = await supabase().from('sales').insert(
     sold.map(({ slug, editionNumber }) => ({
       slug,
@@ -304,7 +312,7 @@ async function handler(req, res) {
     html: `
       <p><strong>${orderNumber}</strong>${isBundle ? ' — six-pack' : ''}</p>
       <ul>${sold.map(({ slug, editionNumber }) =>
-        `<li><strong>${PRODUCT_NAMES[slug]}</strong> — next unsold is
+        `<li><strong>${PRODUCT_NAMES[slug]}</strong> — reserved box
          <strong>${editionNumber}</strong> (provisional)</li>`).join('')}</ul>
       <p><strong>Paid:</strong> ${formatAmount(session)}<br>
          <strong>Buyer:</strong> ${session.customer_details?.name || 'unknown'}
