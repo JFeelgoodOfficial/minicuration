@@ -25,8 +25,10 @@ module.exports = async function handler(req, res) {
 
   if (req.method !== 'GET') return res.status(405).end()
 
+  // public_stock is a view over the editions grid: a design's stock is its
+  // count of available + relisted editions not reserved by a pending order.
   const { data, error } = await supabase()
-    .from('inventory')
+    .from('public_stock')
     .select('slug, stock')
 
   if (error) {
