@@ -21,6 +21,10 @@
     .admin button:hover{background:var(--accent-strong);}
     .admin button[disabled]{opacity:50%;cursor:not-allowed;}
     .token-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:28px;}
+
+    /* An author display rule outranks the UA sheet's [hidden], so the token
+       wall needs to say it explicitly or hiding the row does nothing. */
+    .token-row[hidden]{display:none;}
     .order{border:1px solid var(--border);border-radius:6px;padding:18px 20px;margin-bottom:14px;}
     .order-head{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:6px;}
     .order-num{font-size:12px;letter-spacing:.12em;color:var(--crimson);}
@@ -59,44 +63,63 @@
 <body>
   <main class="admin">
     <h1>Pack &amp; ship</h1>
-    <p class="lede">
-      Enter the edition numbers actually written on the prints you are packing.
-      Those numbers — not the reservation — are what the buyer is told, and the
-      email goes out the moment you save them. A six-pack ships as one order
-      and one email. Each order can only be shipped once.
+
+    <p class="lede" id="locked-note">
+      Enter your admin token to unlock the order queue and the inventory grid.
     </p>
 
-    <div class="token-row">
+    <div class="token-row" id="token-row">
       <div>
         <label for="token">Admin token</label>
         <input id="token" type="password" autocomplete="current-password"/>
       </div>
-      <button id="load" type="button">Load orders</button>
+      <button id="unlock" type="button">Unlock</button>
     </div>
 
     <div id="status" hidden></div>
-    <div id="orders"></div>
 
-    <h2>Inventory</h2>
-    <p class="lede">
-      One box per print. Click a box to cycle its status; every click saves.
-      Shipping an order marks its editions sold automatically. Clicking a
-      reserved box offers to release its reservation — do that only if the
-      order was refunded or cancelled.
-    </p>
-    <div class="legend">
-      <span><span class="chip"></span>Available</span>
-      <span><span class="chip st-sold"></span>Sold</span>
-      <span><span class="chip st-gifted"></span>Gifted</span>
-      <span><span class="chip st-relisted"></span>Relisted</span>
-      <span><span class="chip reserved"></span>Reserved (paid, not packed)</span>
+    <!-- Everything below stays hidden until the token is accepted by the API.
+         This is a convenience gate, not the security boundary: every endpoint
+         checks the token itself, so a hidden panel still holds no data. -->
+    <div id="panel" hidden>
+      <div class="token-row">
+        <button id="load" type="button">Refresh</button>
+        <button id="lock" type="button">Lock</button>
+      </div>
+
+      <p class="lede">
+        Enter the edition numbers actually written on the prints you are packing.
+        Those numbers — not the reservation — are what the buyer is told, and the
+        email goes out the moment you save them. A six-pack ships as one order
+        and one email. Each order can only be shipped once.
+      </p>
+
+      <div id="orders"></div>
+
+      <h2>Inventory</h2>
+      <p class="lede">
+        One box per print. Click a box to cycle its status; every click saves.
+        Shipping an order marks its editions sold automatically. Clicking a
+        reserved box offers to release its reservation — do that only if the
+        order was refunded or cancelled.
+      </p>
+      <div class="legend">
+        <span><span class="chip"></span>Available</span>
+        <span><span class="chip st-sold"></span>Sold</span>
+        <span><span class="chip st-gifted"></span>Gifted</span>
+        <span><span class="chip st-relisted"></span>Relisted</span>
+        <span><span class="chip reserved"></span>Reserved (paid, not packed)</span>
+      </div>
+      <div id="grid"></div>
     </div>
-    <div id="grid"></div>
   </main>
 
   <script>
   (function () {
     const tokenInput = document.getElementById('token')
+    const tokenRow   = document.getElementById('token-row')
+    const lockedNote = document.getElementById('locked-note')
+    const panelEl    = document.getElementById('panel')
     const statusEl   = document.getElementById('status')
     const ordersEl   = document.getElementById('orders')
     const gridEl     = document.getElementById('grid')
@@ -104,8 +127,9 @@
     // Mirrors EDITION_STATUSES in api/_lib.js — change both together.
     const CYCLE      = ['available', 'sold', 'gifted', 'relisted']
 
-    const saved = localStorage.getItem(STORAGE)
-    if (saved) tokenInput.value = saved
+    // The token the API has already accepted. Nothing is rendered and no
+    // request is sent until this is set by a successful unlock.
+    let token = null
 
     function say(msg, kind) {
       statusEl.hidden = false
@@ -114,9 +138,7 @@
     }
 
     function request(path, method, body) {
-      const token = tokenInput.value.trim()
-      if (!token) { say('Enter the admin token first.', 'err'); return Promise.reject() }
-      localStorage.setItem(STORAGE, token)
+      if (!token) return Promise.reject(new Error('Locked — enter the admin token.'))
       return fetch(path, {
         method: method,
         headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
@@ -124,6 +146,9 @@
       }).then(function (r) {
         return r.json().catch(function () { return {} }).then(function (data) {
           if (!r.ok) {
+            // A token that stops working mid-session (rotated, revoked) drops
+            // the panel back behind the wall rather than leaving stale data up.
+            if (r.status === 401) lock('Token rejected.')
             const msg = r.status === 401 ? 'Token rejected.'
             : (data.detail || data.error || ('Request failed (' + r.status + ')'))
             const err = new Error(msg)
@@ -132,6 +157,46 @@
           }
           return data
         })
+      })
+    }
+
+    // ── The token wall ────────────────────────────────────────────────────────
+    function lock(msg) {
+      token = null
+      localStorage.removeItem(STORAGE)
+      tokenInput.value = ''
+      panelEl.hidden = true
+      tokenRow.hidden = false
+      lockedNote.hidden = false
+      // Drop anything already rendered so nothing survives behind the wall.
+      ordersEl.innerHTML = ''
+      gridEl.innerHTML = ''
+      if (msg) say(msg, 'err'); else statusEl.hidden = true
+      tokenInput.focus()
+    }
+
+    function unlock(candidate, quiet) {
+      const trimmed = String(candidate || '').trim()
+      if (!trimmed) { say('Enter the admin token first.', 'err'); return }
+      // The API is the only judge of the token: a GET that comes back 200 is
+      // what unlocks the panel, so a wrong token never reveals anything.
+      token = trimmed
+      request('/api/ship', 'GET').then(function (data) {
+        localStorage.setItem(STORAGE, trimmed)
+        tokenRow.hidden = true
+        lockedNote.hidden = true
+        panelEl.hidden = false
+        statusEl.hidden = true
+        renderOrders(data.orders || [], data.editionSize || 50)
+        loadGrid()
+      }).catch(function (err) {
+        token = null
+        if (quiet && err && err.message === 'Token rejected.') {
+          // A stale saved token on page load: fall back to the prompt quietly.
+          lock()
+          return
+        }
+        if (err && err.message) say(err.message, 'err')
       })
     }
 
@@ -320,12 +385,7 @@
       })
     }
 
-    function load() {
-      request('/api/ship', 'GET').then(function (data) {
-        renderOrders(data.orders || [], data.editionSize || 50)
-      }).catch(function (err) {
-        if (err && err.message) say(err.message, 'err')
-      })
+    function loadGrid() {
       request('/api/editions', 'GET').then(function (data) {
         renderGrid(data.grid || {}, data.names || {})
       }).catch(function (err) {
@@ -333,8 +393,28 @@
       })
     }
 
+    function load() {
+      request('/api/ship', 'GET').then(function (data) {
+        renderOrders(data.orders || [], data.editionSize || 50)
+      }).catch(function (err) {
+        if (err && err.message) say(err.message, 'err')
+      })
+      loadGrid()
+    }
+
+    document.getElementById('unlock').addEventListener('click', function () {
+      unlock(tokenInput.value)
+    })
+    tokenInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') unlock(tokenInput.value)
+    })
     document.getElementById('load').addEventListener('click', load)
-    if (saved) load()
+    document.getElementById('lock').addEventListener('click', function () { lock() })
+
+    // A remembered token still has to be accepted by the API before anything
+    // is shown; if it has been rotated, the prompt comes back instead.
+    const saved = localStorage.getItem(STORAGE)
+    if (saved) unlock(saved, true)
   })()
   </script>
 </body>
