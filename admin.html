@@ -40,12 +40,23 @@
     .status.ok{border:1px solid var(--border);color:var(--muted);}
     .empty{color:var(--muted);font-size:14px;padding:30px 0;}
 
-    /* Inventory grid: one card per design, 50 boxes cycling through statuses */
+    /* Inventory grid: one card per design, 50 boxes cycling through statuses.
+       Each design's grid collapses behind its name so the section reads as a
+       list of six, not 300 buttons. */
     .design{border:1px solid var(--border);border-radius:6px;padding:18px 20px;margin-bottom:14px;}
-    .design-head{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:baseline;margin-bottom:12px;}
-    .design h3{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:400;}
+    .design-head{margin:0;}
+    .admin .design-toggle{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:baseline;width:100%;padding:0;background:none;border:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;letter-spacing:normal;text-transform:none;text-align:left;cursor:pointer;}
+    .admin .design-toggle:hover{background:none;}
+    .admin .design-toggle:hover .design-name{color:var(--crimson);}
+    .design-name{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:400;flex:1;}
+    .caret{display:inline-block;color:var(--muted);font-size:11px;transition:transform .15s ease;}
+    .design-toggle.open .caret{transform:rotate(90deg);}
     .tally{font-size:12px;color:var(--muted);letter-spacing:.04em;}
-    .boxes{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;}
+    .boxes{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin-top:12px;}
+
+    /* An author display rule outranks the UA sheet's [hidden] — same reason
+       .token-row needs this. Without it the grid never actually collapses. */
+    .boxes[hidden]{display:none;}
     .admin .boxes button{padding:0;height:34px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:12px;letter-spacing:0;text-transform:none;border-radius:3px;}
     .admin .boxes button:hover{border-color:var(--crimson);background:var(--bg);}
     .admin .boxes button.st-sold{background:#2e7d43;border-color:#2e7d43;color:#fff;}
@@ -171,6 +182,7 @@
       // Drop anything already rendered so nothing survives behind the wall.
       ordersEl.innerHTML = ''
       gridEl.innerHTML = ''
+      openSlug = null
       if (msg) say(msg, 'err'); else statusEl.hidden = true
       tokenInput.focus()
     }
@@ -310,6 +322,23 @@
       btn.title = label
     }
 
+    // Accordion: at most one design's grid is open. Held in memory, not
+    // storage, so it survives the re-render after shipping but a fresh page
+    // load starts fully collapsed.
+    let openSlug = null
+
+    function setOpen(slug) {
+      openSlug = slug
+      const toggles = gridEl.querySelectorAll('.design-toggle')
+      Array.prototype.forEach.call(toggles, function (toggle) {
+        const isOpen = toggle.dataset.slug === slug
+        const boxesEl = document.getElementById(toggle.getAttribute('aria-controls'))
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false')
+        toggle.classList.toggle('open', isOpen)
+        if (boxesEl) boxesEl.hidden = !isOpen
+      })
+    }
+
     function renderGrid(grid, names) {
       gridEl.innerHTML = ''
       Object.keys(grid).forEach(function (slug) {
@@ -317,15 +346,29 @@
         if (!boxes.length) return
         const card = document.createElement('div')
         card.className = 'design'
-        card.innerHTML = '<div class="design-head"><h3></h3>' +
-          '<span class="tally"></span></div><div class="boxes"></div>'
+        card.innerHTML =
+          '<h3 class="design-head">' +
+          '<button type="button" class="design-toggle" aria-expanded="false">' +
+          '<span class="caret" aria-hidden="true">▸</span>' +
+          '<span class="design-name"></span><span class="tally"></span>' +
+          '</button></h3>' +
+          '<div class="boxes" hidden></div>'
 
         const name = (names && names[slug]) || slug
-        card.querySelector('h3').textContent = name
+        card.querySelector('.design-name').textContent = name
 
         const boxesEl = card.querySelector('.boxes')
         const tallyEl = card.querySelector('.tally')
-        const btns = []
+        const toggle  = card.querySelector('.design-toggle')
+        const btns    = []
+
+        boxesEl.id = 'boxes-' + slug
+        toggle.setAttribute('aria-controls', boxesEl.id)
+        toggle.dataset.slug = slug
+        // Clicking the open design closes it; clicking another swaps to it.
+        toggle.addEventListener('click', function () {
+          setOpen(openSlug === slug ? null : slug)
+        })
 
         boxes.forEach(function (box) {
           const btn = document.createElement('button')
@@ -383,6 +426,9 @@
         tallyEl.textContent = tallyText(btns)
         gridEl.appendChild(card)
       })
+      // Reopen whatever was open before this render; collapses everything
+      // when nothing was open, or when that design is no longer listed.
+      setOpen(openSlug)
     }
 
     function loadGrid() {
