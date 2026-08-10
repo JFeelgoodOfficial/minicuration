@@ -1,4 +1,26 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
+
+// Two designs so accordion behaviour (opening one closes the other) is testable.
+async function mockAdminApi(page: Page) {
+  await page.route('**/api/ship*', route =>
+    route.fulfill({ status: 200, body: JSON.stringify({ orders: [], editionSize: 50 }) }))
+  await page.route('**/api/editions*', route =>
+    route.fulfill({ status: 200, body: JSON.stringify({
+      editionSize: 50,
+      names: { dreamfall: 'Dreamfall', veritas: 'Veritas' },
+      grid: {
+        dreamfall: [{ n: 1, status: 'available', reservedOrder: null }],
+        veritas:   [{ n: 1, status: 'sold', reservedOrder: null }],
+      },
+    }) }))
+}
+
+async function unlockPanel(page: Page) {
+  await mockAdminApi(page)
+  await page.locator('#token').fill('the-real-token')
+  await page.locator('#unlock').click()
+  await expect(page.locator('#panel')).toBeVisible()
+}
 
 // The admin page is publicly reachable (noindex, but no server-side gate on
 // the HTML itself), so the panel must stay behind the token wall. The API is
@@ -51,20 +73,13 @@ test.describe('Admin — token wall', () => {
   })
 
   test('a valid token reveals the panel, and Lock puts it back', async ({ page }) => {
-    await page.route('**/api/ship*', route =>
-      route.fulfill({ status: 200, body: JSON.stringify({ orders: [], editionSize: 50 }) }))
-    await page.route('**/api/editions*', route =>
-      route.fulfill({ status: 200, body: JSON.stringify({
-        editionSize: 50,
-        names: { dreamfall: 'Dreamfall' },
-        grid: { dreamfall: [{ n: 1, status: 'available', reservedOrder: null }] },
-      }) }))
+    await mockAdminApi(page)
 
     await page.locator('#token').fill('the-real-token')
     await page.locator('#unlock').click()
 
     await expect(page.locator('#panel')).toBeVisible()
-    await expect(page.locator('#grid .design')).toHaveCount(1)
+    await expect(page.locator('#grid .design')).toHaveCount(2)
     await expect(page.locator('#token')).toBeHidden()
 
     await page.locator('#lock').click()
@@ -72,5 +87,72 @@ test.describe('Admin — token wall', () => {
     await expect(page.locator('#token')).toBeVisible()
     await expect(page.locator('#grid .design')).toHaveCount(0)
     expect(await page.evaluate(() => localStorage.getItem('mc_admin_token'))).toBeNull()
+  })
+})
+
+// Six designs at 50 boxes each is 300 buttons, so each grid hides behind its
+// name and only one opens at a time.
+test.describe('Admin — collapsible inventory grids', () => {
+  const dreamfall = '#boxes-dreamfall'
+  const veritas   = '#boxes-veritas'
+  const toggleFor = (slug: string) => `.design-toggle[data-slug="${slug}"]`
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/admin.html')
+    await unlockPanel(page)
+  })
+
+  test('every grid starts collapsed', async ({ page }) => {
+    await expect(page.locator('#grid .design')).toHaveCount(2)
+    await expect(page.locator(dreamfall)).toBeHidden()
+    await expect(page.locator(veritas)).toBeHidden()
+    await expect(page.locator(toggleFor('dreamfall'))).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  test('the design name is a button that opens its grid', async ({ page }) => {
+    await expect(page.locator(`${toggleFor('dreamfall')} .design-name`)).toHaveText('Dreamfall')
+    await page.locator(toggleFor('dreamfall')).click()
+    await expect(page.locator(dreamfall)).toBeVisible()
+    await expect(page.locator(`${dreamfall} button`)).toBeVisible()
+    await expect(page.locator(toggleFor('dreamfall'))).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  test('pressing the same name again closes the grid', async ({ page }) => {
+    await page.locator(toggleFor('dreamfall')).click()
+    await expect(page.locator(dreamfall)).toBeVisible()
+    await page.locator(toggleFor('dreamfall')).click()
+    await expect(page.locator(dreamfall)).toBeHidden()
+    await expect(page.locator(toggleFor('dreamfall'))).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  test('opening one design closes the other', async ({ page }) => {
+    await page.locator(toggleFor('dreamfall')).click()
+    await expect(page.locator(dreamfall)).toBeVisible()
+
+    await page.locator(toggleFor('veritas')).click()
+    await expect(page.locator(veritas)).toBeVisible()
+    await expect(page.locator(dreamfall)).toBeHidden()
+    await expect(page.locator(toggleFor('dreamfall'))).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  test('the grid reopens after a refresh re-renders it', async ({ page }) => {
+    await page.locator(toggleFor('veritas')).click()
+    await expect(page.locator(veritas)).toBeVisible()
+
+    // Shipping an order triggers the same reload path.
+    await page.locator('#load').click()
+    await expect(page.locator(veritas)).toBeVisible()
+    await expect(page.locator(dreamfall)).toBeHidden()
+  })
+
+  test('locking forgets which design was open', async ({ page }) => {
+    await page.locator(toggleFor('veritas')).click()
+    await expect(page.locator(veritas)).toBeVisible()
+
+    await page.locator('#lock').click()
+    await page.locator('#token').fill('the-real-token')
+    await page.locator('#unlock').click()
+    await expect(page.locator('#panel')).toBeVisible()
+    await expect(page.locator(veritas)).toBeHidden()
   })
 })
