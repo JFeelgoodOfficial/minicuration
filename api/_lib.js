@@ -3,15 +3,16 @@
 // edition number and tells the buyer) and api/editions.js (the admin
 // inventory grid). Underscore prefix keeps Vercel from exposing this as a
 // route of its own.
+//
+// Storage lives behind api/_store.js — Google Sheets by default, Supabase when
+// STORE_BACKEND says so. Nothing in here knows which.
 const crypto = require('crypto')
-const { createClient } = require('@supabase/supabase-js')
 const { Resend } = require('resend')
+const { store, backend } = require('./_store.js')
+const { PRODUCT_NAMES, EDITION_SIZE, EDITION_STATUSES } = require('./_constants.js')
 
-// ── Lazy singletons (re-used across warm invocations) ────────────────────────
-let _supabase, _resend
-function supabase() {
-  return _supabase ||= createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
-}
+// ── Lazy singleton (re-used across warm invocations) ─────────────────────────
+let _resend
 function resend() { return _resend ||= new Resend(process.env.RESEND_API_KEY) }
 
 // ── Email addresses ──────────────────────────────────────────────────────────
@@ -19,22 +20,6 @@ function resend() { return _resend ||= new Resend(process.env.RESEND_API_KEY) }
 // fulfillment email actually reach someone.
 const STORE_EMAIL = 'Minicuration <support@minicuration.com>'
 function notifyEmail() { return process.env.ORDER_NOTIFY_EMAIL || 'support@minicuration.com' }
-
-const PRODUCT_NAMES = {
-  'dreamfall':           'Dreamfall',
-  'dream-mountain':      'Dream Mountain',
-  'sky-miles':           'Sky Miles',
-  'a-simple-meditation': 'A Simple Meditation',
-  'veritas':             'Veritas',
-  'sweet-dreams':        'Sweet Dreams',
-}
-
-const EDITION_SIZE = 50
-
-// The admin grid's click cycle, in order: each click on a box advances to the
-// next status and the last wraps back to available. admin.html keeps its own
-// copy (browser JS cannot require CommonJS) — change both together.
-const EDITION_STATUSES = ['available', 'sold', 'gifted', 'relisted']
 
 // ── Admin auth ────────────────────────────────────────────────────────────────
 // Shared by api/ship.js and api/editions.js. Timing-safe so the token can't be
@@ -95,7 +80,8 @@ function parseEditionNumber(value) {
 }
 
 module.exports = {
-  supabase,
+  store,
+  backend,
   resend,
   sendMail,
   notifyEmail,

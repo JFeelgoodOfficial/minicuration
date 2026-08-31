@@ -5,7 +5,7 @@
 //   GET  → the full grid
 //   POST → set one box's status, or release a dangling reservation
 const {
-  supabase, checkAdminToken, readJsonBody, parseEditionNumber, orderNumberFrom,
+  store, checkAdminToken, readJsonBody, parseEditionNumber, orderNumberFrom,
   PRODUCT_NAMES, EDITION_SIZE, EDITION_STATUSES,
 } = require('./_lib.js')
 
@@ -21,11 +21,7 @@ module.exports = async function handler(req, res) {
 
   // ── Full grid ───────────────────────────────────────────────────────────────
   if (req.method === 'GET') {
-    const { data, error } = await supabase()
-      .from('editions')
-      .select('slug, edition_number, status, reserved_by')
-      .order('slug')
-      .order('edition_number')
+    const { data, error } = await store().listEditions()
 
     if (error) {
       console.error('Grid fetch failed:', error.message)
@@ -62,22 +58,17 @@ module.exports = async function handler(req, res) {
   // For orders that were refunded or cancelled after the webhook reserved a
   // box — until released, that box silently counts against public stock.
   if (body.action === 'release') {
-    const { data: rows, error } = await supabase()
-      .from('editions')
-      .update({ reserved_by: null, reserved_at: null, updated_at: new Date().toISOString() })
-      .eq('slug', slug)
-      .eq('edition_number', parsed.editionNumber)
-      .not('reserved_by', 'is', null)
-      .select('slug, edition_number, status')
+    const { data: row, error } = await store()
+      .releaseReservation(slug, parsed.editionNumber, new Date().toISOString())
 
     if (error) {
       console.error('Reservation release failed:', error.message)
       return res.status(500).json({ error: 'release_failed' })
     }
-    if (!rows?.length) return res.status(409).json({ error: 'not_reserved_or_missing' })
+    if (!row) return res.status(409).json({ error: 'not_reserved_or_missing' })
 
     console.log(`Released reservation on ${slug} #${parsed.editionNumber}`)
-    return res.status(200).json({ slug, edition: parsed.editionNumber, status: rows[0].status })
+    return res.status(200).json({ slug, edition: parsed.editionNumber, status: row.status })
   }
 
   // ── Set a box's status ──────────────────────────────────────────────────────
@@ -88,18 +79,14 @@ module.exports = async function handler(req, res) {
 
   // Last write wins: with a single owner clicking one grid, a stale tab
   // overwriting a fresher one is acceptable — reload beats a conflict dance.
-  const { data: rows, error } = await supabase()
-    .from('editions')
-    .update({ status, updated_at: new Date().toISOString() })
-    .eq('slug', slug)
-    .eq('edition_number', parsed.editionNumber)
-    .select('slug, edition_number, status')
+  const { data: row, error } = await store()
+    .setEditionStatus(slug, parsed.editionNumber, status, new Date().toISOString())
 
   if (error) {
     console.error('Status update failed:', error.message)
     return res.status(500).json({ error: 'status_update_failed' })
   }
-  if (!rows?.length) return res.status(404).json({ error: 'edition_not_found' })
+  if (!row) return res.status(404).json({ error: 'edition_not_found' })
 
   // Slug and number only — never buyer data. See api/webhook.js.
   console.log(`Edition ${slug} #${parsed.editionNumber} → ${status}`)

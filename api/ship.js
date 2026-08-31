@@ -7,7 +7,7 @@
 //   POST → record the numbers actually written on the prints, mark those
 //          editions sold in the grid, then tell the buyer
 const {
-  supabase, sendMail, checkAdminToken, readJsonBody, parseEditionNumber,
+  store, sendMail, checkAdminToken, readJsonBody, parseEditionNumber,
   orderNumberFrom, PRODUCT_NAMES, EDITION_SIZE,
 } = require('./_lib.js')
 
@@ -109,12 +109,7 @@ async function handler(req, res) {
 
   // ── Pending queue, grouped by order ─────────────────────────────────────────
   if (req.method === 'GET') {
-    const { data, error } = await supabase()
-      .from('sales')
-      .select('id, order_number, slug, edition_number, buyer_name, buyer_email, created_at')
-      .is('shipped_at', null)
-      .order('created_at', { ascending: false })
-      .limit(100)
+    const { data, error } = await store().listPendingSales(100)
 
     if (error) {
       console.error('Pending fetch failed:', error.message)
@@ -138,11 +133,7 @@ async function handler(req, res) {
   }
 
   const ids = parsed.items.map(i => i.id)
-  const { data: pending, error: fetchError } = await supabase()
-    .from('sales')
-    .select('id, order_number, slug, buyer_name, buyer_email, stripe_session')
-    .in('id', ids)
-    .is('shipped_at', null)
+  const { data: pending, error: fetchError } = await store().getPendingSalesByIds(ids)
 
   if (fetchError) {
     console.error('Ship fetch failed:', fetchError.message)
@@ -175,11 +166,8 @@ async function handler(req, res) {
   // that is already sold or gifted, or is reserved for a DIFFERENT order.
   // This order's own reservation is expected and not a conflict.
   const slugs = [...new Set(sales.map(s => s.slug))]
-  const { data: boxes, error: boxError } = await supabase()
-    .from('editions')
-    .select('slug, edition_number, status, reserved_by')
-    .in('slug', slugs)
-    .in('edition_number', [...new Set(sales.map(s => s.editionNumber))])
+  const { data: boxes, error: boxError } = await store()
+    .getEditionBoxes(slugs, [...new Set(sales.map(s => s.editionNumber))])
 
   if (boxError) {
     console.error('Edition lookup failed:', boxError.message)
@@ -209,42 +197,31 @@ async function handler(req, res) {
   }
 
   // ── Ship each row, then update the grid ─────────────────────────────────────
-  // Sequential and non-transactional (Supabase REST cannot batch). If a write
-  // fails mid-loop, some rows are shipped and no email has gone out; the
+  // Sequential and non-transactional (neither backend can batch this). If a
+  // write fails mid-loop, some rows are shipped and no email has gone out; the
   // shipped_at guard makes retrying the remainder safe and email-once.
   const shippedAt = new Date().toISOString()
   const shipped = []
   for (const sale of sales) {
-    const { data: rows, error } = await supabase()
-      .from('sales')
-      .update({ edition_number: sale.editionNumber, shipped_at: shippedAt })
-      .eq('id', sale.id)
-      .is('shipped_at', null)
-      .select('id, order_number, slug, edition_number, buyer_name, buyer_email')
+    const { data: row, error } = await store().shipSale(sale.id, sale.editionNumber, shippedAt)
 
     if (error) {
       console.error('Ship update failed:', error.message)
       return res.status(500).json({ error: 'ship_update_failed', shippedSoFar: shipped.length })
     }
-    if (!rows?.length) return res.status(409).json({ error: 'already_shipped_or_missing' })
-    shipped.push(rows[0])
+    if (!row) return res.status(409).json({ error: 'already_shipped_or_missing' })
+    shipped.push(row)
 
     // The packed print's box turns green, and this order's reservation is
     // released — if the owner packed a different print than was reserved, the
     // reserved box simply returns to circulation untouched.
-    const { error: gridError } = await supabase()
-      .from('editions')
-      .update({ status: 'sold', updated_at: shippedAt })
-      .eq('slug', sale.slug)
-      .eq('edition_number', sale.editionNumber)
+    const { error: gridError } = await store()
+      .setEditionStatus(sale.slug, sale.editionNumber, 'sold', shippedAt)
     if (gridError) console.error('Grid mark-sold failed:', gridError.message)
 
     if (sale.stripe_session) {
-      const { error: releaseError } = await supabase()
-        .from('editions')
-        .update({ reserved_by: null, reserved_at: null, updated_at: shippedAt })
-        .eq('slug', sale.slug)
-        .eq('reserved_by', sale.stripe_session)
+      const { error: releaseError } = await store()
+        .releaseReservationBySession(sale.slug, sale.stripe_session, shippedAt)
       if (releaseError) console.error('Reservation release failed:', releaseError.message)
     }
   }

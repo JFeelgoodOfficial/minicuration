@@ -1,7 +1,7 @@
 'use strict'
 const Stripe = require('stripe')
 const {
-  supabase, sendMail, notifyEmail, orderNumberFrom, PRODUCT_NAMES, EDITION_SIZE,
+  store, sendMail, notifyEmail, orderNumberFrom, PRODUCT_NAMES, EDITION_SIZE,
 } = require('./_lib.js')
 
 // ── Lazy singleton (re-used across warm invocations) ─────────────────────────
@@ -165,21 +165,18 @@ async function handler(req, res) {
     return res.status(200).json({ received: true })
   }
 
-  // 3. Atomically reserve one edition per slug (Postgres RPC prevents race
-  // conditions). claim_edition reserves the lowest available box for this
-  // session — the box only turns "sold" in the grid at pack time, when the
-  // real number is known. The claim is idempotent per session, so a Stripe
-  // retry after our 500 below cannot reserve a second print.
+  // 3. Reserve one edition per slug. The store reserves the lowest available
+  // box for this session — the box only turns "sold" in the grid at pack time,
+  // when the real number is known. The claim is idempotent per session, so a
+  // Stripe retry after our 500 below cannot reserve a second print. (Under the
+  // Supabase backend this is a locking Postgres RPC; under Sheets it is a
+  // write-then-verify — see the note on claimEdition in api/_store.js.)
   const sold      = []  // { slug, editionNumber } — editionNumber is provisional
   const soldOut   = []  // nothing left to reserve when this purchase landed
   let   emptiedAn = false
 
   for (const slug of slugs) {
-    const { data, error } = await supabase().rpc('claim_edition', {
-      product_slug: slug,
-      session_id:   session.id,
-    })
-    const row = Array.isArray(data) ? data[0] : data
+    const { data: row, error } = await store().claimEdition(slug, session.id)
 
     if (error || !row) {
       console.error(`Edition claim failed for ${slug}:`, error?.message)
@@ -263,7 +260,7 @@ async function handler(req, res) {
   // but the owner may pack a different print. The number the buyer is told is
   // set in api/ship.js when the print is actually packed, which is also when
   // shipped_at stops being NULL and the reservation is released.
-  const { error: ledgerError } = await supabase().from('sales').insert(
+  const { error: ledgerError } = await store().insertSales(
     sold.map(({ slug, editionNumber }) => ({
       slug,
       edition_number: editionNumber,
@@ -275,7 +272,7 @@ async function handler(req, res) {
   if (ledgerError) console.error('Ledger insert failed:', ledgerError.message)
 
   // No buyer name or address in logs — the order number is enough to find the
-  // sale in Supabase or Stripe, and log retention is not the place for PII.
+  // sale in the ledger or Stripe, and log retention is not the place for PII.
   console.log(`Sold${isBundle ? ' (six-pack)' : ''} ${orderNumber}: ` +
     sold.map(s => `${s.slug} (provisional edition ${s.editionNumber}/${EDITION_SIZE})`).join(', '))
 

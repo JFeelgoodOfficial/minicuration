@@ -1,13 +1,5 @@
 'use strict'
-const { createClient } = require('@supabase/supabase-js')
-
-let _supabase
-function supabase() {
-  return _supabase ||= createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY  // anon key — read-only, safe server-side
-  )
-}
+const { store } = require('./_store.js')
 
 // Sister sites allowed to read inventory cross-origin (jfeelgood.com "Collect" section)
 const ALLOWED_ORIGINS = [
@@ -25,11 +17,10 @@ module.exports = async function handler(req, res) {
 
   if (req.method !== 'GET') return res.status(405).end()
 
-  // public_stock is a view over the editions grid: a design's stock is its
-  // count of available + relisted editions not reserved by a pending order.
-  const { data, error } = await supabase()
-    .from('public_stock')
-    .select('slug, stock')
+  // A design's stock is its count of available + relisted editions not
+  // reserved by a pending order — a Postgres view under the Supabase backend,
+  // counted from the editions tab under Sheets.
+  const { data, error } = await store().listStock()
 
   if (error) {
     console.error('Stock fetch failed:', error.message)

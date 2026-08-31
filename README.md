@@ -11,7 +11,7 @@ Limited edition ACEO-sized art prints by JFeelgood. 50 numbered editions per des
 | Layer | Service |
 |---|---|
 | Hosting | Vercel (static + serverless functions) |
-| Database | Supabase (Postgres) |
+| Data | Google Sheets (Supabase/Postgres paused — see [Storage backend](#storage-backend)) |
 | Payments | Stripe Checkout |
 | Email | Resend |
 
@@ -33,9 +33,13 @@ Limited edition ACEO-sized art prints by JFeelgood. 50 numbered editions per des
 ├── fonts/                  # Self-hosted woff2 (Cormorant Garamond, DM Sans)
 ├── image/                  # All site images (webp)
 ├── api/
-│   ├── _lib.js             # Shared Supabase/Resend clients, order + edition helpers
+│   ├── _constants.js       # Product slugs, edition size, grid statuses
+│   ├── _store.js           # Storage adapter — Google Sheets or Supabase
+│   ├── _sheets.js          # Dependency-free Google Sheets v4 client
+│   ├── _lib.js             # Resend client, order + edition helpers
 │   ├── webhook.js          # Stripe checkout.session.completed handler
 │   ├── ship.js             # Admin: assign edition number, email buyer
+│   ├── editions.js         # Admin: the 6 × 50 inventory grid
 │   └── stock.js            # Read-only inventory endpoint
 ├── js/
 │   ├── analytics.js        # Pageview + buy_click / newsletter event tracking
@@ -56,6 +60,73 @@ npm run audit:seo   # Updates sitemap lastmod + checks SEO files
 ```
 
 Vercel functions require env vars — use `vercel dev` with a `.env.local` for local testing.
+
+---
+
+## Storage backend
+
+Inventory and the sales ledger sit behind `api/_store.js`, which has two drivers
+selected by the `STORE_BACKEND` environment variable:
+
+| Value | Backend | Notes |
+|---|---|---|
+| `sheets` (default) | A Google Spreadsheet, two tabs | In use now — the Supabase project is paused so its free-tier slot can go elsewhere |
+| `supabase` | The original Postgres schema | Unchanged and still in `scripts/*.sql`; switching back is a config change |
+
+Nothing above the adapter knows which is active: both drivers return the same
+`{ data, error }` shape, and the SQL in `scripts/per-edition-inventory.sql`
+still describes the schema the Supabase driver talks to.
+
+### The spreadsheet
+
+Two tabs, one row per record, headers in row 1 (column order does not matter —
+the driver reads by header name, and extra columns you add by hand are
+preserved on write):
+
+- **`editions`** — `slug`, `edition_number`, `status`, `reserved_by`, `reserved_at`, `updated_at`
+  (6 designs × 50 rows; `status` is the admin grid's `available → sold → gifted → relisted` cycle)
+- **`sales`** — `id`, `slug`, `edition_number`, `order_number`, `buyer_email`, `buyer_name`, `stripe_session`, `created_at`, `shipped_at`
+  (`shipped_at` empty = still in the pack queue)
+
+Public stock is derived, not stored: a design's stock is its count of
+`available`/`relisted` editions with no `reserved_by` — the same rule the
+`public_stock` view used.
+
+### Moving from Supabase to Sheets
+
+1. Create a Google Cloud service account, enable the **Google Sheets API**, and
+   download its JSON key.
+2. Create a spreadsheet and share it with the service account's email as an
+   **Editor**. Its ID is the `/d/<id>/edit` part of the URL.
+3. Export the live data **before pausing Supabase** — a paused project cannot be read:
+   ```
+   SUPABASE_URL=… SUPABASE_SERVICE_KEY=… node scripts/supabase-export.js
+   ```
+   Writes `.local/supabase-export.json` (gitignored — it contains buyer names and emails).
+4. Build and seed the tabs:
+   ```
+   GOOGLE_SHEETS_ID=… GOOGLE_SERVICE_ACCOUNT_EMAIL=… GOOGLE_PRIVATE_KEY=… \
+     node scripts/sheets-setup.js --import
+   ```
+   Without `--import` it seeds 300 fresh `available` editions instead. It
+   refuses to overwrite a tab that already has rows unless given `--force`.
+5. Set `STORE_BACKEND=sheets` plus the three `GOOGLE_*` variables in Vercel, redeploy,
+   and check `/api/stock` and `admin.html`.
+6. Only then pause the Supabase project.
+
+To go back: set `STORE_BACKEND=supabase`, redeploy. Anything sold in the
+meantime lives only in the spreadsheet, so replay those rows into Postgres first.
+
+### The one thing Postgres did that Sheets cannot
+
+`claim_edition` took a row lock, so two simultaneous checkouts for the last
+print could never both win. The Sheets API has no compare-and-swap, so the
+driver writes the reservation and reads it back to confirm it stuck, retrying
+on the next free box if it lost. That closes the common race but leaves a
+sub-second window where two checkouts of the *same* design could reserve the
+same box. At current volume that is unlikely, and the pack-time
+duplicate-edition check in `api/ship.js` catches it before any print is
+mislabelled — but it is a real difference, not an equivalent.
 
 ---
 
