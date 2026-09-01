@@ -197,7 +197,7 @@ async function handler(req, res) {
   }
 
   // ── Ship each row, then update the grid ─────────────────────────────────────
-  // Sequential and non-transactional (neither backend can batch this). If a
+  // Sequential and non-transactional: each row is its own statement. If a
   // write fails mid-loop, some rows are shipped and no email has gone out; the
   // shipped_at guard makes retrying the remainder safe and email-once.
   const shippedAt = new Date().toISOString()

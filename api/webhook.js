@@ -165,12 +165,12 @@ async function handler(req, res) {
     return res.status(200).json({ received: true })
   }
 
-  // 3. Reserve one edition per slug. The store reserves the lowest available
-  // box for this session — the box only turns "sold" in the grid at pack time,
-  // when the real number is known. The claim is idempotent per session, so a
-  // Stripe retry after our 500 below cannot reserve a second print. (Under the
-  // Supabase backend this is a locking Postgres RPC; under Sheets it is a
-  // write-then-verify — see the note on claimEdition in api/_store.js.)
+  // 3. Atomically reserve one edition per slug (a Postgres function holding a
+  // row lock, so concurrent checkouts cannot both take the last print).
+  // claim_edition reserves the lowest available box for this session — the box
+  // only turns "sold" in the grid at pack time, when the real number is known.
+  // The claim is idempotent per session, so a Stripe retry after our 500 below
+  // cannot reserve a second print.
   const sold      = []  // { slug, editionNumber } — editionNumber is provisional
   const soldOut   = []  // nothing left to reserve when this purchase landed
   let   emptiedAn = false

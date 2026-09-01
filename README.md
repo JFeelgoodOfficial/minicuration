@@ -11,7 +11,7 @@ Limited edition ACEO-sized art prints by JFeelgood. 50 numbered editions per des
 | Layer | Service |
 |---|---|
 | Hosting | Vercel (static + serverless functions) |
-| Data | Google Sheets (Supabase/Postgres paused — see [Storage backend](#storage-backend)) |
+| Database | Neon (serverless Postgres) |
 | Payments | Stripe Checkout |
 | Email | Resend |
 
@@ -34,8 +34,7 @@ Limited edition ACEO-sized art prints by JFeelgood. 50 numbered editions per des
 ├── image/                  # All site images (webp)
 ├── api/
 │   ├── _constants.js       # Product slugs, edition size, grid statuses
-│   ├── _store.js           # Storage adapter — Google Sheets or Supabase
-│   ├── _sheets.js          # Dependency-free Google Sheets v4 client
+│   ├── _store.js           # Every database call, over Neon's HTTP driver
 │   ├── _lib.js             # Resend client, order + edition helpers
 │   ├── webhook.js          # Stripe checkout.session.completed handler
 │   ├── ship.js             # Admin: assign edition number, email buyer
@@ -63,70 +62,63 @@ Vercel functions require env vars — use `vercel dev` with a `.env.local` for l
 
 ---
 
-## Storage backend
+## Database
 
-Inventory and the sales ledger sit behind `api/_store.js`, which has two drivers
-selected by the `STORE_BACKEND` environment variable:
+Neon serverless Postgres, reached through `api/_store.js` — the single module
+that talks SQL. Handlers never build a query themselves.
 
-| Value | Backend | Notes |
-|---|---|---|
-| `sheets` (default) | A Google Spreadsheet, two tabs | In use now — the Supabase project is paused so its free-tier slot can go elsewhere |
-| `supabase` | The original Postgres schema | Unchanged and still in `scripts/*.sql`; switching back is a config change |
+The schema is `scripts/neon-schema.sql`: an `editions` table (6 designs × 50
+boxes, each cycling `available → sold → gifted → relisted`), a `sales` ledger,
+the `claim_edition` function, and the `public_stock` view. Public stock is
+derived, not stored — a design's stock is its count of `available`/`relisted`
+boxes with no `reserved_by`.
 
-Nothing above the adapter knows which is active: both drivers return the same
-`{ data, error }` shape, and the SQL in `scripts/per-edition-inventory.sql`
-still describes the schema the Supabase driver talks to.
+Two differences from the old Supabase schema, both because Neon has no
+PostgREST and no `anon` role:
 
-### The spreadsheet
+- **No RLS, no role grants.** Under Supabase every table in `public` was
+  reachable from a browser holding the anon key, so `sales` needed RLS to keep
+  buyer emails private. Neon is reachable only from `api/` over `DATABASE_URL`,
+  so the network boundary does the job the policies used to.
+- **`sales.id` is `text`.** The Supabase table may have keyed on a uuid or a
+  bigint; `admin.html` only ever round-trips the value as an opaque string, and
+  `text` accepts either, so existing order history keeps its identifiers.
 
-Two tabs, one row per record, headers in row 1 (column order does not matter —
-the driver reads by header name, and extra columns you add by hand are
-preserved on write):
+Neon scales its compute to zero after ~5 minutes idle and wakes on the next
+query, so the first request after a quiet spell pays a wake-up cost. That is
+also why `/api/stock` carries a 5-minute CDN cache — it keeps the database
+asleep between real visitors rather than on every page view.
 
-- **`editions`** — `slug`, `edition_number`, `status`, `reserved_by`, `reserved_at`, `updated_at`
-  (6 designs × 50 rows; `status` is the admin grid's `available → sold → gifted → relisted` cycle)
-- **`sales`** — `id`, `slug`, `edition_number`, `order_number`, `buyer_email`, `buyer_name`, `stripe_session`, `created_at`, `shipped_at`
-  (`shipped_at` empty = still in the pack queue)
+`scripts/per-edition-inventory.sql`, `edition-numbers.sql` and `rls-audit.sql`
+are the Supabase-era originals, kept for reference until the move is finished.
 
-Public stock is derived, not stored: a design's stock is its count of
-`available`/`relisted` editions with no `reserved_by` — the same rule the
-`public_stock` view used.
+### Moving from Supabase to Neon
 
-### Moving from Supabase to Sheets
-
-1. Create a Google Cloud service account, enable the **Google Sheets API**, and
-   download its JSON key.
-2. Create a spreadsheet and share it with the service account's email as an
-   **Editor**. Its ID is the `/d/<id>/edit` part of the URL.
-3. Export the live data **before pausing Supabase** — a paused project cannot be read:
+1. Create a Neon project and copy its **pooled** connection string.
+2. Build the schema:
    ```
-   SUPABASE_URL=… SUPABASE_SERVICE_KEY=… node scripts/supabase-export.js
+   psql "$DATABASE_URL" -f scripts/neon-schema.sql
    ```
-   Writes `.local/supabase-export.json` (gitignored — it contains buyer names and emails).
-4. Build and seed the tabs:
+3. Copy the live data across — **before pausing Supabase**, since a paused
+   project cannot be read:
    ```
-   GOOGLE_SHEETS_ID=… GOOGLE_SERVICE_ACCOUNT_EMAIL=… GOOGLE_PRIVATE_KEY=… \
-     node scripts/sheets-setup.js --import
+   SUPABASE_URL=… SUPABASE_SERVICE_KEY=… DATABASE_URL=… npm run db:migrate
    ```
-   Without `--import` it seeds 300 fresh `available` editions instead. It
-   refuses to overwrite a tab that already has rows unless given `--force`.
-5. Set `STORE_BACKEND=sheets` plus the three `GOOGLE_*` variables in Vercel, redeploy,
-   and check `/api/stock` and `admin.html`.
-6. Only then pause the Supabase project.
-
-To go back: set `STORE_BACKEND=supabase`, redeploy. Anything sold in the
-meantime lives only in the spreadsheet, so replay those rows into Postgres first.
-
-### The one thing Postgres did that Sheets cannot
-
-`claim_edition` took a row lock, so two simultaneous checkouts for the last
-print could never both win. The Sheets API has no compare-and-swap, so the
-driver writes the reservation and reads it back to confirm it stuck, retrying
-on the next free box if it lost. That closes the common race but leaves a
-sub-second window where two checkouts of the *same* design could reserve the
-same box. At current volume that is unlikely, and the pack-time
-duplicate-edition check in `api/ship.js` catches it before any print is
-mislabelled — but it is a real difference, not an equivalent.
+   Add `--dry-run` to see the counts without writing. It backs up what it read
+   to `.local/supabase-export.json` (gitignored — buyer names and emails) before
+   sending anything, and is safe to re-run: editions upsert, sales skip rows
+   already present.
+4. Check the result:
+   ```
+   DATABASE_URL=… npm run db:verify -- --claim-test
+   ```
+   Read-only without the flag. With it, the script reserves a real box on a
+   scratch session to prove `claim_edition` locks and is retry-safe, then
+   releases it — including if a check fails partway.
+5. Set `DATABASE_URL` in Vercel, redeploy, and confirm `/api/stock` and
+   `admin.html` look right.
+6. Only then pause the Supabase project. Keep `.local/supabase-export.json`
+   until you are confident.
 
 ---
 

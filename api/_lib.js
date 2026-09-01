@@ -4,11 +4,11 @@
 // inventory grid). Underscore prefix keeps Vercel from exposing this as a
 // route of its own.
 //
-// Storage lives behind api/_store.js — Google Sheets by default, Supabase when
-// STORE_BACKEND says so. Nothing in here knows which.
+// Storage lives behind api/_store.js (Neon Postgres). Nothing in here talks to
+// the database directly.
 const crypto = require('crypto')
 const { Resend } = require('resend')
-const { store, backend } = require('./_store.js')
+const { store } = require('./_store.js')
 const { PRODUCT_NAMES, EDITION_SIZE, EDITION_STATUSES } = require('./_constants.js')
 
 // ── Lazy singleton (re-used across warm invocations) ─────────────────────────
@@ -81,7 +81,6 @@ function parseEditionNumber(value) {
 
 module.exports = {
   store,
-  backend,
   resend,
   sendMail,
   notifyEmail,

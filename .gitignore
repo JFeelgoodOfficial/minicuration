@@ -17,5 +17,5 @@ test-results/
 # Lighthouse CI local reports
 .lighthouseci/
 
-# Supabase export staged for the Google Sheets import — contains buyer PII
+# Supabase backup written by scripts/migrate-to-neon.js — contains buyer PII
 .local/

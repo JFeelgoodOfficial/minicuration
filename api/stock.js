@@ -17,9 +17,8 @@ module.exports = async function handler(req, res) {
 
   if (req.method !== 'GET') return res.status(405).end()
 
-  // A design's stock is its count of available + relisted editions not
-  // reserved by a pending order — a Postgres view under the Supabase backend,
-  // counted from the editions tab under Sheets.
+  // public_stock is a view over the editions grid: a design's stock is its
+  // count of available + relisted editions not reserved by a pending order.
   const { data, error } = await store().listStock()
 
   if (error) {
@@ -31,7 +30,12 @@ module.exports = async function handler(req, res) {
     data.map(row => [row.slug, { stock: row.stock, soldOut: row.stock === 0 }])
   )
 
-  // CDN: 60s fresh, 30s stale-while-revalidate
-  res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30')
+  // CDN: 5 min fresh, 10 min stale-while-revalidate. Longer than it looks:
+  // stock only moves on a sale or an admin click, and overselling is prevented
+  // in api/webhook.js (the payment link is deactivated the moment a design
+  // empties), not by the freshness of this badge. The long window also keeps
+  // Neon's compute asleep between real visitors, which is what the free plan's
+  // CU-hour budget is spent on.
+  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600')
   return res.status(200).json(inventory)
 }
