@@ -67,7 +67,8 @@ Vercel functions require env vars — use `vercel dev` with a `.env.local` for l
 Neon serverless Postgres, reached through `api/_store.js` — the single module
 that talks SQL. Handlers never build a query themselves.
 
-The schema is `scripts/neon-schema.sql`: an `editions` table (6 designs × 50
+The schema is `scripts/neon-schema.sql`, applied for you by `npm run db:setup`:
+an `editions` table (6 designs × 50
 boxes, each cycling `available → sold → gifted → relisted`), a `sales` ledger,
 the `claim_edition` function, and the `public_stock` view. Public stock is
 derived, not stored — a design's stock is its count of `available`/`relisted`
@@ -94,31 +95,50 @@ are the Supabase-era originals, kept for reference until the move is finished.
 
 ### Moving from Supabase to Neon
 
-1. Create a Neon project and copy its **pooled** connection string.
-2. Build the schema:
-   ```
-   psql "$DATABASE_URL" -f scripts/neon-schema.sql
-   ```
-3. Copy the live data across — **before pausing Supabase**, since a paused
-   project cannot be read:
-   ```
-   SUPABASE_URL=… SUPABASE_SERVICE_KEY=… DATABASE_URL=… npm run db:migrate
-   ```
-   Add `--dry-run` to see the counts without writing. It backs up what it read
-   to `.local/supabase-export.json` (gitignored — buyer names and emails) before
-   sending anything, and is safe to re-run: editions upsert, sales skip rows
-   already present.
-4. Check the result:
-   ```
-   DATABASE_URL=… npm run db:verify -- --claim-test
-   ```
-   Read-only without the flag. With it, the script reserves a real box on a
-   scratch session to prove `claim_edition` locks and is retry-safe, then
-   releases it — including if a check fails partway.
-5. Set `DATABASE_URL` in Vercel, redeploy, and confirm `/api/stock` and
-   `admin.html` look right.
-6. Only then pause the Supabase project. Keep `.local/supabase-export.json`
-   until you are confident.
+All of this happens on your own computer, in the `minicuration` folder, in
+Terminal. You do not need to install Postgres or know any SQL.
+
+**1. Make the database.** Sign up at [neon.com](https://neon.com), create a
+project. On the project page, find **Connection string** and copy it — it is one
+long line starting `postgresql://`. Pick the **pooled** one if offered (its
+address contains `-pooler`).
+
+**2. Save your settings.** Copy `.env.example` to a new file called
+`.env.local`, then fill in three values:
+
+- `DATABASE_URL` — the line you just copied from Neon
+- `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` — from supabase.com → your project →
+  Settings → API. Use the **service_role** key, not the anon one.
+
+`.env.local` is ignored by git, so these never leave your machine.
+
+**3. Run one command.**
+
+```
+npm run db:setup
+```
+
+It creates the tables, copies every print and every order across from Supabase,
+and prints what the shop will show — a stock count per design and how many
+orders are still to pack. Check those numbers look right. Add `--dry-run` to see
+what it *would* do without writing anything.
+
+Do this **before** pausing Supabase — a paused project can't be read. The
+command saves a backup of everything it read to `.local/supabase-export.json`
+first, and it is safe to run again if anything goes wrong: it never deletes, and
+re-running won't duplicate your orders.
+
+**4. Tell the live site.** In Vercel: your project → Settings → Environment
+Variables → add `DATABASE_URL` with the same value from step 2. Then redeploy
+(Deployments → the latest one → ⋯ → Redeploy).
+
+**5. Check it worked.** Open `minicuration.com/admin.html` and confirm your
+orders and the edition grid look correct. Then you can pause the Supabase
+project. Keep the backup file until you are confident.
+
+If something looks wrong later, `npm run db:verify` re-checks the database and
+says what it finds. Adding `-- --claim-test` also proves a purchase can still
+reserve a print correctly.
 
 ---
 
