@@ -73,6 +73,39 @@ function privateKey() {
   return key
 }
 
+async function accessToken() {
+  if (_token && _token.expiresAt > Date.now()) return _token.value
+
+  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
+  if (!email) throw new Error('GOOGLE_SERVICE_ACCOUNT_EMAIL is not set')
+
+  const now = Math.floor(Date.now() / 1000)
+  const header = base64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }))
+  const claims = base64url(JSON.stringify({
+    iss: email, scope: SCOPE, aud: TOKEN_URL, iat: now, exp: now + 3600,
+  }))
+  const signature = base64url(
+    crypto.createSign('RSA-SHA256').update(`${header}.${claims}`).sign(privateKey()))
+
+  const res = await fetch(TOKEN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion: `${header}.${claims}.${signature}`,
+    }),
+  })
+  const body = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    const err = new Error(`Google token request failed (${res.status}): ${body.error_description || body.error || 'unknown'}`)
+    err.status = res.status
+    err.isAuth = true
+    throw err
+  }
+  _token = { value: body.access_token, expiresAt: Date.now() + (body.expires_in - 60) * 1000 }
+  return _token.value
+}
+
 function spreadsheetId() {
   const id = process.env.GOOGLE_SHEETS_ID
   if (!id) throw new Error('GOOGLE_SHEETS_ID is not set')
