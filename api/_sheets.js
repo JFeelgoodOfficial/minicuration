@@ -22,54 +22,55 @@ function base64url(input) {
 }
 
 // The private key is copied out of a downloaded JSON file and pasted into a
-// web form, which is the single most error-prone step of setting this up. It
-// can arrive wrapped in the JSON string's quotes, with newlines written as the
-// two characters \n, or with real newlines — accept all of them rather than
-// failing with an opaque crypto error.
-function privateKey() {
-  let key = process.env.GOOGLE_PRIVATE_KEY
-  if (!key) throw new Error('GOOGLE_PRIVATE_KEY is not set')
-  key = key.trim().replace(/^["']|["']$/g, '').replace(/\\n/g, '\n')
-  if (!key.includes('BEGIN PRIVATE KEY')) {
-    throw new Error(
-      'GOOGLE_PRIVATE_KEY does not look like a key — it should be the whole ' +
-      '"private_key" value from the service-account JSON, starting with ' +
-      '-----BEGIN PRIVATE KEY-----')
+// web form. Every way that can go wrong produces the same unreadable OpenSSL
+// error ("DECODER routines::unsupported"), so rather than let that reach the
+// logs, recover the key from the shapes people actually paste:
+//
+//   - the clean PEM block
+//   - newlines written as the two characters \n (how JSON stores it)
+//   - the value still wrapped in the JSON string's quotes
+//   - the ENTIRE service-account JSON file
+//   - the PEM with its newlines flattened to spaces (some forms do this)
+//
+// Anything still unusable is reported by name instead of by OpenSSL error.
+const PEM_BODY = /-----BEGIN ([A-Z ]+?)-----([\s\S]*?)-----END \1-----/
+
+function normalisePrivateKey(raw) {
+  let key = String(raw).trim()
+
+  // The whole JSON file: pull out the field we actually want.
+  if (key.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(key)
+      if (parsed.private_key) key = String(parsed.private_key).trim()
+    } catch { /* not JSON after all — carry on with the other repairs */ }
   }
-  return key.endsWith('\n') ? key : key + '\n'
+
+  key = key.replace(/^["']|["']$/g, '').replace(/\\n/g, '\n')
+
+  // Rebuild the PEM from its base64 body, which fixes newlines that were
+  // flattened to spaces and normalises stray indentation. Untouched if the
+  // block is already well formed, since re-wrapping is idempotent.
+  const match = PEM_BODY.exec(key)
+  if (!match) return null
+  const [, label, body] = match
+  const base64 = body.replace(/\s+/g, '')
+  if (!base64) return null
+  const lines = base64.match(/.{1,64}/g) || []
+  return `-----BEGIN ${label}-----\n${lines.join('\n')}\n-----END ${label}-----\n`
 }
 
-async function accessToken() {
-  if (_token && _token.expiresAt > Date.now()) return _token.value
-
-  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
-  if (!email) throw new Error('GOOGLE_SERVICE_ACCOUNT_EMAIL is not set')
-
-  const now = Math.floor(Date.now() / 1000)
-  const header = base64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }))
-  const claims = base64url(JSON.stringify({
-    iss: email, scope: SCOPE, aud: TOKEN_URL, iat: now, exp: now + 3600,
-  }))
-  const signature = base64url(
-    crypto.createSign('RSA-SHA256').update(`${header}.${claims}`).sign(privateKey()))
-
-  const res = await fetch(TOKEN_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-      assertion: `${header}.${claims}.${signature}`,
-    }),
-  })
-  const body = await res.json().catch(() => ({}))
-  if (!res.ok) {
-    const err = new Error(`Google token request failed (${res.status}): ${body.error_description || body.error || 'unknown'}`)
-    err.status = res.status
-    err.isAuth = true
-    throw err
+function privateKey() {
+  const raw = process.env.GOOGLE_PRIVATE_KEY
+  if (!raw) throw new Error('GOOGLE_PRIVATE_KEY is not set')
+  const key = normalisePrivateKey(raw)
+  if (!key) {
+    throw new Error(
+      'GOOGLE_PRIVATE_KEY is not a readable private key — it should be the ' +
+      '"private_key" value from the service-account JSON, the part beginning ' +
+      '-----BEGIN PRIVATE KEY-----')
   }
-  _token = { value: body.access_token, expiresAt: Date.now() + (body.expires_in - 60) * 1000 }
-  return _token.value
+  return key
 }
 
 function spreadsheetId() {
@@ -180,4 +181,7 @@ async function readRow(tab, header, rowNumber) {
 
 module.exports = {
   call, readTab, readRow, toObjects, writeRow, writeRows, appendRows, columnLetter,
+  // Exported for tests: every way a pasted key can be malformed produces the
+  // same opaque OpenSSL error, so this is worth covering directly.
+  normalisePrivateKey,
 }

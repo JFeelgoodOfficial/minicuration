@@ -300,3 +300,56 @@ test.describe('sheets store — telling the owner what is wrong', () => {
     }
   })
 })
+
+// GOOGLE_PRIVATE_KEY is copied out of a downloaded JSON file into a web form,
+// and every way that goes wrong produces the same unreadable OpenSSL error
+// ("DECODER routines::unsupported"). These are the shapes people actually
+// paste; each must end up signing correctly.
+test.describe('sheets client — recovering a pasted private key', () => {
+  /* eslint-disable @typescript-eslint/no-var-requires */
+  const crypto = require('crypto')
+  const { normalisePrivateKey } = require('../api/_sheets.js')
+
+  // Google issues PKCS#8 RSA 2048, so test against the real thing.
+  const { privateKey: pem } = crypto.generateKeyPairSync('rsa', {
+    modulusLength: 2048,
+    privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+    publicKeyEncoding: { type: 'spki', format: 'pem' },
+  })
+
+  const signsCorrectly = (value: string) => {
+    const normalised = normalisePrivateKey(value)
+    expect(normalised, 'key was rejected outright').not.toBeNull()
+    return crypto.createSign('RSA-SHA256').update('payload').sign(normalised).length
+  }
+
+  test('the clean PEM block', () => expect(signsCorrectly(pem)).toBe(256))
+
+  test('newlines written as the two characters \\n, as JSON stores them', () => {
+    expect(signsCorrectly(pem.replace(/\n/g, '\\n'))).toBe(256)
+  })
+
+  test('still wrapped in the JSON string quotes', () => {
+    expect(signsCorrectly(`"${pem.replace(/\n/g, '\\n')}"`)).toBe(256)
+  })
+
+  test('the entire service-account JSON file pasted in', () => {
+    expect(signsCorrectly(JSON.stringify({
+      type: 'service_account', private_key: pem, client_email: 'bot@p.iam.gserviceaccount.com',
+    }))).toBe(256)
+  })
+
+  test('newlines flattened to spaces by a form', () => {
+    expect(signsCorrectly(pem.replace(/\n/g, ' '))).toBe(256)
+  })
+
+  test('surrounded by stray whitespace', () => {
+    expect(signsCorrectly(`  \n${pem}\n  `)).toBe(256)
+  })
+
+  test('rejects things that are not keys at all', () => {
+    for (const junk of ['', '   ', 'sk_live_not_a_key', '{"client_email":"x"}', '-----BEGIN PRIVATE KEY----------END PRIVATE KEY-----']) {
+      expect(normalisePrivateKey(junk), `should reject ${JSON.stringify(junk)}`).toBeNull()
+    }
+  })
+})
