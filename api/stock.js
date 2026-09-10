@@ -23,7 +23,12 @@ module.exports = async function handler(req, res) {
 
   if (error) {
     console.error('Stock fetch failed:', error.message)
-    return res.status(500).json({ error: 'Failed to fetch inventory' })
+    // `reason` names the setup step to fix; it deliberately contains no IDs,
+    // addresses or keys, because this endpoint is public.
+    return res.status(500).json({
+      error: 'Failed to fetch inventory',
+      ...(error.reason ? { reason: error.reason } : {}),
+    })
   }
 
   const inventory = Object.fromEntries(

@@ -63,7 +63,10 @@ async function accessToken() {
   })
   const body = await res.json().catch(() => ({}))
   if (!res.ok) {
-    throw new Error(`Google token request failed (${res.status}): ${body.error_description || body.error || 'unknown'}`)
+    const err = new Error(`Google token request failed (${res.status}): ${body.error_description || body.error || 'unknown'}`)
+    err.status = res.status
+    err.isAuth = true
+    throw err
   }
   _token = { value: body.access_token, expiresAt: Date.now() + (body.expires_in - 60) * 1000 }
   return _token.value
@@ -89,7 +92,9 @@ async function call(path, { method = 'GET', query, body } = {}) {
   })
   const json = await res.json().catch(() => ({}))
   if (!res.ok) {
-    throw new Error(`Sheets ${method} ${path} failed (${res.status}): ${json.error?.message || 'unknown'}`)
+    const err = new Error(`Sheets ${method} ${path} failed (${res.status}): ${json.error?.message || 'unknown'}`)
+    err.status = res.status
+    throw err
   }
   return json
 }

@@ -261,3 +261,42 @@ test.describe('sheets store — first run on an empty spreadsheet', () => {
     expect(tabs.sales.rows).toHaveLength(1)
   })
 })
+
+// Setting the shop up is half a dozen browser forms, each of which can be got
+// subtly wrong. A generic "Failed to fetch inventory" leaves the owner reading
+// Vercel logs, so every failure mode names the step to fix — without ever
+// naming an ID, address or key, because /api/stock is public.
+test.describe('sheets store — telling the owner what is wrong', () => {
+  /* eslint-disable @typescript-eslint/no-var-requires */
+  const { describeFailure } = require('../api/_store.js')
+  const err = (message: string, extra: Record<string, unknown> = {}) =>
+    Object.assign(new Error(message), extra)
+
+  test('names the missing variable', () => {
+    expect(describeFailure(err('GOOGLE_SHEETS_ID is not set'))).toContain('GOOGLE_SHEETS_ID')
+    expect(describeFailure(err('GOOGLE_PRIVATE_KEY is not set'))).toContain('GOOGLE_PRIVATE_KEY')
+  })
+
+  test('distinguishes a wrong key from an unshared sheet from a bad ID', () => {
+    expect(describeFailure(err('invalid_grant', { isAuth: true }))).toContain('rejected the service-account key')
+    expect(describeFailure(err('no permission', { status: 403 }))).toContain('shared with the service account')
+    expect(describeFailure(err('not found', { status: 404 }))).toContain('GOOGLE_SHEETS_ID')
+  })
+
+  test('says nothing rather than guessing at an unrecognised failure', () => {
+    expect(describeFailure(err('socket hang up'))).toBeNull()
+  })
+
+  test('never leaks an id, address or key into the public response', () => {
+    const secrets = ['1a2bSHEETID', 'bot@proj.iam.gserviceaccount.com', 'BEGIN PRIVATE KEY']
+    const failures = [
+      err(`Sheets GET failed (403): caller has no access to 1a2bSHEETID`, { status: 403 }),
+      err(`Google token request failed (400): invalid_grant for bot@proj.iam.gserviceaccount.com`, { isAuth: true }),
+      err('GOOGLE_PRIVATE_KEY does not look like a key -----BEGIN PRIVATE KEY-----'),
+    ]
+    for (const failure of failures) {
+      const reason = describeFailure(failure) || ''
+      for (const secret of secrets) expect(reason).not.toContain(secret)
+    }
+  })
+})

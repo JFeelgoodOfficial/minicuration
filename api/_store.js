@@ -45,8 +45,28 @@ async function guard(fn) {
   try {
     return { data: await fn(), error: null }
   } catch (err) {
-    return { data: null, error: { message: err.message } }
+    return { data: null, error: { message: err.message, reason: describeFailure(err) } }
   }
+}
+
+// Turns whatever Google said into one short sentence naming the thing to fix.
+// Setting this shop up is half a dozen browser forms and every one of them can
+// be got subtly wrong, so "something failed" is not a good enough answer — but
+// the text is also served publicly, so it names no IDs, emails or keys.
+function describeFailure(err) {
+  const message = err.message || ''
+  if (/GOOGLE_SHEETS_ID is not set/.test(message)) return 'GOOGLE_SHEETS_ID is not set in Vercel'
+  if (/GOOGLE_SERVICE_ACCOUNT_EMAIL is not set/.test(message)) return 'GOOGLE_SERVICE_ACCOUNT_EMAIL is not set in Vercel'
+  if (/GOOGLE_PRIVATE_KEY is not set/.test(message)) return 'GOOGLE_PRIVATE_KEY is not set in Vercel'
+  if (/does not look like a key/.test(message)) return 'GOOGLE_PRIVATE_KEY is not a private key — paste the "private_key" value from the service-account JSON'
+  if (err.isAuth || /invalid_grant|invalid_client|Invalid JWT/i.test(message)) {
+    return 'Google rejected the service-account key — check GOOGLE_PRIVATE_KEY and GOOGLE_SERVICE_ACCOUNT_EMAIL match the same JSON file'
+  }
+  if (err.status === 403) return 'the spreadsheet is not shared with the service account — share it as an Editor'
+  if (err.status === 404) return 'no spreadsheet with that GOOGLE_SHEETS_ID'
+  if (err.status === 429) return 'Google rate-limited us — try again in a minute'
+  if (/Unable to parse range|not found/i.test(message)) return 'the spreadsheet is missing its tabs and they could not be created'
+  return null
 }
 
 // ── First-run setup ──────────────────────────────────────────────────────────
@@ -185,4 +205,4 @@ const store = {
   },
 }
 
-module.exports = { store: () => store, EDITION_COLUMNS, SALES_COLUMNS }
+module.exports = { store: () => store, describeFailure, EDITION_COLUMNS, SALES_COLUMNS }
