@@ -47,7 +47,7 @@ function fakeSheets(tabs: Record<string, Tab>) {
   }
 }
 
-// Six designs × EDITION_SIZE boxes, all available — what sheets-setup.js seeds.
+// Six designs × EDITION_SIZE boxes, all available — what first-run setup seeds.
 function seedEditions(): string[][] {
   const rows: string[][] = []
   for (const slug of Object.keys(PRODUCT_NAMES)) {
@@ -160,5 +160,104 @@ test.describe('sheets store — recording an order', () => {
     // shipped_at starts empty — that is how you see what is still to pack.
     const shippedAtCol = SALES_COLUMNS.indexOf('shipped_at')
     expect(tabs.sales.rows.every(r => !r[shippedAtCol])).toBe(true)
+  })
+})
+
+// A brand-new spreadsheet is empty. The first request has to build both tabs
+// and seed all 300 prints, because there is no setup script to run any more —
+// the shop is configured entirely from a browser.
+test.describe('sheets store — first run on an empty spreadsheet', () => {
+  // Stands in for a spreadsheet with no tabs: any range read fails the way the
+  // real API fails, until addSheet creates it.
+  function emptySpreadsheet() {
+    const tabs: Record<string, Tab> = {}
+    const calls: string[] = []
+    const api = {
+      async call(path: string, opts?: { body?: { requests?: { addSheet: { properties: { title: string } } }[] }; }) {
+        calls.push(path)
+        if (path === '') return { sheets: Object.keys(tabs).map(t => ({ properties: { title: t } })) }
+        if (path === ':batchUpdate') {
+          const title = opts!.body!.requests![0].addSheet.properties.title
+          if (tabs[title]) throw new Error(`Sheets POST failed (400): A sheet with the name "${title}" already exists`)
+          tabs[title] = { header: [], rows: [] }
+          return {}
+        }
+        // values PUT — seed the tab it names
+        const title = decodeURIComponent(path).split('!')[0].replace('/values/', '')
+        const values = (opts as unknown as { body: { values: string[][] } }).body.values
+        tabs[title] = { header: values[0], rows: values.slice(1) }
+        return {}
+      },
+      async readTab(tab: string) {
+        if (!tabs[tab]) throw new Error(`Sheets GET failed (400): Unable to parse range: ${tab}`)
+        return { header: tabs[tab].header, rows: tabs[tab].rows.map(r => [...r]) }
+      },
+      toObjects(header: string[], rows: string[][]) {
+        return rows.map((row, i) => {
+          const obj: Record<string, unknown> = { _row: i + 2 }
+          header.forEach((name, col) => { obj[name] = row[col] ?? '' })
+          return obj
+        })
+      },
+      async readRow(tab: string, header: string[], rowNumber: number) {
+        const row = tabs[tab].rows[rowNumber - 2] ?? []
+        const obj: Record<string, unknown> = { _row: rowNumber }
+        header.forEach((name, col) => { obj[name] = row[col] ?? '' })
+        return obj
+      },
+      async writeRow(tab: string, header: string[], rowNumber: number, obj: Record<string, unknown>) {
+        tabs[tab].rows[rowNumber - 2] = header.map(n => (obj[n] == null ? '' : String(obj[n])))
+      },
+      async appendRows(tab: string, header: string[], objects: Record<string, unknown>[]) {
+        for (const obj of objects) tabs[tab].rows.push(header.map(n => (obj[n] == null ? '' : String(obj[n]))))
+      },
+      columnLetter: (n: number) => String.fromCharCode(64 + n),
+    }
+    require.cache[SHEETS] = { id: SHEETS, filename: SHEETS, loaded: true, exports: api } as never
+    delete require.cache[require.resolve('../api/_store.js')]
+    const { store } = require('../api/_store.js')
+    return { store: store(), tabs, calls }
+  }
+
+  test('builds both tabs and seeds 300 prints, then answers normally', async () => {
+    const { store, tabs } = emptySpreadsheet()
+    const { data, error } = await store.listStock()
+
+    expect(error).toBeNull()
+    expect(Object.keys(tabs).sort()).toEqual(['editions', 'sales'])
+    expect(tabs.editions.rows).toHaveLength(Object.keys(PRODUCT_NAMES).length * EDITION_SIZE)
+    expect(tabs.sales.header).toContain('shipped_at')
+    expect(tabs.sales.rows).toHaveLength(0)
+    for (const row of data) expect(row.stock).toBe(EDITION_SIZE)
+  })
+
+  test('a checkout on an unbuilt sheet still reserves print 1', async () => {
+    const { store, tabs } = emptySpreadsheet()
+    const { data, error } = await store.claimEdition('veritas', 'cs_live_first')
+    expect(error).toBeNull()
+    expect(data.claimed).toBe(1)
+    expect(tabs.editions.rows).toHaveLength(Object.keys(PRODUCT_NAMES).length * EDITION_SIZE)
+  })
+
+  test('setup runs once — a second call does not rebuild the tabs', async () => {
+    const { store, calls } = emptySpreadsheet()
+    await store.listStock()
+    const afterFirst = calls.filter(c => c === ':batchUpdate').length
+    await store.listStock()
+    expect(calls.filter(c => c === ':batchUpdate').length).toBe(afterFirst)
+  })
+
+  test('never overwrites a tab that already holds sales', async () => {
+    const { store, tabs } = emptySpreadsheet()
+    await store.listStock()
+    await store.insertSales([{
+      slug: 'veritas', edition_number: 1, order_number: 'MC-REAL0001',
+      buyer_email: 'ada@example.com', buyer_name: 'Ada', stripe_session: 'cs_live_real',
+    }])
+    // A later cold start must not wipe that row.
+    delete require.cache[require.resolve('../api/_store.js')]
+    const { store: restarted } = require('../api/_store.js')
+    await restarted().listStock()
+    expect(tabs.sales.rows).toHaveLength(1)
   })
 })

@@ -15,11 +15,15 @@
 // renders a 500 instead of taking the function down.
 const crypto = require('crypto')
 const sheets = require('./_sheets.js')
-const { PRODUCT_NAMES } = require('./_constants.js')
+const { PRODUCT_NAMES, EDITION_SIZE } = require('./_constants.js')
 
 const EDITIONS_TAB = 'editions'
 const SALES_TAB = 'sales'
 const SELLABLE = new Set(['available', 'relisted'])
+
+const EDITION_COLUMNS = ['slug', 'edition_number', 'status', 'reserved_by', 'reserved_at', 'updated_at']
+const SALES_COLUMNS = ['id', 'slug', 'edition_number', 'order_number', 'buyer_email', 'buyer_name',
+                       'stripe_session', 'created_at', 'shipped_at']
 
 // Sheets hands back strings and drops trailing blank cells; normalise so the
 // rest of the code sees numbers and nulls.
@@ -45,6 +49,64 @@ async function guard(fn) {
   }
 }
 
+// ── First-run setup ──────────────────────────────────────────────────────────
+// A brand-new spreadsheet is empty, so the first request to hit it builds the
+// two tabs and seeds all 300 prints. Doing it here rather than in a script
+// means the shop can be set up entirely from a browser: share the sheet with
+// the service account, set the three variables in Vercel, and the first
+// visitor completes the job.
+function freshEditions() {
+  const now = new Date().toISOString()
+  const rows = []
+  for (const slug of Object.keys(PRODUCT_NAMES)) {
+    for (let n = 1; n <= EDITION_SIZE; n++) {
+      rows.push({ slug, edition_number: n, status: 'available',
+                  reserved_by: '', reserved_at: '', updated_at: now })
+    }
+  }
+  return rows
+}
+
+async function createTab(title, columns, rows) {
+  try {
+    await sheets.call(':batchUpdate', {
+      method: 'POST',
+      body: { requests: [{ addSheet: { properties: { title } } }] },
+    })
+  } catch (err) {
+    // Two cold requests can race to create the same tab; the loser carries on
+    // and writes into the tab the winner just made.
+    if (!/already exists/i.test(err.message)) throw err
+  }
+  const values = [columns, ...rows.map(row => columns.map(c => (row[c] == null ? '' : String(row[c]))))]
+  await sheets.call(
+    `/values/${encodeURIComponent(`${title}!A1:${sheets.columnLetter(columns.length)}${values.length}`)}`,
+    { method: 'PUT', query: { valueInputOption: 'RAW' }, body: { values } })
+}
+
+async function ensureSetUp() {
+  const meta = await sheets.call('', { query: { fields: 'sheets.properties.title' } })
+  const existing = new Set((meta.sheets || []).map(s => s.properties.title))
+
+  // Never overwrite a tab that is already there — that would wipe real sales.
+  if (!existing.has(EDITIONS_TAB)) await createTab(EDITIONS_TAB, EDITION_COLUMNS, freshEditions())
+  if (!existing.has(SALES_TAB)) await createTab(SALES_TAB, SALES_COLUMNS, [])
+}
+
+// Sheets answers a request for a tab that does not exist with a parse error on
+// the range. That is the signal to build the spreadsheet, once, then retry.
+const isMissingTab = (err) => /Unable to parse range|not found/i.test(err.message)
+
+async function withSetup(fn) {
+  try {
+    return await fn()
+  } catch (err) {
+    if (!isMissingTab(err)) throw err
+    await ensureSetUp()
+    return fn()
+  }
+}
+
 async function loadEditions() {
   const { header, rows } = await sheets.readTab(EDITIONS_TAB)
   return { header, boxes: sheets.toObjects(header, rows).map(edition) }
@@ -59,14 +121,14 @@ async function patchRow(tab, header, rowNumber, patch) {
 
 const store = {
   listStock() {
-    return guard(async () => {
+    return guard(() => withSetup(async () => {
       const { boxes } = await loadEditions()
       const counts = Object.fromEntries(Object.keys(PRODUCT_NAMES).map(slug => [slug, 0]))
       for (const box of boxes) {
         if (box.slug in counts && isSellable(box)) counts[box.slug]++
       }
       return Object.entries(counts).map(([slug, stock]) => ({ slug, stock }))
-    })
+    }))
   },
 
   // Reserves the lowest-numbered print still for sale and returns it as the
@@ -80,7 +142,7 @@ const store = {
   // result is visible in the sheet (two orders showing the same number) rather
   // than silent — but it is a real difference from a database, not an equal.
   claimEdition(slug, sessionId) {
-    return guard(async () => {
+    return guard(() => withSetup(async () => {
       const { header, boxes } = await loadEditions()
       const mine = boxes.filter(b => b.slug === slug)
       const remaining = () => mine.filter(isSellable).length
@@ -105,11 +167,11 @@ const store = {
         box.reserved_by = confirmed.reserved_by   // lost the race — try the next
       }
       return { claimed: null, remaining: 0 }
-    })
+    }))
   },
 
   insertSales(rows) {
-    return guard(async () => {
+    return guard(() => withSetup(async () => {
       const { header } = await sheets.readTab(SALES_TAB)
       const now = new Date().toISOString()
       await sheets.appendRows(SALES_TAB, header, rows.map(row => ({
@@ -119,8 +181,8 @@ const store = {
         ...row,
       })))
       return null
-    })
+    }))
   },
 }
 
-module.exports = { store: () => store }
+module.exports = { store: () => store, EDITION_COLUMNS, SALES_COLUMNS }

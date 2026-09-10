@@ -21,11 +21,22 @@ function base64url(input) {
     .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
 
-// Vercel's env UI stores newlines as the two characters \n, so unescape them.
+// The private key is copied out of a downloaded JSON file and pasted into a
+// web form, which is the single most error-prone step of setting this up. It
+// can arrive wrapped in the JSON string's quotes, with newlines written as the
+// two characters \n, or with real newlines — accept all of them rather than
+// failing with an opaque crypto error.
 function privateKey() {
-  const key = process.env.GOOGLE_PRIVATE_KEY
+  let key = process.env.GOOGLE_PRIVATE_KEY
   if (!key) throw new Error('GOOGLE_PRIVATE_KEY is not set')
-  return key.includes('\\n') ? key.replace(/\\n/g, '\n') : key
+  key = key.trim().replace(/^["']|["']$/g, '').replace(/\\n/g, '\n')
+  if (!key.includes('BEGIN PRIVATE KEY')) {
+    throw new Error(
+      'GOOGLE_PRIVATE_KEY does not look like a key — it should be the whole ' +
+      '"private_key" value from the service-account JSON, starting with ' +
+      '-----BEGIN PRIVATE KEY-----')
+  }
+  return key.endsWith('\n') ? key : key + '\n'
 }
 
 async function accessToken() {
