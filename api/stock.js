@@ -31,11 +31,10 @@ module.exports = async function handler(req, res) {
   )
 
   // CDN: 5 min fresh, 10 min stale-while-revalidate. Longer than it looks:
-  // stock only moves on a sale or an admin click, and overselling is prevented
-  // in api/webhook.js (the payment link is deactivated the moment a design
-  // empties), not by the freshness of this badge. The long window also keeps
-  // Neon's compute asleep between real visitors, which is what the free plan's
-  // CU-hour budget is spent on.
+  // stock only moves on a sale or an edit to the sheet, and overselling is
+  // prevented in api/webhook.js (the payment link is deactivated the moment a
+  // design empties), not by the freshness of this badge. The long window also
+  // keeps us well inside Google's per-minute API quota.
   res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600')
   return res.status(200).json(inventory)
 }

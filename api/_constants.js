@@ -1,7 +1,6 @@
 'use strict'
 // Shared constants, in their own module so api/_store.js can use them without
 // requiring api/_lib.js (which requires the store — that would be a cycle).
-// api/_lib.js re-exports everything here, so existing imports keep working.
 
 const PRODUCT_NAMES = {
   'dreamfall':           'Dreamfall',
@@ -14,9 +13,8 @@ const PRODUCT_NAMES = {
 
 const EDITION_SIZE = 50
 
-// The admin grid's click cycle, in order: each click on a box advances to the
-// next status and the last wraps back to available. admin.html keeps its own
-// copy (browser JS cannot require CommonJS) — change both together.
+// The values the `status` column in the editions tab accepts. You set these by
+// hand in the spreadsheet; only 'available' and 'relisted' count as for sale.
 const EDITION_STATUSES = ['available', 'sold', 'gifted', 'relisted']
 
 module.exports = { PRODUCT_NAMES, EDITION_SIZE, EDITION_STATUSES }

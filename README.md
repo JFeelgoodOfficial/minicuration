@@ -11,7 +11,7 @@ Limited edition ACEO-sized art prints by JFeelgood. 50 numbered editions per des
 | Layer | Service |
 |---|---|
 | Hosting | Vercel (static + serverless functions) |
-| Database | Neon (serverless Postgres) |
+| Inventory & orders | A Google Spreadsheet |
 | Payments | Stripe Checkout |
 | Email | Resend |
 
@@ -34,18 +34,16 @@ Limited edition ACEO-sized art prints by JFeelgood. 50 numbered editions per des
 ├── image/                  # All site images (webp)
 ├── api/
 │   ├── _constants.js       # Product slugs, edition size, grid statuses
-│   ├── _store.js           # Every database call, over Neon's HTTP driver
-│   ├── _lib.js             # Resend client, order + edition helpers
+│   ├── _store.js           # The three things the site does to the sheet
+│   ├── _sheets.js          # Dependency-free Google Sheets v4 client
+│   ├── _lib.js             # Resend client, order helpers
 │   ├── webhook.js          # Stripe checkout.session.completed handler
-│   ├── ship.js             # Admin: assign edition number, email buyer
-│   ├── editions.js         # Admin: the 6 × 50 inventory grid
 │   └── stock.js            # Read-only inventory endpoint
 ├── js/
 │   ├── analytics.js        # Pageview + buy_click / newsletter event tracking
 │   ├── store.js            # Product-page inventory, edition #, sold-out capture
 │   └── nav.js              # Mobile nav toggle
 ├── thanks.html             # Post-purchase landing (newsletter + cross-sell)
-├── admin.html              # Pack & ship queue (token-gated, noindex)
 ├── scripts/                # Build/audit scripts
 ├── .env.example            # Required environment variables
 └── vercel.json
@@ -62,83 +60,67 @@ Vercel functions require env vars — use `vercel dev` with a `.env.local` for l
 
 ---
 
-## Database
+## Inventory and orders
 
-Neon serverless Postgres, reached through `api/_store.js` — the single module
-that talks SQL. Handlers never build a query themselves.
+There is no database. Everything lives in one Google Spreadsheet that you can
+open and edit like any other spreadsheet — that *is* the admin interface.
 
-The schema is `scripts/neon-schema.sql`, applied for you by `npm run db:setup`:
-an `editions` table (6 designs × 50
-boxes, each cycling `available → sold → gifted → relisted`), a `sales` ledger,
-the `claim_edition` function, and the `public_stock` view. Public stock is
-derived, not stored — a design's stock is its count of `available`/`relisted`
-boxes with no `reserved_by`.
+**`editions` tab** — one row per physical print, 6 designs × 50.
 
-Two differences from the old Supabase schema, both because Neon has no
-PostgREST and no `anon` role:
+| column | what it is |
+|---|---|
+| `slug` | which design (`sweet-dreams`, `veritas`, …) |
+| `edition_number` | 1–50 |
+| `status` | `available`, `sold`, `gifted` or `relisted` |
+| `reserved_by` | set automatically when someone checks out; blank otherwise |
+| `reserved_at`, `updated_at` | timestamps, set automatically |
 
-- **No RLS, no role grants.** Under Supabase every table in `public` was
-  reachable from a browser holding the anon key, so `sales` needed RLS to keep
-  buyer emails private. Neon is reachable only from `api/` over `DATABASE_URL`,
-  so the network boundary does the job the policies used to.
-- **`sales.id` is `text`.** The Supabase table may have keyed on a uuid or a
-  bigint; `admin.html` only ever round-trips the value as an opaque string, and
-  `text` accepts either, so existing order history keeps its identifiers.
+A print is for sale when `status` is `available` or `relisted` **and**
+`reserved_by` is empty. That is the whole stock rule — `/api/stock` just counts
+those rows, and the product pages read it.
 
-Neon scales its compute to zero after ~5 minutes idle and wakes on the next
-query, so the first request after a quiet spell pays a wake-up cost. That is
-also why `/api/stock` carries a 5-minute CDN cache — it keeps the database
-asleep between real visitors rather than on every page view.
+**`sales` tab** — one row per print sold. The website appends to it; you fill in
+`edition_number` and `shipped_at` by hand when you pack.
 
-`scripts/per-edition-inventory.sql`, `edition-numbers.sql` and `rls-audit.sql`
-are the Supabase-era originals, kept for reference until the move is finished.
+### The two things you do by hand
 
-### Moving from Supabase to Neon
+When a print sells you get an email with the order, the address, and a link
+straight to the sheet. After you pack it:
 
-All of this happens on your own computer, in the `minicuration` folder, in
-Terminal. You do not need to install Postgres or know any SQL.
+1. **In the sheet** — write the number actually on the print into
+   `edition_number` on the `sales` tab, put the date in `shipped_at`, then on
+   the `editions` tab set that print to `sold` and clear its `reserved_by` cell.
+2. **Tell the buyer** — the same order email has a link that opens a written
+   message with a blank where the edition number goes. Fill in the number, send.
 
-**1. Make the database.** Sign up at [neon.com](https://neon.com), create a
-project. On the project page, find **Connection string** and copy it — it is one
-long line starting `postgresql://`. Pick the **pooled** one if offered (its
-address contains `-pooler`).
+Refunded or abandoned order still holding a print? Clear its `reserved_by` cell
+and the print goes back on sale.
 
-**2. Save your settings.** Copy `.env.example` to a new file called
-`.env.local`, then fill in three values:
+### One-time setup
 
-- `DATABASE_URL` — the line you just copied from Neon
-- `SUPABASE_URL` and `SUPABASE_SERVICE_KEY` — from supabase.com → your project →
-  Settings → API. Use the **service_role** key, not the anon one.
+1. Create a Google Cloud project, enable the **Google Sheets API**, create a
+   **Service Account**, and download its JSON key.
+2. Create a spreadsheet, and **Share** it with the service account's email
+   address as an **Editor**. Its ID is the `/d/<id>/edit` part of the URL.
+3. Copy `.env.example` to `.env.local` and fill in the three `GOOGLE_` values.
+   Create this file on your own computer — never through the GitHub website,
+   which ignores `.gitignore` and will commit it.
+4. Build the tabs: `npm run sheet:setup`
+5. Put the same three values into Vercel (Settings → Environment Variables, as
+   **Secret**) and redeploy.
 
-`.env.local` is ignored by git, so these never leave your machine.
+### The tradeoff, honestly
 
-**3. Run one command.**
+A spreadsheet has no way to say "claim this row, and only this row, atomically".
+`claimEdition` writes a reservation and reads it back to confirm it stuck,
+moving to the next print if another checkout got there first. That handles the
+ordinary case, but leaves a sub-second window where two checkouts of the *same
+design* could land on the same print.
 
-```
-npm run db:setup
-```
-
-It creates the tables, copies every print and every order across from Supabase,
-and prints what the shop will show — a stock count per design and how many
-orders are still to pack. Check those numbers look right. Add `--dry-run` to see
-what it *would* do without writing anything.
-
-Do this **before** pausing Supabase — a paused project can't be read. The
-command saves a backup of everything it read to `.local/supabase-export.json`
-first, and it is safe to run again if anything goes wrong: it never deletes, and
-re-running won't duplicate your orders.
-
-**4. Tell the live site.** In Vercel: your project → Settings → Environment
-Variables → add `DATABASE_URL` with the same value from step 2. Then redeploy
-(Deployments → the latest one → ⋯ → Redeploy).
-
-**5. Check it worked.** Open `minicuration.com/admin.html` and confirm your
-orders and the edition grid look correct. Then you can pause the Supabase
-project. Keep the backup file until you are confident.
-
-If something looks wrong later, `npm run db:verify` re-checks the database and
-says what it finds. Adding `-- --claim-test` also proves a purchase can still
-reserve a print correctly.
+At a few sales a week across six designs that is unlikely, and if it ever
+happens you will see it in the sheet — two orders showing the same number —
+rather than it passing silently. A database would rule it out entirely. This is
+the price of not running one, and for this shop it is a reasonable price.
 
 ---
 
@@ -189,19 +171,19 @@ the stock counter: a webhook that fails, a print sold by hand, or packing out of
 order all put the counter out of step with the box of prints. That drift already
 sent one buyer the wrong number.
 
-So the counter is never used to tell a buyer anything. The flow is:
+So no number is ever quoted to a buyer automatically. The flow is:
 
-1. **Checkout** — the webhook decrements stock, writes a `sales` row with
-   `shipped_at` NULL, and confirms the order to the buyer *without* a number.
-   The `edition_number` it writes is provisional: only a suggested default.
-2. **Packing** — open `/admin.html`, enter the admin token, and type the number
-   actually written on the print. That sets `edition_number` + `shipped_at` and
-   emails the buyer their real number.
+1. **Checkout** — the webhook reserves a print, appends a `sales` row with
+   `shipped_at` empty, and confirms the order to the buyer *without* a number,
+   promising it by email once the print is packed. The `edition_number` it
+   writes is provisional: the print it reserved, not necessarily the one you
+   pull off the pile.
+2. **Packing** — you write the number actually on the print into the sheet, and
+   send the buyer the draft email linked from your order notification.
 
-`POST /api/ship` only updates rows where `shipped_at` is still NULL, so a
-double submit can't email a buyer twice. Both the endpoint and the page are
-guarded by `ADMIN_TOKEN` (compared in constant time); the endpoint returns 503
-if that variable isn't set.
+Telling the buyer is deliberately a human step. A number stated automatically
+and later found wrong is worse than one stated a day later and correct — that
+drift is what sent a buyer the wrong number once already.
 
 The owner is also emailed on the three cases that need a human: a checkout that
 matched no product, an oversell refund, and a six-pack that included a sold-out

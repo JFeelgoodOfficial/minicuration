@@ -1,12 +1,9 @@
 'use strict'
-// Shared by api/webhook.js (records the sale), api/ship.js (assigns the
-// edition number and tells the buyer) and api/editions.js (the admin
-// inventory grid). Underscore prefix keeps Vercel from exposing this as a
-// route of its own.
+// Shared by api/webhook.js and api/stock.js. The underscore prefix keeps Vercel
+// from exposing this as a route of its own.
 //
-// Storage lives behind api/_store.js (Neon Postgres). Nothing in here talks to
-// the database directly.
-const crypto = require('crypto')
+// Inventory lives behind api/_store.js (a Google Spreadsheet). Nothing in here
+// touches it directly.
 const { Resend } = require('resend')
 const { store } = require('./_store.js')
 const { PRODUCT_NAMES, EDITION_SIZE, EDITION_STATUSES } = require('./_constants.js')
@@ -20,29 +17,6 @@ function resend() { return _resend ||= new Resend(process.env.RESEND_API_KEY) }
 // fulfillment email actually reach someone.
 const STORE_EMAIL = 'Minicuration <support@minicuration.com>'
 function notifyEmail() { return process.env.ORDER_NOTIFY_EMAIL || 'support@minicuration.com' }
-
-// ── Admin auth ────────────────────────────────────────────────────────────────
-// Shared by api/ship.js and api/editions.js. Timing-safe so the token can't be
-// recovered by measuring response times.
-function checkAdminToken(supplied) {
-  const expected = process.env.ADMIN_TOKEN
-  if (!expected || !supplied) return false
-  const a = Buffer.from(String(supplied))
-  const b = Buffer.from(expected)
-  return a.length === b.length && crypto.timingSafeEqual(a, b)
-}
-
-function readJsonBody(req) {
-  if (req.body && typeof req.body === 'object') return Promise.resolve(req.body)
-  return new Promise(resolve => {
-    let raw = ''
-    req.on('data', chunk => { raw += chunk })
-    req.on('end', () => {
-      try { resolve(JSON.parse(raw || '{}')) } catch { resolve(null) }
-    })
-    req.on('error', () => resolve(null))
-  })
-}
 
 // ── Order numbers ─────────────────────────────────────────────────────────────
 // Derived from the Stripe session rather than a counter: no extra table, no
@@ -66,28 +40,12 @@ async function sendMail({ to, subject, html }) {
   }
 }
 
-// ── Edition numbers ───────────────────────────────────────────────────────────
-// The number written on the print the owner physically packs. It is NOT
-// derivable from the stock counter: a missed webhook, a hand-sold print, or
-// packing out of order all put the counter out of step with the box of prints.
-// So it is only ever accepted as explicit input, and validated here.
-function parseEditionNumber(value) {
-  const n = Number(value)
-  if (!Number.isInteger(n) || n < 1 || n > EDITION_SIZE) {
-    return { ok: false, error: `edition number must be a whole number from 1 to ${EDITION_SIZE}` }
-  }
-  return { ok: true, editionNumber: n }
-}
-
 module.exports = {
   store,
   resend,
   sendMail,
   notifyEmail,
   orderNumberFrom,
-  parseEditionNumber,
-  checkAdminToken,
-  readJsonBody,
   STORE_EMAIL,
   PRODUCT_NAMES,
   EDITION_SIZE,

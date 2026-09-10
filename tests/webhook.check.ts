@@ -6,9 +6,9 @@ import { test, expect } from '@playwright/test'
 // purchase must consume all six editions, not one.
 //
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { resolveSlugs, slugFromName, orderNumberFrom } = require('../api/webhook.js')
+const { resolveSlugs, slugFromName, orderNumberFrom, draftEditionEmail } = require('../api/webhook.js')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { parseEditionNumber } = require('../api/_lib.js')
+const { PRODUCT_NAMES, EDITION_SIZE } = require('../api/_lib.js')
 
 const ALL_SLUGS = [
   'dreamfall',
@@ -100,25 +100,39 @@ test.describe('webhook — order numbers', () => {
   })
 })
 
-// The edition number is written on a physical print and told to a buyer as a
-// permanent claim, so a bad one must never reach the ledger or an email.
-test.describe('ship — edition number validation', () => {
-  test('accepts any number within the edition', () => {
-    expect(parseEditionNumber(1)).toEqual({ ok: true, editionNumber: 1 })
-    expect(parseEditionNumber(50)).toEqual({ ok: true, editionNumber: 50 })
-    // The admin form submits strings.
-    expect(parseEditionNumber('27')).toEqual({ ok: true, editionNumber: 27 })
+// There is no admin page any more: the owner tells the buyer their edition
+// number by hand, from a draft link in the order email. If that link is
+// malformed the buyer never learns the number their print was sold on.
+test.describe('webhook — the buyer\'s edition-number draft', () => {
+  const session = { customer_details: { name: 'Ada Lovelace', email: 'ada@example.com' } }
+
+  test('addresses the buyer and leaves a blank for the number', () => {
+    const url = new URL(draftEditionEmail('MC-AAAA0001', [{ slug: 'sweet-dreams' }], session))
+    expect(decodeURIComponent(url.pathname)).toBe('ada@example.com')
+    expect(url.searchParams.get('subject')).toContain('MC-AAAA0001')
+    expect(url.searchParams.get('subject')).toContain('Sweet Dreams')
+
+    const body = url.searchParams.get('body')
+    expect(body).toContain('Ada,')
+    expect(body).toContain(`edition ___ of ${EDITION_SIZE}`)
+    expect(body).toContain('yours alone')
+    expect(body).toContain('MC-AAAA0001')
   })
 
-  test('rejects numbers outside 1–50', () => {
-    for (const bad of [0, -1, 51, 999]) {
-      expect(parseEditionNumber(bad).ok, `${bad} should be rejected`).toBe(false)
-    }
+  test('a six-pack lists every print with its own blank', () => {
+    const sold = Object.keys(PRODUCT_NAMES).map(slug => ({ slug }))
+    const body = new URL(draftEditionEmail('MC-BUNDLE01', sold, session))
+      .searchParams.get('body')
+    for (const name of Object.values(PRODUCT_NAMES)) expect(body).toContain(name)
+    expect(body.match(/edition ___ of/g)).toHaveLength(6)
+    expect(body).toContain('their way')   // plural wording
   })
 
-  test('rejects anything that is not a whole number', () => {
-    for (const bad of [1.5, 'two', '', null, undefined, NaN, {}]) {
-      expect(parseEditionNumber(bad as never).ok, `${String(bad)} should be rejected`).toBe(false)
-    }
+  test('survives a checkout with no buyer name', () => {
+    const anon = { customer_details: { email: 'x@example.com' } }
+    const body = new URL(draftEditionEmail('MC-NONAME01', [{ slug: 'veritas' }], anon))
+      .searchParams.get('body')
+    expect(body).toContain('Hello,')
+    expect(body).not.toContain('undefined')
   })
 })
