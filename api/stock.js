@@ -1,13 +1,5 @@
 'use strict'
-const { createClient } = require('@supabase/supabase-js')
-
-let _supabase
-function supabase() {
-  return _supabase ||= createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_ANON_KEY  // anon key — read-only, safe server-side
-  )
-}
+const { store } = require('./_store.js')
 
 // Sister sites allowed to read inventory cross-origin (jfeelgood.com "Collect" section)
 const ALLOWED_ORIGINS = [
@@ -27,9 +19,7 @@ module.exports = async function handler(req, res) {
 
   // public_stock is a view over the editions grid: a design's stock is its
   // count of available + relisted editions not reserved by a pending order.
-  const { data, error } = await supabase()
-    .from('public_stock')
-    .select('slug, stock')
+  const { data, error } = await store().listStock()
 
   if (error) {
     console.error('Stock fetch failed:', error.message)
@@ -40,7 +30,11 @@ module.exports = async function handler(req, res) {
     data.map(row => [row.slug, { stock: row.stock, soldOut: row.stock === 0 }])
   )
 
-  // CDN: 60s fresh, 30s stale-while-revalidate
-  res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30')
+  // CDN: 5 min fresh, 10 min stale-while-revalidate. Longer than it looks:
+  // stock only moves on a sale or an edit to the sheet, and overselling is
+  // prevented in api/webhook.js (the payment link is deactivated the moment a
+  // design empties), not by the freshness of this badge. The long window also
+  // keeps us well inside Google's per-minute API quota.
+  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600')
   return res.status(200).json(inventory)
 }

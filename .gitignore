@@ -1,7 +1,7 @@
 node_modules/
 
 # Local secrets — the README tells you to create .env.local for `vercel dev`,
-# and it holds the live Stripe secret and the Supabase service_role key.
+# and it holds the live Stripe secret and the Google service-account key.
 # .env.example is the only one that belongs in git.
 .env
 .env.*

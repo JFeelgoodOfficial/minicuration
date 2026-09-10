@@ -8,12 +8,12 @@
     "test:e2e:headed": "playwright test --headed",
     "test:links": "! grep -qrn 'href=\"#\"' *.html shop/*.html",
     "test:sale": "! grep -rn '\\$23' *.html shop/*.html journal/*.html artists/*.html js/*.js llms.txt sitemap.xml | grep -v 'price-was\\|was \\$23\\|regularly \\$23' | grep .",
+    "sheet:setup": "node scripts/sheets-setup.js",
     "audit:images": "node scripts/check-images.js",
     "audit:seo": "node scripts/update-sitemap-lastmod.js && node scripts/check-seo-files.js",
     "lighthouse": "lhci autorun"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.105.4",
     "@vercel/analytics": "^2.0.1",
     "resend": "^6.12.3",
     "stripe": "^22.1.1"
@@ -21,13 +21,13 @@
   "devDependencies": {
     "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.44.0",
-    "sharp": "^0.35.3",
     "eslint": "^8.57.0",
     "eslint-plugin-html": "^8.1.1",
     "html-validate": "9.5.5",
     "postcss-html": "^1.7.0",
     "prettier": "^3.3.0",
     "serve": "^14.2.3",
+    "sharp": "^0.35.3",
     "stylelint": "^16.6.0",
     "stylelint-config-html": "^1.1.0",
     "stylelint-config-standard": "^36.0.1",

@@ -1,17 +1,15 @@
 'use strict'
-// Shared by api/webhook.js (records the sale), api/ship.js (assigns the
-// edition number and tells the buyer) and api/editions.js (the admin
-// inventory grid). Underscore prefix keeps Vercel from exposing this as a
-// route of its own.
-const crypto = require('crypto')
-const { createClient } = require('@supabase/supabase-js')
+// Shared by api/webhook.js and api/stock.js. The underscore prefix keeps Vercel
+// from exposing this as a route of its own.
+//
+// Inventory lives behind api/_store.js (a Google Spreadsheet). Nothing in here
+// touches it directly.
 const { Resend } = require('resend')
+const { store } = require('./_store.js')
+const { PRODUCT_NAMES, EDITION_SIZE, EDITION_STATUSES } = require('./_constants.js')
 
-// ── Lazy singletons (re-used across warm invocations) ────────────────────────
-let _supabase, _resend
-function supabase() {
-  return _supabase ||= createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
-}
+// ── Lazy singleton (re-used across warm invocations) ─────────────────────────
+let _resend
 function resend() { return _resend ||= new Resend(process.env.RESEND_API_KEY) }
 
 // ── Email addresses ──────────────────────────────────────────────────────────
@@ -19,45 +17,6 @@ function resend() { return _resend ||= new Resend(process.env.RESEND_API_KEY) }
 // fulfillment email actually reach someone.
 const STORE_EMAIL = 'Minicuration <support@minicuration.com>'
 function notifyEmail() { return process.env.ORDER_NOTIFY_EMAIL || 'support@minicuration.com' }
-
-const PRODUCT_NAMES = {
-  'dreamfall':           'Dreamfall',
-  'dream-mountain':      'Dream Mountain',
-  'sky-miles':           'Sky Miles',
-  'a-simple-meditation': 'A Simple Meditation',
-  'veritas':             'Veritas',
-  'sweet-dreams':        'Sweet Dreams',
-}
-
-const EDITION_SIZE = 50
-
-// The admin grid's click cycle, in order: each click on a box advances to the
-// next status and the last wraps back to available. admin.html keeps its own
-// copy (browser JS cannot require CommonJS) — change both together.
-const EDITION_STATUSES = ['available', 'sold', 'gifted', 'relisted']
-
-// ── Admin auth ────────────────────────────────────────────────────────────────
-// Shared by api/ship.js and api/editions.js. Timing-safe so the token can't be
-// recovered by measuring response times.
-function checkAdminToken(supplied) {
-  const expected = process.env.ADMIN_TOKEN
-  if (!expected || !supplied) return false
-  const a = Buffer.from(String(supplied))
-  const b = Buffer.from(expected)
-  return a.length === b.length && crypto.timingSafeEqual(a, b)
-}
-
-function readJsonBody(req) {
-  if (req.body && typeof req.body === 'object') return Promise.resolve(req.body)
-  return new Promise(resolve => {
-    let raw = ''
-    req.on('data', chunk => { raw += chunk })
-    req.on('end', () => {
-      try { resolve(JSON.parse(raw || '{}')) } catch { resolve(null) }
-    })
-    req.on('error', () => resolve(null))
-  })
-}
 
 // ── Order numbers ─────────────────────────────────────────────────────────────
 // Derived from the Stripe session rather than a counter: no extra table, no
@@ -81,28 +40,12 @@ async function sendMail({ to, subject, html }) {
   }
 }
 
-// ── Edition numbers ───────────────────────────────────────────────────────────
-// The number written on the print the owner physically packs. It is NOT
-// derivable from the stock counter: a missed webhook, a hand-sold print, or
-// packing out of order all put the counter out of step with the box of prints.
-// So it is only ever accepted as explicit input, and validated here.
-function parseEditionNumber(value) {
-  const n = Number(value)
-  if (!Number.isInteger(n) || n < 1 || n > EDITION_SIZE) {
-    return { ok: false, error: `edition number must be a whole number from 1 to ${EDITION_SIZE}` }
-  }
-  return { ok: true, editionNumber: n }
-}
-
 module.exports = {
-  supabase,
+  store,
   resend,
   sendMail,
   notifyEmail,
   orderNumberFrom,
-  parseEditionNumber,
-  checkAdminToken,
-  readJsonBody,
   STORE_EMAIL,
   PRODUCT_NAMES,
   EDITION_SIZE,

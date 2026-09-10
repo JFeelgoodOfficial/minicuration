@@ -1,7 +1,7 @@
 'use strict'
 const Stripe = require('stripe')
 const {
-  supabase, sendMail, notifyEmail, orderNumberFrom, PRODUCT_NAMES, EDITION_SIZE,
+  store, sendMail, notifyEmail, orderNumberFrom, PRODUCT_NAMES, EDITION_SIZE,
 } = require('./_lib.js')
 
 // ── Lazy singleton (re-used across warm invocations) ─────────────────────────
@@ -103,6 +103,46 @@ function formatAddress(session) {
   ].filter(Boolean).join('<br>')
 }
 
+// ── The owner's two manual steps ─────────────────────────────────────────────
+// With no admin page, packing a print means writing the real edition number
+// into the sheet and telling the buyer. Both are one click from the order
+// email: a link to the spreadsheet, and a pre-written message with a blank
+// where the number goes.
+function sheetUrl() {
+  const id = process.env.GOOGLE_SHEETS_ID
+  return id ? `https://docs.google.com/spreadsheets/d/${id}/edit` : null
+}
+
+// Mirrors the wording buyers used to get automatically, so the promise on the
+// product page still reads the same in their inbox.
+function draftEditionEmail(orderNumber, sold, session) {
+  const name = session.customer_details?.name?.split(' ')[0]
+  const lines = sold.length === 1
+    ? [`You own ${PRODUCT_NAMES[sold[0].slug]} — edition ___ of ${EDITION_SIZE}.`]
+    : ['You own:', ...sold.map(s => `  ${PRODUCT_NAMES[s.slug]} — edition ___ of ${EDITION_SIZE}`)]
+
+  const body = [
+    `${name ? name + ',' : 'Hello,'}`,
+    '',
+    sold.length === 1 ? 'Your print is packed and on its way.' : 'Your prints are packed and on their way.',
+    '',
+    ...lines,
+    '',
+    sold.length === 1
+      ? 'That number is written on the print itself and is yours alone. No other collector holds this edition.'
+      : 'Those numbers are written on the prints themselves and are yours alone. No other collector holds these editions.',
+    '',
+    `Order ${orderNumber}. Reply to this email with any questions.`,
+  ].join('\n')
+
+  const subject = sold.length === 1
+    ? `Order ${orderNumber} — ${PRODUCT_NAMES[sold[0].slug]}, your edition number`
+    : `Order ${orderNumber} — your prints are packed, edition numbers inside`
+
+  return `mailto:${encodeURIComponent(session.customer_details?.email || '')}` +
+    `?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+}
+
 // ── Raw body reader (required for Stripe signature verification) ──────────────
 function getRawBody(req) {
   return new Promise((resolve, reject) => {
@@ -165,21 +205,18 @@ async function handler(req, res) {
     return res.status(200).json({ received: true })
   }
 
-  // 3. Atomically reserve one edition per slug (Postgres RPC prevents race
-  // conditions). claim_edition reserves the lowest available box for this
-  // session — the box only turns "sold" in the grid at pack time, when the
-  // real number is known. The claim is idempotent per session, so a Stripe
-  // retry after our 500 below cannot reserve a second print.
+  // 3. Atomically reserve one edition per slug (a Postgres function holding a
+  // row lock, so concurrent checkouts cannot both take the last print).
+  // claim_edition reserves the lowest available box for this session — the box
+  // only turns "sold" in the grid at pack time, when the real number is known.
+  // The claim is idempotent per session, so a Stripe retry after our 500 below
+  // cannot reserve a second print.
   const sold      = []  // { slug, editionNumber } — editionNumber is provisional
   const soldOut   = []  // nothing left to reserve when this purchase landed
   let   emptiedAn = false
 
   for (const slug of slugs) {
-    const { data, error } = await supabase().rpc('claim_edition', {
-      product_slug: slug,
-      session_id:   session.id,
-    })
-    const row = Array.isArray(data) ? data[0] : data
+    const { data: row, error } = await store().claimEdition(slug, session.id)
 
     if (error || !row) {
       console.error(`Edition claim failed for ${slug}:`, error?.message)
@@ -263,7 +300,7 @@ async function handler(req, res) {
   // but the owner may pack a different print. The number the buyer is told is
   // set in api/ship.js when the print is actually packed, which is also when
   // shipped_at stops being NULL and the reservation is released.
-  const { error: ledgerError } = await supabase().from('sales').insert(
+  const { error: ledgerError } = await store().insertSales(
     sold.map(({ slug, editionNumber }) => ({
       slug,
       edition_number: editionNumber,
@@ -275,7 +312,7 @@ async function handler(req, res) {
   if (ledgerError) console.error('Ledger insert failed:', ledgerError.message)
 
   // No buyer name or address in logs — the order number is enough to find the
-  // sale in Supabase or Stripe, and log retention is not the place for PII.
+  // sale in the ledger or Stripe, and log retention is not the place for PII.
   console.log(`Sold${isBundle ? ' (six-pack)' : ''} ${orderNumber}: ` +
     sold.map(s => `${s.slug} (provisional edition ${s.editionNumber}/${EDITION_SIZE})`).join(', '))
 
@@ -319,10 +356,20 @@ async function handler(req, res) {
          &lt;${session.customer_details?.email || 'no email'}&gt;</p>
       <p><strong>Ship to:</strong><br>${formatAddress(session)}</p>
       <p><strong>Stripe session:</strong> ${session.id}</p>
-      <p>The buyer has <em>not</em> been given an edition number yet. Enter the
-         number actually written on the print at
-         <a href="https://minicuration.com/admin.html">minicuration.com/admin.html</a>
-         to confirm it to them.</p>
+      <hr>
+      <p><strong>When you have packed it, two things:</strong></p>
+      <ol>
+        <li>Write the number actually on the print into the
+            <strong>edition_number</strong> column of the
+            ${sheetUrl() ? `<a href="${sheetUrl()}">sales sheet</a>` : 'sales sheet'},
+            put today's date in <strong>shipped_at</strong>, and in the
+            <strong>editions</strong> tab set that print to <strong>sold</strong>
+            and clear its <strong>reserved_by</strong> cell.</li>
+        <li><a href="${draftEditionEmail(orderNumber, sold, session)}">Send the buyer
+            their edition number</a> — that link opens a written email, you just
+            fill in the blank where the number goes.</li>
+      </ol>
+      <p>The buyer has <em>not</em> been told an edition number yet.</p>
     `,
   })
 
@@ -337,3 +384,6 @@ module.exports = handler
 module.exports.resolveSlugs = resolveSlugs
 module.exports.slugFromName = slugFromName
 module.exports.orderNumberFrom = orderNumberFrom
+// The manual pack-and-ship flow lives entirely in the owner's order email, so
+// the draft link it contains is worth covering.
+module.exports.draftEditionEmail = draftEditionEmail
