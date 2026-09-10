@@ -1,5 +1,6 @@
 'use strict'
 const { store } = require('./_store.js')
+const { renderStockPage } = require('./_stock-page.js')
 
 // Sister sites allowed to read inventory cross-origin (jfeelgood.com "Collect" section)
 const ALLOWED_ORIGINS = [
@@ -13,7 +14,9 @@ module.exports = async function handler(req, res) {
   if (origin && ALLOWED_ORIGINS.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin)
   }
-  res.setHeader('Vary', 'Origin')
+  // Vary on Accept as well as Origin: the same URL answers with HTML or JSON
+  // depending on who asked, and a CDN must not serve one to the other.
+  res.setHeader('Vary', 'Origin, Accept')
 
   if (req.method !== 'GET') return res.status(405).end()
 
@@ -21,10 +24,21 @@ module.exports = async function handler(req, res) {
   // count of available + relisted editions not reserved by a pending order.
   const { data, error } = await store().listStock()
 
+  // A browser navigating here gets the page; fetch() (js/store.js, and
+  // jfeelgood.com's Collect section) sends Accept: */* and keeps getting JSON.
+  // ?format=json forces JSON, ?format=html forces the page.
+  const format = new URL(req.url, 'https://minicuration.com').searchParams.get('format')
+  const wantsHtml = format === 'html'
+    || (format !== 'json' && String(req.headers.accept || '').includes('text/html'))
+
   if (error) {
     console.error('Stock fetch failed:', error.message)
     // `reason` names the setup step to fix; it deliberately contains no IDs,
     // addresses or keys, because this endpoint is public.
+    if (wantsHtml) {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8')
+      return res.status(500).send(renderStockPage({}, error.reason))
+    }
     return res.status(500).json({
       error: 'Failed to fetch inventory',
       ...(error.reason ? { reason: error.reason } : {}),
@@ -41,5 +55,10 @@ module.exports = async function handler(req, res) {
   // design empties), not by the freshness of this badge. The long window also
   // keeps us well inside Google's per-minute API quota.
   res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600')
+
+  if (wantsHtml) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8')
+    return res.status(200).send(renderStockPage(inventory))
+  }
   return res.status(200).json(inventory)
 }
