@@ -58,7 +58,11 @@ function describeFailure(err) {
   if (/GOOGLE_SHEETS_ID is not set/.test(message)) return 'GOOGLE_SHEETS_ID is not set in Vercel'
   if (/GOOGLE_SERVICE_ACCOUNT_EMAIL is not set/.test(message)) return 'GOOGLE_SERVICE_ACCOUNT_EMAIL is not set in Vercel'
   if (/GOOGLE_PRIVATE_KEY is not set/.test(message)) return 'GOOGLE_PRIVATE_KEY is not set in Vercel'
-  if (/does not look like a key/.test(message)) return 'GOOGLE_PRIVATE_KEY is not a private key — paste the "private_key" value from the service-account JSON'
+  if (/not a readable private key/.test(message)) return 'GOOGLE_PRIVATE_KEY is not a readable private key — paste the "private_key" value from the service-account JSON'
+  // OpenSSL's own complaint when a key gets past parsing but will not load.
+  if (/DECODER routines|unsupported|asn1 encoding/i.test(message)) {
+    return 'GOOGLE_PRIVATE_KEY could not be read — re-paste the "private_key" value from the service-account JSON, or paste the whole JSON file into it'
+  }
   if (err.isAuth || /invalid_grant|invalid_client|Invalid JWT/i.test(message)) {
     return 'Google rejected the service-account key — check GOOGLE_PRIVATE_KEY and GOOGLE_SERVICE_ACCOUNT_EMAIL match the same JSON file'
   }
