@@ -98,16 +98,26 @@ and the print goes back on sale.
 
 ### One-time setup
 
-1. Create a Google Cloud project, enable the **Google Sheets API**, create a
-   **Service Account**, and download its JSON key.
-2. Create a spreadsheet, and **Share** it with the service account's email
-   address as an **Editor**. Its ID is the `/d/<id>/edit` part of the URL.
-3. Copy `.env.example` to `.env.local` and fill in the three `GOOGLE_` values.
-   Create this file on your own computer — never through the GitHub website,
-   which ignores `.gitignore` and will commit it.
-4. Build the tabs: `npm run sheet:setup`
-5. Put the same three values into Vercel (Settings → Environment Variables, as
-   **Secret**) and redeploy.
+All of it in a browser — nothing to install, nothing to run.
+
+1. **Google Cloud** ([console.cloud.google.com](https://console.cloud.google.com)) —
+   create a project, enable the **Google Sheets API**, then Credentials →
+   create a **Service Account** → Keys → **Add key → JSON**. Keep the file that
+   downloads; you need two values out of it.
+2. **The spreadsheet** — [sheets.new](https://sheets.new) makes a blank one.
+   **Share** it with the service account's email (`client_email` in the JSON)
+   as an **Editor**. Its ID is the `/d/<id>/edit` part of the URL. Leave it
+   empty; the tabs build themselves.
+3. **Vercel** → Settings → Environment Variables → add three, each as
+   **Secret**: `GOOGLE_SHEETS_ID`, `GOOGLE_SERVICE_ACCOUNT_EMAIL`
+   (`client_email`), `GOOGLE_PRIVATE_KEY` (`private_key`, pasted whole —
+   quotes, `\n` escapes or real newlines all work). Then redeploy.
+4. **Open the shop.** The first request finds an empty spreadsheet, creates the
+   `editions` and `sales` tabs and seeds all 300 prints. Nothing to trigger.
+
+To start the inventory over, delete both tabs in the spreadsheet and load the
+site again. Setup only ever creates tabs that are missing, so it can never
+overwrite real sales.
 
 ### The tradeoff, honestly
 

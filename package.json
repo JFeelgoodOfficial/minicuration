@@ -8,7 +8,6 @@
     "test:e2e:headed": "playwright test --headed",
     "test:links": "! grep -qrn 'href=\"#\"' *.html shop/*.html",
     "test:sale": "! grep -rn '\\$23' *.html shop/*.html journal/*.html artists/*.html js/*.js llms.txt sitemap.xml | grep -v 'price-was\\|was \\$23\\|regularly \\$23' | grep .",
-    "sheet:setup": "node scripts/sheets-setup.js",
     "audit:images": "node scripts/check-images.js",
     "audit:seo": "node scripts/update-sitemap-lastmod.js && node scripts/check-seo-files.js",
     "lighthouse": "lhci autorun"

@@ -21,11 +21,22 @@ function base64url(input) {
     .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
 
-// Vercel's env UI stores newlines as the two characters \n, so unescape them.
+// The private key is copied out of a downloaded JSON file and pasted into a
+// web form, which is the single most error-prone step of setting this up. It
+// can arrive wrapped in the JSON string's quotes, with newlines written as the
+// two characters \n, or with real newlines — accept all of them rather than
+// failing with an opaque crypto error.
 function privateKey() {
-  const key = process.env.GOOGLE_PRIVATE_KEY
+  let key = process.env.GOOGLE_PRIVATE_KEY
   if (!key) throw new Error('GOOGLE_PRIVATE_KEY is not set')
-  return key.includes('\\n') ? key.replace(/\\n/g, '\n') : key
+  key = key.trim().replace(/^["']|["']$/g, '').replace(/\\n/g, '\n')
+  if (!key.includes('BEGIN PRIVATE KEY')) {
+    throw new Error(
+      'GOOGLE_PRIVATE_KEY does not look like a key — it should be the whole ' +
+      '"private_key" value from the service-account JSON, starting with ' +
+      '-----BEGIN PRIVATE KEY-----')
+  }
+  return key.endsWith('\n') ? key : key + '\n'
 }
 
 async function accessToken() {
@@ -52,7 +63,10 @@ async function accessToken() {
   })
   const body = await res.json().catch(() => ({}))
   if (!res.ok) {
-    throw new Error(`Google token request failed (${res.status}): ${body.error_description || body.error || 'unknown'}`)
+    const err = new Error(`Google token request failed (${res.status}): ${body.error_description || body.error || 'unknown'}`)
+    err.status = res.status
+    err.isAuth = true
+    throw err
   }
   _token = { value: body.access_token, expiresAt: Date.now() + (body.expires_in - 60) * 1000 }
   return _token.value
@@ -78,7 +92,9 @@ async function call(path, { method = 'GET', query, body } = {}) {
   })
   const json = await res.json().catch(() => ({}))
   if (!res.ok) {
-    throw new Error(`Sheets ${method} ${path} failed (${res.status}): ${json.error?.message || 'unknown'}`)
+    const err = new Error(`Sheets ${method} ${path} failed (${res.status}): ${json.error?.message || 'unknown'}`)
+    err.status = res.status
+    throw err
   }
   return json
 }
