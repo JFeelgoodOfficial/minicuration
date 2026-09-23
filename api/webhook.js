@@ -3,6 +3,10 @@ const Stripe = require('stripe')
 const {
   store, sendMail, notifyEmail, orderNumberFrom, PRODUCT_NAMES, EDITION_SIZE,
 } = require('./_lib.js')
+const { SIX_PACK_SLUGS } = require('./_constants.js')
+const { BY_SLUG } = require('./_catalog.js')
+
+const nameOf = (slug) => PRODUCT_NAMES[slug] || BY_SLUG[slug]?.title || slug
 
 // ── Lazy singleton (re-used across warm invocations) ─────────────────────────
 let _stripe
@@ -38,7 +42,7 @@ const BUNDLE_PRICE_IDS = new Set([
 
 const ALL_SLUGS = Object.keys(PRODUCT_NAMES)
 
-// The six-pack sells every edition in one checkout.
+// The six-pack sells every edition of the original six in one checkout.
 const BUNDLE_PATTERN = /six[\s-]?pack|bundle|complete\s+(set|collection)|all\s+six/i
 
 // "Dream Mountain — Limited Edition Mini Art Print" → 'dream-mountain'
@@ -50,20 +54,38 @@ function slugFromName(name) {
     .find(slug => normalised.includes(slug)) || null
 }
 
-// Which editions does this checkout consume? Bundle → all six, otherwise one
-// slug per line item.
+// Which editions does this checkout consume? Cart checkouts (api/checkout.js)
+// name each card in the product's metadata: limited cards become slugs, which
+// reserve a numbered print, and open-edition cards are listed with their
+// quantity, since they have no inventory. Payment Link checkouts carry no
+// metadata: a six-pack there is all six originals, otherwise one slug per
+// line item, found by price ID or product name.
 function resolveSlugs(lineItems) {
-  const isBundle = lineItems.some(item =>
+  const slugs = []
+  const open = []
+  const legacy = []
+  for (const item of lineItems) {
+    const meta = item.price?.product?.metadata
+    if (meta?.slug && BY_SLUG[meta.slug]) {
+      if (meta.kind === 'open') open.push({ slug: meta.slug, qty: item.quantity || 1 })
+      else slugs.push(meta.slug)
+    } else {
+      legacy.push(item)
+    }
+  }
+
+  const isBundle = legacy.some(item =>
     BUNDLE_PRICE_IDS.has(item.price?.id)
     || BUNDLE_PATTERN.test(item.description || item.price?.product?.name || ''))
-  if (isBundle) return { slugs: [...ALL_SLUGS], isBundle: true }
+  if (isBundle) return { slugs: [...SIX_PACK_SLUGS], isBundle: true, open }
 
-  const slugs = lineItems
-    .map(item => PRICE_TO_SLUG[item.price?.id]
+  for (const item of legacy) {
+    const slug = PRICE_TO_SLUG[item.price?.id]
       || slugFromName(item.price?.product?.name)
-      || slugFromName(item.description))
-    .filter(Boolean)
-  return { slugs: [...new Set(slugs)], isBundle: false }
+      || slugFromName(item.description)
+    if (slug) slugs.push(slug)
+  }
+  return { slugs: [...new Set(slugs)], isBundle: false, open }
 }
 
 // ── Deactivate a Payment Link so it can no longer be purchased ────────────────
@@ -118,8 +140,8 @@ function sheetUrl() {
 function draftEditionEmail(orderNumber, sold, session) {
   const name = session.customer_details?.name?.split(' ')[0]
   const lines = sold.length === 1
-    ? [`You own ${PRODUCT_NAMES[sold[0].slug]} — edition ___ of ${EDITION_SIZE}.`]
-    : ['You own:', ...sold.map(s => `  ${PRODUCT_NAMES[s.slug]} — edition ___ of ${EDITION_SIZE}`)]
+    ? [`You own ${nameOf(sold[0].slug)} — edition ___ of ${EDITION_SIZE}.`]
+    : ['You own:', ...sold.map(s => `  ${nameOf(s.slug)} — edition ___ of ${EDITION_SIZE}`)]
 
   const body = [
     `${name ? name + ',' : 'Hello,'}`,
@@ -136,7 +158,7 @@ function draftEditionEmail(orderNumber, sold, session) {
   ].join('\n')
 
   const subject = sold.length === 1
-    ? `Order ${orderNumber} — ${PRODUCT_NAMES[sold[0].slug]}, your edition number`
+    ? `Order ${orderNumber} — ${nameOf(sold[0].slug)}, your edition number`
     : `Order ${orderNumber} — your prints are packed, edition numbers inside`
 
   return `mailto:${encodeURIComponent(session.customer_details?.email || '')}` +
@@ -179,12 +201,13 @@ async function handler(req, res) {
   const session     = event.data.object
   const orderNumber = orderNumberFrom(session.id)
   const lineItems   = await stripe().checkout.sessions.listLineItems(session.id, {
-    limit: 10,
+    limit: 100,
     expand: ['data.price.product'],
   })
-  const { slugs, isBundle } = resolveSlugs(lineItems.data)
+  const { slugs, isBundle, open } = resolveSlugs(lineItems.data)
+  const fromCart = session.metadata?.source === 'cart'
 
-  if (!slugs.length) {
+  if (!slugs.length && !open.length) {
     const items = lineItems.data.map(item => item.description || item.price?.id).join(', ')
     console.warn('Unrecognised checkout — no product matched:', items)
     // Money changed hands but nothing was fulfilled — this must not sit in a log.
@@ -214,6 +237,7 @@ async function handler(req, res) {
   const sold      = []  // { slug, editionNumber } — editionNumber is provisional
   const soldOut   = []  // nothing left to reserve when this purchase landed
   let   emptiedAn = false
+  let   emptiedSix = false  // one of the six-pack designs just ran out
 
   for (const slug of slugs) {
     const { data: row, error } = await store().claimEdition(slug, session.id)
@@ -226,17 +250,59 @@ async function handler(req, res) {
     if (row.claimed == null) { soldOut.push(slug); continue }
 
     sold.push({ slug, editionNumber: row.claimed })
-    if (row.remaining === 0) emptiedAn = true
+    if (row.remaining === 0) {
+      emptiedAn = true
+      if (SIX_PACK_SLUGS.includes(slug)) emptiedSix = true
+    }
   }
+  if (soldOut.some(slug => SIX_PACK_SLUGS.includes(slug))) emptiedSix = true
 
   // A sold-out edition also makes the six-pack unfulfillable, so close that link
-  // too when its ID is configured.
+  // too when its ID is configured. Cart checkouts have no link of their own;
+  // api/checkout.js refuses a sold-out design before payment instead.
   if (emptiedAn || soldOut.length) {
     await deactivatePaymentLink(session.payment_link)
-    if (!isBundle) await deactivatePaymentLink(process.env.STRIPE_BUNDLE_LINK_ID)
+    if (!isBundle && emptiedSix) await deactivatePaymentLink(process.env.STRIPE_BUNDLE_LINK_ID)
   }
 
-  if (soldOut.length) {
+  // A cart can hold several cards, so a limited card that lost the race for its
+  // last print is refunded on its own and everything else still ships.
+  if (soldOut.length && fromCart) {
+    const amount = soldOut.reduce((sum, slug) => sum + (BY_SLUG[slug]?.price || 0), 0)
+    console.error(`OVERSELL BLOCKED in cart ${orderNumber}: ${soldOut.join(', ')} — refunding ${amount}`)
+    let refunded = false
+    if (session.payment_intent && amount) {
+      try {
+        await stripe().refunds.create({
+          payment_intent: session.payment_intent,
+          amount,
+          reason: 'requested_by_customer',
+        })
+        refunded = true
+      } catch (refundErr) {
+        console.error('Partial refund failed (needs manual refund):', refundErr.message)
+      }
+    }
+    await sendMail({
+      to:      notifyEmail(),
+      subject: refunded
+        ? `Order ${orderNumber} — ${soldOut.map(nameOf).join(', ')} was sold out and refunded`
+        : `ACTION NEEDED — order ${orderNumber} oversold and the refund failed`,
+      html: `
+        <p>A cart checkout included <strong>${soldOut.map(nameOf).join(', ')}</strong>,
+           which sold out before payment landed.
+           ${refunded
+             ? `$${(amount / 100).toFixed(2)} was refunded automatically. The rest of the order is below and still needs packing.`
+             : '<strong>The automatic refund failed — refund that card in Stripe by hand.</strong>'}</p>
+        <p><strong>Order:</strong> ${orderNumber}<br>
+           <strong>Buyer:</strong> ${session.customer_details?.email || 'unknown'}<br>
+           <strong>Stripe session:</strong> ${session.id}</p>
+      `,
+    })
+    if (!sold.length && !open.length) {
+      return res.status(200).json({ received: true, warning: 'sold_out_refunded' })
+    }
+  } else if (soldOut.length) {
     if (isBundle) {
       // Never auto-refund a whole six-pack: the other editions in it are valid
       // and shipping. Refund amount is a judgement call, so escalate instead.
@@ -300,25 +366,32 @@ async function handler(req, res) {
   // but the owner may pack a different print. The number the buyer is told is
   // set in api/ship.js when the print is actually packed, which is also when
   // shipped_at stops being NULL and the reservation is released.
-  const { error: ledgerError } = await store().insertSales(
-    sold.map(({ slug, editionNumber }) => ({
-      slug,
-      edition_number: editionNumber,
-      order_number:   orderNumber,
-      buyer_email:    session.customer_details?.email,
-      buyer_name:     session.customer_details?.name,
-      stripe_session: session.id,
-    })))
+  // Open-edition cards get one row per card, marked "open" in place of a number.
+  const buyer = {
+    order_number:   orderNumber,
+    buyer_email:    session.customer_details?.email,
+    buyer_name:     session.customer_details?.name,
+    stripe_session: session.id,
+  }
+  const { error: ledgerError } = await store().insertSales([
+    ...sold.map(({ slug, editionNumber }) => ({ slug, edition_number: editionNumber, ...buyer })),
+    ...open.flatMap(({ slug, qty }) => Array.from({ length: qty }, () => ({ slug, edition_number: 'open', ...buyer }))),
+  ])
   if (ledgerError) console.error('Ledger insert failed:', ledgerError.message)
 
   // No buyer name or address in logs — the order number is enough to find the
   // sale in the ledger or Stripe, and log retention is not the place for PII.
   console.log(`Sold${isBundle ? ' (six-pack)' : ''} ${orderNumber}: ` +
-    sold.map(s => `${s.slug} (provisional edition ${s.editionNumber}/${EDITION_SIZE})`).join(', '))
+    [...sold.map(s => `${s.slug} (provisional edition ${s.editionNumber}/${EDITION_SIZE})`),
+     ...open.map(o => `${o.slug} ×${o.qty} (open edition)`)].join(', '))
 
-  const productList = sold
-    .map(({ slug }) => `<li><strong>${PRODUCT_NAMES[slug]}</strong></li>`)
-    .join('')
+  const openList = open
+    .map(({ slug, qty }) => `<li><strong>${nameOf(slug)}</strong>${qty > 1 ? ` × ${qty}` : ''} — open edition</li>`)
+  const productList = [
+    ...sold.map(({ slug }) => `<li><strong>${nameOf(slug)}</strong></li>`),
+    ...openList,
+  ].join('')
+  const cardCount = sold.length + open.reduce((n, o) => n + o.qty, 0)
 
   // 5. Confirm the order to the buyer. Deliberately no edition number: it is
   // not known until the print is picked, and a number stated here that later
@@ -327,17 +400,17 @@ async function handler(req, res) {
     to:      session.customer_details?.email,
     subject: isBundle
       ? `Order ${orderNumber} — your Minicuration six-pack is confirmed`
-      : `Order ${orderNumber} — your Minicuration print is confirmed`,
+      : `Order ${orderNumber} — your Minicuration ${cardCount > 1 ? 'order' : 'print'} is confirmed`,
     html: `
       <p>Thank you for your order. Your order number is <strong>${orderNumber}</strong>.</p>
       <p>You ordered${isBundle ? ' the complete collection:' : ':'}</p>
       <ul>${productList}</ul>
-      <p>${sold.length > 1 ? 'Each print is' : 'Your print is'} hand-numbered from an
+      ${sold.length ? `<p>${sold.length > 1 ? 'Each limited print is' : 'Your limited print is'} hand-numbered from an
          edition of ${EDITION_SIZE}. We confirm
          ${sold.length > 1 ? 'your exact edition numbers' : 'your exact edition number'}
          by email the moment ${sold.length > 1 ? 'they are' : 'it is'} packed —
-         ${sold.length > 1 ? 'those numbers are' : 'that number is'} yours alone.</p>
-      <p>${sold.length > 1 ? 'Prints ship' : 'Your print ships'} within 5–7 business days.
+         ${sold.length > 1 ? 'those numbers are' : 'that number is'} yours alone.</p>` : ''}
+      <p>${cardCount > 1 ? 'Prints ship' : 'Your print ships'} within 5–7 business days.
          Reply to this email with any questions and quote ${orderNumber}.</p>
     `,
   })
@@ -345,18 +418,18 @@ async function handler(req, res) {
   // 6. Tell the shop owner there is something to pack
   await sendMail({
     to:      notifyEmail(),
-    subject: `New order ${orderNumber} — ${sold.map(s => PRODUCT_NAMES[s.slug]).join(', ')}`,
+    subject: `New order ${orderNumber} — ${[...sold.map(s => nameOf(s.slug)), ...open.map(o => nameOf(o.slug))].join(', ')}`,
     html: `
       <p><strong>${orderNumber}</strong>${isBundle ? ' — six-pack' : ''}</p>
       <ul>${sold.map(({ slug, editionNumber }) =>
-        `<li><strong>${PRODUCT_NAMES[slug]}</strong> — reserved box
-         <strong>${editionNumber}</strong> (provisional)</li>`).join('')}</ul>
+        `<li><strong>${nameOf(slug)}</strong> — reserved box
+         <strong>${editionNumber}</strong> (provisional)</li>`).join('')}${openList.join('')}</ul>
       <p><strong>Paid:</strong> ${formatAmount(session)}<br>
          <strong>Buyer:</strong> ${session.customer_details?.name || 'unknown'}
          &lt;${session.customer_details?.email || 'no email'}&gt;</p>
       <p><strong>Ship to:</strong><br>${formatAddress(session)}</p>
       <p><strong>Stripe session:</strong> ${session.id}</p>
-      <hr>
+      ${sold.length ? `<hr>
       <p><strong>When you have packed it, two things:</strong></p>
       <ol>
         <li>Write the number actually on the print into the
@@ -369,11 +442,11 @@ async function handler(req, res) {
             their edition number</a> — that link opens a written email, you just
             fill in the blank where the number goes.</li>
       </ol>
-      <p>The buyer has <em>not</em> been told an edition number yet.</p>
+      <p>The buyer has <em>not</em> been told an edition number yet.</p>` : ''}
     `,
   })
 
-  return res.status(200).json({ received: true, orderNumber, isBundle, sold })
+  return res.status(200).json({ received: true, orderNumber, isBundle, sold, open })
 }
 
 // Disable Vercel's body parser so we can read the raw body for Stripe verification

@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test'
 //
 /* eslint-disable @typescript-eslint/no-var-requires */
 const SHEETS = require.resolve('../api/_sheets.js')
-const { PRODUCT_NAMES, EDITION_SIZE } = require('../api/_constants.js')
+const { PRODUCT_NAMES, SIX_PACK_SLUGS, EDITION_SIZE } = require('../api/_constants.js')
 
 const EDITION_COLUMNS = ['slug', 'edition_number', 'status', 'reserved_by', 'reserved_at', 'updated_at']
 const SALES_COLUMNS = ['id', 'slug', 'edition_number', 'order_number', 'buyer_email', 'buyer_name', 'stripe_session', 'created_at', 'shipped_at']
@@ -68,6 +68,48 @@ function newStore(editionRows = seedEditions(), salesRows: string[][] = []) {
   const { store } = require('../api/_store.js')
   return { store: store(), tabs }
 }
+
+test.describe('sheets store — designs added after setup', () => {
+  // A sheet built when only the six originals existed.
+  function sixOnly(): string[][] {
+    return seedEditions().filter(row => SIX.includes(row[0]))
+  }
+  const SIX = ['dreamfall', 'dream-mountain', 'sky-miles', 'a-simple-meditation', 'veritas', 'sweet-dreams']
+
+  test('the first read appends 50 prints for each new design and leaves the rest alone', async () => {
+    const rows = sixOnly()
+    rows[0][2] = 'sold'
+    const { store, tabs } = newStore(rows)
+    const { data, error } = await store.listStock()
+    expect(error).toBeNull()
+    expect(tabs.editions.rows).toHaveLength(Object.keys(PRODUCT_NAMES).length * EDITION_SIZE)
+    expect(tabs.editions.rows[0][2]).toBe('sold')
+    const stock = Object.fromEntries(data.map((r: { slug: string; stock: number }) => [r.slug, r.stock]))
+    expect(stock.pride).toBe(EDITION_SIZE)
+    expect(stock.dreamfall).toBe(EDITION_SIZE - 1)
+  })
+
+  test('seeding happens once, not on every read', async () => {
+    const { store, tabs } = newStore(sixOnly())
+    await store.listStock()
+    await store.listStock()
+    expect(tabs.editions.rows).toHaveLength(Object.keys(PRODUCT_NAMES).length * EDITION_SIZE)
+  })
+
+  test('a checkout of a new design on an old sheet reserves print 1', async () => {
+    const { store } = newStore(sixOnly())
+    const { data, error } = await store.claimEdition('permission', 'cs_live_new')
+    expect(error).toBeNull()
+    expect(data).toEqual({ claimed: 1, remaining: EDITION_SIZE - 1 })
+  })
+
+  test('two cold requests that both seeded still count 50, not 100', async () => {
+    const doubled = [...seedEditions(), ...seedEditions().filter(row => row[0] === 'lush')]
+    const { store } = newStore(doubled)
+    const { data } = await store.listStock()
+    expect(data.find((r: { slug: string }) => r.slug === 'lush').stock).toBe(EDITION_SIZE)
+  })
+})
 
 test.describe('sheets store — stock counting', () => {
   test('a fresh sheet reports every design fully in stock', async () => {
@@ -150,7 +192,7 @@ test.describe('sheets store — recording an order', () => {
 
   test('a six-pack appends one row per print, all sharing the order number', async () => {
     const { store, tabs } = newStore()
-    const bundle = Object.keys(PRODUCT_NAMES).map((slug, i) => ({
+    const bundle = SIX_PACK_SLUGS.map((slug: string, i: number) => ({
       slug, edition_number: i + 1, order_number: 'MC-BUNDLE01',
       buyer_email: 'ada@example.com', buyer_name: 'Ada', stripe_session: 'cs_live_bundle',
     }))

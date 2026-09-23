@@ -39,15 +39,15 @@ test.describe('webhook — product resolution', () => {
     }
     for (const [priceId, slug] of Object.entries(CURRENT)) {
       expect(resolveSlugs([{ price: { id: priceId } }]), `${slug} price ID`)
-        .toEqual({ slugs: [slug], isBundle: false })
+        .toEqual({ slugs: [slug], isBundle: false, open: [] })
     }
   })
 
   test('superseded price IDs still resolve (in-flight checkouts)', () => {
     expect(resolveSlugs([{ price: { id: 'price_1TYe162mxhfkNl2YfTEeMam4' } }]))
-      .toEqual({ slugs: ['dreamfall'], isBundle: false })
+      .toEqual({ slugs: ['dreamfall'], isBundle: false, open: [] })
     expect(resolveSlugs([{ price: { id: 'price_1TYGcr2mxhfkNl2YAUNVRpw4' } }]))
-      .toEqual({ slugs: ['sweet-dreams'], isBundle: false })
+      .toEqual({ slugs: ['sweet-dreams'], isBundle: false, open: [] })
   })
 
   test('the six-pack price ID consumes all six editions', () => {
@@ -59,7 +59,7 @@ test.describe('webhook — product resolution', () => {
   test('a price ID absent from the map resolves via product name', () => {
     // This is the sale case: new $10 prices whose IDs were never hardcoded.
     expect(resolveSlugs([{ price: { id: 'price_unknown', product: { name: 'Veritas' } } }]))
-      .toEqual({ slugs: ['veritas'], isBundle: false })
+      .toEqual({ slugs: ['veritas'], isBundle: false, open: [] })
   })
 
   test('a six-pack consumes all six editions', () => {
@@ -74,6 +74,24 @@ test.describe('webhook — product resolution', () => {
     const result = resolveSlugs([{ description: 'Dreamfall' }])
     expect(result.isBundle).toBe(false)
     expect(result.slugs).toEqual(['dreamfall'])
+  })
+
+  test('a cart checkout reads each card from its product metadata', () => {
+    const cart = (slug: string, kind: string, quantity = 1) =>
+      ({ quantity, description: 'x', price: { id: 'price_inline', product: { name: 'x', metadata: { slug, kind } } } })
+    expect(resolveSlugs([cart('pride', 'limited'), cart('ember', 'open', 12), cart('reach', 'open')]))
+      .toEqual({ slugs: ['pride'], isBundle: false, open: [{ slug: 'ember', qty: 12 }, { slug: 'reach', qty: 1 }] })
+  })
+
+  test('a cart of only unlimited cards reserves no numbered print', () => {
+    const result = resolveSlugs([{ quantity: 10, price: { product: { metadata: { slug: 'gilded-cage', kind: 'open' } } } }])
+    expect(result.slugs).toEqual([])
+    expect(result.open).toEqual([{ slug: 'gilded-cage', qty: 10 }])
+  })
+
+  test('the six-pack is still the original six, not every limited design', () => {
+    const result = resolveSlugs([{ description: 'Complete Collection Six-Pack' }])
+    expect(result.slugs.sort()).toEqual([...ALL_SLUGS].sort())
   })
 
   test('unrecognised checkouts resolve to nothing rather than guessing', () => {
@@ -120,10 +138,10 @@ test.describe('webhook — the buyer\'s edition-number draft', () => {
   })
 
   test('a six-pack lists every print with its own blank', () => {
-    const sold = Object.keys(PRODUCT_NAMES).map(slug => ({ slug }))
+    const sold = ALL_SLUGS.map(slug => ({ slug }))
     const body = new URL(draftEditionEmail('MC-BUNDLE01', sold, session))
       .searchParams.get('body')
-    for (const name of Object.values(PRODUCT_NAMES)) expect(body).toContain(name)
+    for (const slug of ALL_SLUGS) expect(body).toContain(PRODUCT_NAMES[slug])
     expect(body.match(/edition ___ of/g)).toHaveLength(6)
     expect(body).toContain('their way')   // plural wording
   })

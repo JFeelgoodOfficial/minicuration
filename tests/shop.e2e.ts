@@ -9,9 +9,10 @@ test.describe('Shop catalog — /shop.html', () => {
     await page.goto('/shop.html')
   })
 
-  test('all 6 product cards are present in the grid', async ({ page }) => {
-    const cards = page.locator('.shop-card')
-    await expect(cards).toHaveCount(6)
+  test('both collections are present: 16 limited, 34 unlimited', async ({ page }) => {
+    await expect(page.locator('.shop-card')).toHaveCount(50)
+    await expect(page.locator('#limited .shop-card')).toHaveCount(16)
+    await expect(page.locator('#unlimited .shop-card')).toHaveCount(34)
   })
 
   test('no Buy Now button has href="#"', async ({ page }) => {
@@ -23,9 +24,11 @@ test.describe('Shop catalog — /shop.html', () => {
   test('every Buy Now button links to a real Stripe URL', async ({ page }) => {
     // This catches the Sentiments bug where the href points to a product page
     // instead of https://buy.stripe.com/…
+    // The six original designs sell through Payment Links; every other card
+    // is a <button data-add-to-cart> that goes through the cart.
     const buyButtons = page.locator('a.btn-buy')
     const count = await buyButtons.count()
-    expect(count, 'Expected 6 buy buttons (one per product)').toBe(6)
+    expect(count, 'Expected 6 Payment Link buttons (the original six)').toBe(6)
 
     for (let i = 0; i < count; i++) {
       const btn = buyButtons.nth(i)
@@ -67,8 +70,31 @@ test.describe('Shop catalog — /shop.html', () => {
     await expect(banner).toContainText('$10')
   })
 
+  test('cart cards: every one has an add-to-cart button, none a link', async ({ page }) => {
+    const cartCards = page.locator('.shop-card:not([data-checkout="link"])')
+    await expect(cartCards).toHaveCount(44)
+    await expect(cartCards.locator('button[data-add-to-cart]')).toHaveCount(44)
+    await expect(cartCards.locator('a.btn-buy')).toHaveCount(0)
+  })
+
+  test('unlimited pricing: $6 with struck $15; new limited cards $23', async ({ page }) => {
+    for (const price of await page.locator('#unlimited .card-price').all()) {
+      await expect(price).toContainText('$6')
+      await expect(price.locator('s.price-was')).toContainText('$15')
+    }
+    const newLimited = page.locator('#limited .shop-card:not([data-checkout="link"]) .card-price')
+    await expect(newLimited).toHaveCount(10)
+    for (const price of await newLimited.all()) await expect(price).toHaveText('$23')
+  })
+
+  test('the Unlimited filter shows only the unlimited collection', async ({ page }) => {
+    await page.getByRole('button', { name: /^Unlimited/ }).click()
+    await expect(page.locator('#limited')).toBeHidden()
+    await expect(page.locator('#unlimited')).toBeVisible()
+  })
+
   test('sale pricing: 5 cards at $10 with struck $23, Sweet Dreams plain $8', async ({ page }) => {
-    const saleCards = page.locator('.shop-card:not([data-slug="sweet-dreams"])')
+    const saleCards = page.locator('.shop-card[data-checkout="link"]:not([data-slug="sweet-dreams"])')
     await expect(saleCards).toHaveCount(5)
     for (const card of await saleCards.all()) {
       const price = card.locator('.card-price')
