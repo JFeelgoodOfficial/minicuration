@@ -13,6 +13,10 @@ button.btn-buy[aria-disabled="true"]{cursor:not-allowed;}
 
 /* Shop: category sections */
 .shop-section{scroll-margin-top:140px;}
+/* The Unlimited grid starts below the fold. Letting the browser skip its
+   layout until it scrolls near keeps first paint as fast as the six-card shop
+   was; the intrinsic size stands in for its height until then. */
+#unlimited{content-visibility:auto;contain-intrinsic-size:auto 4200px;}
 .shop-section-head{max-width:1200px;margin:0 auto;padding:36px 48px 24px;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px 24px;}
 .shop-section-head h2{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(30px,4vw,44px);}
 .shop-section-head p{color:var(--muted);font-size:14px;line-height:1.6;max-width:560px;}
