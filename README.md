@@ -60,12 +60,42 @@ Vercel functions require env vars — use `vercel dev` with a `.env.local` for l
 
 ---
 
+## The cart: more limited editions and the unlimited run
+
+The six original designs sell through their own Stripe Payment Links. Every
+other card — nine more limited editions of 50 and the unlimited (open-edition)
+archive cards — sells through the cart:
+
+| file | what it does |
+|---|---|
+| `api/_catalog.js` | every cart card: title, words, painting, price. **The one place to edit.** |
+| `scripts/build-cards.js` | writes `shop/<slug>.html`, the grids in `shop.html`, the sitemap entries and `js/catalog-data.js` from the catalog |
+| `image/cards/` | card front and back for each card (`<slug>-front.webp`, `<slug>-back.webp`) |
+| `js/cart.js`, `cart.html` | the cart, kept in the visitor's browser |
+| `api/checkout.js` | prices the cart from the catalog and opens Stripe Checkout |
+
+Prices: limited $23; unlimited $6 (shown against $15). Every full 10 unlimited
+cards in one order take $10 off (10 cards $50, 20 cards $100), applied as a
+single-use Stripe coupon created for that checkout. Shipping is a flat $9 per
+order. Change any of these in `api/_catalog.js`, run
+`node scripts/build-cards.js`, and commit.
+
+Checkout needs only `STRIPE_SECRET_KEY`, which the webhook already uses — no
+Payment Links to create. A cart checkout comes back through the same webhook:
+limited cards reserve a print in the sheet exactly like a Payment Link sale,
+unlimited cards are written to the `sales` tab with `edition_number` set to
+`open`, and the order emails list both. If a limited card sold out between the
+cart and payment, only that card is refunded and the rest of the order ships.
+
+New limited designs need no spreadsheet work: the first time the shop reads the
+sheet, any design in the catalog with no rows gets its 50 prints appended.
+
 ## Inventory and orders
 
 There is no database. Everything lives in one Google Spreadsheet that you can
 open and edit like any other spreadsheet — that *is* the admin interface.
 
-**`editions` tab** — one row per physical print, 6 designs × 50.
+**`editions` tab** — one row per physical print, 50 per limited design.
 
 | column | what it is |
 |---|---|

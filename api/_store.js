@@ -75,14 +75,14 @@ function describeFailure(err) {
 
 // ── First-run setup ──────────────────────────────────────────────────────────
 // A brand-new spreadsheet is empty, so the first request to hit it builds the
-// two tabs and seeds all 300 prints. Doing it here rather than in a script
+// two tabs and seeds 50 prints for every design. Doing it here rather than in a script
 // means the shop can be set up entirely from a browser: share the sheet with
 // the service account, set the three variables in Vercel, and the first
 // visitor completes the job.
-function freshEditions() {
+function freshEditions(slugs = Object.keys(PRODUCT_NAMES)) {
   const now = new Date().toISOString()
   const rows = []
-  for (const slug of Object.keys(PRODUCT_NAMES)) {
+  for (const slug of slugs) {
     for (let n = 1; n <= EDITION_SIZE; n++) {
       rows.push({ slug, edition_number: n, status: 'available',
                   reserved_by: '', reserved_at: '', updated_at: now })
@@ -136,6 +136,19 @@ async function loadEditions() {
   return { header, boxes: sheets.toObjects(header, rows).map(edition) }
 }
 
+// A design added to PRODUCT_NAMES after the sheet was built has no rows yet.
+// Its 50 prints are appended the first time the shop reads the sheet, the same
+// browser-only way the sheet was first set up. Only a design with no rows at
+// all is seeded, so a print deleted or edited by hand is never put back.
+async function loadSeededEditions() {
+  const loaded = await loadEditions()
+  const have = new Set(loaded.boxes.map(b => b.slug))
+  const missing = Object.keys(PRODUCT_NAMES).filter(slug => !have.has(slug))
+  if (!missing.length) return loaded
+  await sheets.appendRows(EDITIONS_TAB, loaded.header, freshEditions(missing))
+  return loadEditions()
+}
+
 // Write back only the columns we own, so any extra column added by hand in the
 // spreadsheet (a note, a shipping date) survives.
 async function patchRow(tab, header, rowNumber, patch) {
@@ -146,12 +159,14 @@ async function patchRow(tab, header, rowNumber, patch) {
 const store = {
   listStock() {
     return guard(() => withSetup(async () => {
-      const { boxes } = await loadEditions()
-      const counts = Object.fromEntries(Object.keys(PRODUCT_NAMES).map(slug => [slug, 0]))
+      const { boxes } = await loadSeededEditions()
+      // Counted by edition number, so two cold requests that both seeded a new
+      // design cannot make it look like 100 prints.
+      const numbers = Object.fromEntries(Object.keys(PRODUCT_NAMES).map(slug => [slug, new Set()]))
       for (const box of boxes) {
-        if (box.slug in counts && isSellable(box)) counts[box.slug]++
+        if (box.slug in numbers && isSellable(box)) numbers[box.slug].add(box.edition_number)
       }
-      return Object.entries(counts).map(([slug, stock]) => ({ slug, stock }))
+      return Object.entries(numbers).map(([slug, sellable]) => ({ slug, stock: sellable.size }))
     }))
   },
 
@@ -167,7 +182,7 @@ const store = {
   // than silent — but it is a real difference from a database, not an equal.
   claimEdition(slug, sessionId) {
     return guard(() => withSetup(async () => {
-      const { header, boxes } = await loadEditions()
+      const { header, boxes } = await loadSeededEditions()
       const mine = boxes.filter(b => b.slug === slug)
       const remaining = () => mine.filter(isSellable).length
 

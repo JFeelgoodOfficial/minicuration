@@ -10,6 +10,11 @@ const PRODUCTS: Record<string, string> = {
   'veritas': '10.00',
   'sweet-dreams': '8.00',
 }
+// The cart-sold cards are generated from api/_catalog.js, so their expected
+// prices come from the same place.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { CARDS } = require('../api/_catalog.js')
+for (const card of CARDS) PRODUCTS[card.slug] = (card.price / 100).toFixed(2)
 const PRODUCT_SLUGS = Object.keys(PRODUCTS)
 
 for (const slug of PRODUCT_SLUGS) {

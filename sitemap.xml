@@ -163,4 +163,266 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- cards:sitemap -->
+  <url>
+    <loc>https://minicuration.com/shop/poetry-of-solace.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/poetry-of-solace-front.webp</image:loc>
+      <image:title>Poetry of Solace by JFeelgood — Limited Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/adonis.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/adonis-front.webp</image:loc>
+      <image:title>Adonis by JFeelgood — Limited Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/vanity.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/vanity-front.webp</image:loc>
+      <image:title>Vanity by JFeelgood — Limited Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/the-king.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/the-king-front.webp</image:loc>
+      <image:title>The King by JFeelgood — Limited Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/pride.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/pride-front.webp</image:loc>
+      <image:title>Pride by JFeelgood — Limited Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/lush.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/lush-front.webp</image:loc>
+      <image:title>Lush by JFeelgood — Limited Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/businessman.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/businessman-front.webp</image:loc>
+      <image:title>Businessman by JFeelgood — Limited Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/best-friend.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/best-friend-front.webp</image:loc>
+      <image:title>Best Friend by JFeelgood — Limited Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/permission.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/permission-front.webp</image:loc>
+      <image:title>Permission by JFeelgood — Limited Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/affordable-housing.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/affordable-housing-front.webp</image:loc>
+      <image:title>Affordable Housing by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/cornerstones.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/cornerstones-front.webp</image:loc>
+      <image:title>Cornerstones by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/gentrification.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/gentrification-front.webp</image:loc>
+      <image:title>Gentrification by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/grecia-monroc.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/grecia-monroc-front.webp</image:loc>
+      <image:title>Grecia Monroc by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/ronin.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/ronin-front.webp</image:loc>
+      <image:title>Ronin by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/supernova.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/supernova-front.webp</image:loc>
+      <image:title>Supernova by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/reach.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/reach-front.webp</image:loc>
+      <image:title>Reach by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/little-wanderer.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/little-wanderer-front.webp</image:loc>
+      <image:title>Little Wanderer by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/portal.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/portal-front.webp</image:loc>
+      <image:title>Portal by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/summer-field.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/summer-field-front.webp</image:loc>
+      <image:title>Summer Field by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/eye-of-the-storm.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/eye-of-the-storm-front.webp</image:loc>
+      <image:title>Eye of the Storm by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/hidden-grove.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/hidden-grove-front.webp</image:loc>
+      <image:title>Hidden Grove by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/moonsail.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/moonsail-front.webp</image:loc>
+      <image:title>Moonsail by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/tidewatcher.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/tidewatcher-front.webp</image:loc>
+      <image:title>Tidewatcher by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/awakening.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/awakening-front.webp</image:loc>
+      <image:title>Awakening by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/gilded-cage.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/gilded-cage-front.webp</image:loc>
+      <image:title>Gilded Cage by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://minicuration.com/shop/le-verbeux.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/le-verbeux-front.webp</image:loc>
+      <image:title>Le Verbeux by JFeelgood — Open Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+<!-- /cards:sitemap -->
 </urlset>

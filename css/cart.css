@@ -1,0 +1,64 @@
+/* Cart, category sections and the add-to-cart button. Loaded after theme.css
+   on shop.html, cart.html and the cart-sold product pages. */
+
+/* Pages with no sale banner: the nav sits flush at the top */
+body.no-banner{--banner-h:0px;}
+
+/* Nav cart link */
+.nav-cart [data-cart-count]{margin-left:4px;}
+
+/* Add to cart shares .btn-buy's look; a <button> needs the browser's chrome removed */
+button.btn-buy{border:none;cursor:pointer;font-family:'DM Sans',sans-serif;}
+button.btn-buy[aria-disabled="true"]{cursor:not-allowed;}
+
+/* Shop: category sections */
+.shop-section{scroll-margin-top:140px;}
+/* The Unlimited grid starts below the fold. Letting the browser skip its
+   layout until it scrolls near keeps first paint as fast as the six-card shop
+   was; the intrinsic size stands in for its height until then. */
+#unlimited{content-visibility:auto;contain-intrinsic-size:auto 4200px;}
+.shop-section-head{max-width:1200px;margin:0 auto;padding:36px 48px 24px;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px 24px;}
+.shop-section-head h2{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(30px,4vw,44px);}
+.shop-section-head p{color:var(--muted);font-size:14px;line-height:1.6;max-width:560px;}
+.shop-section-head strong{color:var(--text);font-weight:500;}
+.bundle-note{display:inline-block;margin-top:6px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);}
+.shop-card .card-edition.is-open{color:var(--link);}
+
+/* Product page: open-edition tag, bundle note under the price */
+.product-info .tag.is-open{border-color:var(--link);color:var(--link);}
+.product-price .bundle-line{display:block;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);font-weight:300;margin-top:6px;}
+.product-images .card-face-label{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);text-align:center;margin-top:-6px;}
+.more-card img.card-img{aspect-ratio:600/816;object-fit:cover;}
+
+/* Cart page */
+.cart-wrap{max-width:1040px;margin:0 auto;padding:140px 48px 90px;display:grid;grid-template-columns:1fr 340px;gap:48px;align-items:start;}
+.cart-wrap h1{grid-column:1/-1;font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(40px,6vw,64px);line-height:1.05;}
+.cart-empty{color:var(--muted);font-size:15px;}
+.cart-empty a{color:var(--link);}
+.cart-line{display:grid;grid-template-columns:84px 1fr auto;gap:18px;align-items:start;padding:18px 0;border-bottom:1px solid var(--border);}
+.cart-line:first-child{border-top:1px solid var(--border);}
+.cart-thumb img{width:84px;height:auto;display:block;border-radius:3px;box-shadow:0 6px 16px var(--shadow-color);}
+.cart-line-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--text);text-decoration:none;}
+.cart-line-kind{font-size:12px;color:var(--muted);margin:4px 0 10px;}
+.cart-line-total{font-family:'Cormorant Garamond',serif;font-size:22px;}
+.cart-qty{display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:2px;}
+.cart-qty button{width:32px;height:30px;background:transparent;border:none;color:var(--text);font-size:16px;cursor:pointer;}
+.cart-qty button:hover{background:var(--accent-soft);}
+.cart-qty span{min-width:28px;text-align:center;font-size:14px;}
+.cart-qty-fixed{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);}
+.cart-remove{display:block;margin-top:10px;background:none;border:none;padding:0;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.cart-summary{position:sticky;top:130px;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:24px;}
+.cart-summary dl{display:grid;grid-template-columns:1fr auto;gap:10px 0;font-size:14px;margin-bottom:18px;}
+.cart-summary dl>div{display:contents;}
+.cart-summary dt{color:var(--muted);}
+.cart-summary dd{text-align:right;padding-left:16px;}
+.cart-summary .row-total{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--text);padding-top:10px;border-top:1px solid var(--border);}
+.cart-summary [hidden]{display:none;}
+.cart-hint{font-size:12px;color:var(--accent);line-height:1.5;margin-bottom:16px;}
+.cart-status{font-size:13px;color:var(--accent);line-height:1.5;margin-top:12px;min-height:1em;}
+.cart-summary .trust-row{margin-top:12px;font-size:11px;color:var(--muted);text-align:center;line-height:1.7;}
+@media(max-width:820px){
+  .cart-wrap{grid-template-columns:1fr;padding:110px 20px 60px;gap:28px;}
+  .cart-summary{position:static;}
+  .shop-section-head{padding:28px 20px 18px;}
+}
