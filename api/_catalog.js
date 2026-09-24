@@ -157,7 +157,7 @@ const OPEN = [
     description: ['A white figure with arms raised stands inside a dark blue oval, surrounded by rings of white brushwork that spin outward toward the edges. It reads like a first breath, or a door opening.'] },
   { slug: 'gilded-cage', title: 'Gilded Cage', painting: A + 'thumbs/JFeelgood painting 165.webp',
     description: ['A wire birdcage is set into a thick, rippled surface of bronze and sky blue. The door is shut and the cage is empty, and the gold around it is beautiful and heavy at once.'] },
-  { slug: 'stillness', title: 'Stillness', painting: A + 'full/JFeelgood painting 166.webp',
+  { slug: 'le-verbeux', title: 'Le Verbeux', painting: A + 'full/JFeelgood painting 166.webp',
     description: ['A pencil portrait of a woman with her eyes closed and her head tipped against her hand, long hair falling past her shoulders. Soft shading and a lot of empty paper keep the moment quiet.'] },
 ]
 

@@ -210,13 +210,13 @@ window.MC_CATALOG = {
    "img": "image/cards/gilded-cage-front.webp",
    "url": "shop/gilded-cage.html"
   },
-  "stillness": {
-   "title": "Stillness",
+  "le-verbeux": {
+   "title": "Le Verbeux",
    "kind": "open",
    "price": 600,
    "was": 1500,
-   "img": "image/cards/stillness-front.webp",
-   "url": "shop/stillness.html"
+   "img": "image/cards/le-verbeux-front.webp",
+   "url": "shop/le-verbeux.html"
   }
  }
 }
