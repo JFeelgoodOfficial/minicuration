@@ -256,13 +256,30 @@ const CARDS = [
   ...LIMITED.map(c => ({ ...c, kind: 'limited', ...PRICES.limited })),
   ...OPEN.map(c => ({ ...c, kind: 'open', medium: 'Open Edition', ...PRICES.open })),
 ]
-const BY_SLUG = Object.fromEntries(CARDS.map(c => [c.slug, c]))
+// Sold alongside the cards. Unlimited cards ship in a protective plastic slip;
+// limited cards already come with a case and a stand. Each add-on upgrades one
+// unlimited card, so an order holds at most one of each per unlimited card.
+// Add-ons do not count toward the bundle. `offer` is the product-page checkbox,
+// `note` the cart line, `upsell` the cart prompt.
+const ADDONS = [
+  { slug: 'acrylic-case', title: 'Magnetic Acrylic Case', kind: 'addon', price: 400, was: null,
+    offer: 'Add a magnetically sealed acrylic case', note: 'Magnetically sealed, one per unlimited card',
+    upsell: 'Upgrade a card from its plastic slip to a magnetically sealed acrylic case', short: 'Acrylic case' },
+  { slug: 'acrylic-stand', title: 'Acrylic Stand', kind: 'addon', price: 100, was: null,
+    offer: 'Add an acrylic display stand', note: 'Display stand, one per unlimited card',
+    upsell: 'Stand a card up on your shelf with an acrylic display stand', short: 'Acrylic stand' },
+]
+const CASE = ADDONS[0]
+const STAND = ADDONS[1]
+
+const BY_SLUG = Object.fromEntries([...CARDS, ...ADDONS].map(c => [c.slug, c]))
 
 const LIMITED_NAMES = Object.fromEntries(LIMITED.map(c => [c.slug, c.title]))
 
 // Prices an order. `items` is [{ slug, qty }] straight from the browser, so
-// anything unknown is rejected and a limited card is capped at one per order
-// (the webhook reserves one numbered print per design per checkout).
+// anything unknown is rejected, a limited card is capped at one per order (the
+// webhook reserves one numbered print per design per checkout), and each
+// add-on is capped at one per unlimited card.
 function quote(items) {
   if (!Array.isArray(items) || !items.length) return { error: 'empty_cart' }
   const lines = []
@@ -277,7 +294,10 @@ function quote(items) {
     if (card.kind === 'limited' && qty !== 1) return { error: 'one_per_limited', slug: card.slug }
     lines.push({ card, qty, amount: card.price * qty })
   }
-  const openCount = lines.filter(l => l.card.kind === 'open').reduce((n, l) => n + l.qty, 0)
+  const count = (kind) => lines.filter(l => l.card.kind === kind).reduce((n, l) => n + l.qty, 0)
+  const openCount = count('open')
+  const extra = lines.find(l => l.card.kind === 'addon' && l.qty > openCount)
+  if (extra) return { error: 'too_many_addons', slug: extra.card.slug }
   const bundles = Math.floor(openCount / BUNDLE.size)
   const subtotal = lines.reduce((sum, l) => sum + l.amount, 0)
   const discount = bundles * BUNDLE.discount
@@ -288,4 +308,4 @@ function quote(items) {
   }
 }
 
-module.exports = { CARDS, BY_SLUG, LIMITED_NAMES, PRICES, BUNDLE, SHIPPING, quote }
+module.exports = { CARDS, ADDONS, CASE, STAND, BY_SLUG, LIMITED_NAMES, PRICES, BUNDLE, SHIPPING, quote }

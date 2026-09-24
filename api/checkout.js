@@ -71,7 +71,11 @@ async function handler(req, res) {
         price_data: {
           currency: 'usd',
           unit_amount: card.price,
-          product_data: {
+          product_data: card.kind === 'addon' ? {
+            name: `${card.title} (add-on)`,
+            description: card.note,
+            metadata: { slug: card.slug, kind: card.kind },
+          } : {
             name: `${card.title} — ${card.kind === 'limited' ? 'Limited Edition' : 'Open Edition'} Mini Art Print`,
             images: [`${site}/image/cards/${card.slug}-front.webp`],
             // The webhook reads these to know what was bought.

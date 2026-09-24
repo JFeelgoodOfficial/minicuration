@@ -78,7 +78,11 @@ Prices: limited $23; unlimited $6 (shown against $15). The bundle is "buy 10
 unlimited pieces for $50 (save $10 & it's free shipping!)": every full 10
 unlimited cards in one order take $10 off (10 cards $50, 20 cards $100),
 applied as a single-use Stripe coupon created for that checkout, and any order
-with a full 10 ships free. Otherwise shipping is a flat $9 per order. Wide
+with a full 10 ships free. Otherwise shipping is a flat $9 per order. Unlimited cards ship in a protective
+plastic slip; a magnetically sealed acrylic case ($4) and an acrylic display
+stand ($1) are add-ons (`ADDONS` in the catalog), at most one of each per
+unlimited card in the order. Limited editions already come with both. Add-ons
+are logged in the `sales` tab with `edition_number` set to `add-on`. Wide
 paintings (`wide: true`) are printed as landscape cards, like Veritas.
 
 The home page used to advertise the $60 six-pack; it now advertises the

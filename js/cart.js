@@ -20,7 +20,21 @@
       return cart
     } catch (e) { return {} }
   }
+  function unlimitedCount(c) {
+    return Object.keys(c).reduce(function (n, slug) { return n + (DATA.cards[slug].kind === 'open' ? c[slug] : 0) }, 0)
+  }
+
+  // At most one of each add-on per unlimited card (api/_catalog.js enforces it too).
+  function clampAddons(c) {
+    var max = unlimitedCount(c)
+    DATA.addons.forEach(function (slug) {
+      if (c[slug] > max) { if (max) c[slug] = max; else delete c[slug] }
+    })
+    return c
+  }
+
   function write(cart) {
+    cart = clampAddons(cart)
     try { localStorage.setItem(KEY, JSON.stringify(cart)) } catch (e) { /* private mode: cart lasts the page */ }
     memory = cart
     refresh()
@@ -53,12 +67,14 @@
       toNext: DATA.bundle.size - (open % DATA.bundle.size) }
   }
 
-  function add(slug) {
+  function add(slug, withAddons) {
     var c = Object.assign({}, cart())
     var card = DATA.cards[slug]
     if (!card) return false
     if (card.kind === 'limited' && c[slug]) return false
+    if (card.kind === 'addon' && (c[slug] || 0) >= unlimitedCount(c)) return false
     c[slug] = card.kind === 'limited' ? 1 : Math.min((c[slug] || 0) + 1, 50)
+    if (card.kind === 'open') (withAddons || []).forEach(function (a) { c[a] = (c[a] || 0) + 1 })
     write(c)
     if (window.mcTrack) window.mcTrack('add_to_cart', { slug: slug, kind: card.kind })
     return true
@@ -102,7 +118,10 @@
       location.href = DATA.root + 'cart.html'
       return
     }
-    add(slug)
+    // An unlimited card's page offers the add-ons as checkboxes beside the button.
+    var opts = [].slice.call(document.querySelectorAll('[data-addon-for="' + slug + '"]'))
+    add(slug, opts.filter(function (o) { return o.checked }).map(function (o) { return o.value }))
+    opts.forEach(function (o) { o.checked = false })
   // Capture phase: shop cards stop clicks from bubbling out of their buy area,
   // and the card itself navigates on click, so this must run first.
   }, true)
@@ -126,25 +145,39 @@
       return
     }
     summary.hidden = false
+    var unlimited = unlimitedCount(c)
+    // Cards first, the case add-on last.
+    slugs.sort(function (a, b) { return (DATA.cards[a].kind === 'addon') - (DATA.cards[b].kind === 'addon') })
     list.innerHTML = slugs.map(function (slug) {
       var card = DATA.cards[slug], qty = c[slug]
+      var addon = card.kind === 'addon'
       var control = card.kind === 'limited'
         ? '<span class="cart-qty-fixed">Numbered print &middot; one per order</span>'
         : '<div class="cart-qty" role="group" aria-label="Quantity of ' + esc(card.title) + '">' +
             '<button type="button" data-qty="' + slug + '" data-step="-1" aria-label="One fewer">&minus;</button>' +
             '<span>' + qty + '</span>' +
-            '<button type="button" data-qty="' + slug + '" data-step="1" aria-label="One more">+</button></div>'
-      return '<div class="cart-line">' +
-        '<a href="' + DATA.root + card.url + '" class="cart-thumb"><img src="' + DATA.root + card.img + '" ' + (card.wide ? 'width="816" height="600"' : 'width="600" height="816"') + ' alt="' + esc(card.title) + ' card front"/></a>' +
-        '<div class="cart-line-body">' +
-          '<a href="' + DATA.root + card.url + '" class="cart-line-title">' + esc(card.title) + '</a>' +
-          '<p class="cart-line-kind">' + (card.kind === 'limited' ? 'Limited Edition' : 'Unlimited') + ' &middot; ' + money(card.price) +
+            '<button type="button" data-qty="' + slug + '" data-step="1" aria-label="One more"' + (addon && qty >= unlimited ? ' disabled' : '') + '>+</button></div>'
+      var thumb = addon
+        ? '<span class="cart-thumb-case" aria-hidden="true">' + esc(card.short) + '</span>'
+        : '<a href="' + DATA.root + card.url + '" class="cart-thumb"><img src="' + DATA.root + card.img + '" ' + (card.wide ? 'width="816" height="600"' : 'width="600" height="816"') + ' alt="' + esc(card.title) + ' card front"/></a>'
+      var title = addon
+        ? '<span class="cart-line-title">' + esc(card.title) + '</span>'
+        : '<a href="' + DATA.root + card.url + '" class="cart-line-title">' + esc(card.title) + '</a>'
+      return '<div class="cart-line">' + thumb +
+        '<div class="cart-line-body">' + title +
+          '<p class="cart-line-kind">' + (addon ? esc(card.note) : card.kind === 'limited' ? 'Limited Edition' : 'Unlimited') + ' &middot; ' + money(card.price) +
             (card.was ? ' <s class="price-was"><span class="sr-only">regular price </span>' + money(card.was) + '</s>' : '') + '</p>' +
           control +
           '<button type="button" class="cart-remove" data-remove="' + slug + '">Remove</button>' +
         '</div>' +
         '<p class="cart-line-total">' + money(card.price * qty) + '</p>' +
       '</div>'
+    }).join('') + DATA.addons.map(function (slug) {
+      var a = DATA.cards[slug]
+      return unlimited > (c[slug] || 0)
+        ? '<div class="cart-upsell"><span>' + esc(a.upsell) + ' for ' + money(a.price) + '.</span>' +
+          '<button type="button" data-add-addon="' + slug + '">Add ' + esc(a.short.toLowerCase()) + '</button></div>'
+        : ''
     }).join('')
 
     var t = totals(c)
@@ -203,6 +236,8 @@
     if (q) { var s = q.getAttribute('data-qty'); setQty(s, (cart()[s] || 0) + Number(q.getAttribute('data-step'))); return }
     var r = e.target.closest('[data-remove]')
     if (r) { setQty(r.getAttribute('data-remove'), 0); return }
+    var extra = e.target.closest('[data-add-addon]')
+    if (extra) { add(extra.getAttribute('data-add-addon')); return }
     var go = e.target.closest('[data-checkout]')
     if (go) checkout(go)
   })

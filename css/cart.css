@@ -21,6 +21,17 @@ button.btn-buy[aria-disabled="true"]{cursor:not-allowed;}
 .bundle-note{display:inline-block;margin-top:6px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);}
 .shop-card .card-edition.is-open{color:var(--link);}
 
+/* Product page: the acrylic case add-on */
+.addon-opt{display:flex;align-items:center;gap:10px;margin:-8px 0 14px;font-size:13px;color:var(--text);cursor:pointer;}
+.addon-opt input{width:16px;height:16px;accent-color:var(--accent);}
+.addon-opt span{color:var(--muted);}
+
+/* Cart: the case line and the prompt to add one */
+.cart-thumb-case{width:84px;aspect-ratio:600/816;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:3px;background:var(--surface);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);text-align:center;}
+.cart-upsell{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:16px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--muted);}
+.cart-upsell button{background:none;border:1px solid var(--accent);color:var(--accent);padding:8px 14px;border-radius:2px;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;}
+.cart-upsell button:hover{background:var(--accent-soft);}
+
 /* Product page: open-edition tag, bundle note under the price */
 .product-info .tag.is-open{border-color:var(--link);color:var(--link);}
 .product-price .bundle-line{display:block;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);font-weight:300;margin-top:6px;}

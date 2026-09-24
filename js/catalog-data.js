@@ -245,6 +245,28 @@ window.MC_CATALOG = {
    "img": "image/cards/le-verbeux-front.webp",
    "url": "shop/le-verbeux.html",
    "wide": false
+  },
+  "acrylic-case": {
+   "title": "Magnetic Acrylic Case",
+   "kind": "addon",
+   "price": 400,
+   "was": null,
+   "note": "Magnetically sealed, one per unlimited card",
+   "upsell": "Upgrade a card from its plastic slip to a magnetically sealed acrylic case",
+   "short": "Acrylic case"
+  },
+  "acrylic-stand": {
+   "title": "Acrylic Stand",
+   "kind": "addon",
+   "price": 100,
+   "was": null,
+   "note": "Display stand, one per unlimited card",
+   "upsell": "Stand a card up on your shelf with an acrylic display stand",
+   "short": "Acrylic stand"
   }
- }
+ },
+ "addons": [
+  "acrylic-case",
+  "acrylic-stand"
+ ]
 }

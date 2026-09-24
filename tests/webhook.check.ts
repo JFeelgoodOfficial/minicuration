@@ -89,6 +89,15 @@ test.describe('webhook — product resolution', () => {
     expect(result.open).toEqual([{ slug: 'gilded-cage', qty: 10 }])
   })
 
+  test('an acrylic case add-on is listed with the unlimited cards, reserving nothing', () => {
+    const result = resolveSlugs([
+      { quantity: 2, price: { product: { metadata: { slug: 'moonsail', kind: 'open' } } } },
+      { quantity: 2, price: { product: { metadata: { slug: 'acrylic-case', kind: 'addon' } } } },
+    ])
+    expect(result.slugs).toEqual([])
+    expect(result.open).toEqual([{ slug: 'moonsail', qty: 2 }, { slug: 'acrylic-case', qty: 2 }])
+  })
+
   test('the six-pack is still the original six, not every limited design', () => {
     const result = resolveSlugs([{ description: 'Complete Collection Six-Pack' }])
     expect(result.slugs.sort()).toEqual([...ALL_SLUGS].sort())

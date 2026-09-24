@@ -7,6 +7,7 @@ const { SIX_PACK_SLUGS } = require('./_constants.js')
 const { BY_SLUG } = require('./_catalog.js')
 
 const nameOf = (slug) => PRODUCT_NAMES[slug] || BY_SLUG[slug]?.title || slug
+const isAddon = (slug) => BY_SLUG[slug]?.kind === 'addon'
 
 // ── Lazy singleton (re-used across warm invocations) ─────────────────────────
 let _stripe
@@ -56,7 +57,7 @@ function slugFromName(name) {
 
 // Which editions does this checkout consume? Cart checkouts (api/checkout.js)
 // name each card in the product's metadata: limited cards become slugs, which
-// reserve a numbered print, and open-edition cards are listed with their
+// reserve a numbered print, and open-edition cards and add-ons are listed with their
 // quantity, since they have no inventory. Payment Link checkouts carry no
 // metadata: a six-pack there is all six originals, otherwise one slug per
 // line item, found by price ID or product name.
@@ -67,7 +68,8 @@ function resolveSlugs(lineItems) {
   for (const item of lineItems) {
     const meta = item.price?.product?.metadata
     if (meta?.slug && BY_SLUG[meta.slug]) {
-      if (meta.kind === 'open') open.push({ slug: meta.slug, qty: item.quantity || 1 })
+      // Unlimited cards and add-ons (the acrylic case) carry no inventory.
+      if (meta.kind === 'open' || meta.kind === 'addon') open.push({ slug: meta.slug, qty: item.quantity || 1 })
       else slugs.push(meta.slug)
     } else {
       legacy.push(item)
@@ -375,7 +377,7 @@ async function handler(req, res) {
   }
   const { error: ledgerError } = await store().insertSales([
     ...sold.map(({ slug, editionNumber }) => ({ slug, edition_number: editionNumber, ...buyer })),
-    ...open.flatMap(({ slug, qty }) => Array.from({ length: qty }, () => ({ slug, edition_number: 'open', ...buyer }))),
+    ...open.flatMap(({ slug, qty }) => Array.from({ length: qty }, () => ({ slug, edition_number: isAddon(slug) ? 'add-on' : 'open', ...buyer }))),
   ])
   if (ledgerError) console.error('Ledger insert failed:', ledgerError.message)
 
@@ -386,12 +388,12 @@ async function handler(req, res) {
      ...open.map(o => `${o.slug} ×${o.qty} (open edition)`)].join(', '))
 
   const openList = open
-    .map(({ slug, qty }) => `<li><strong>${nameOf(slug)}</strong>${qty > 1 ? ` × ${qty}` : ''} — open edition</li>`)
+    .map(({ slug, qty }) => `<li><strong>${nameOf(slug)}</strong>${qty > 1 ? ` × ${qty}` : ''} — ${isAddon(slug) ? 'add-on' : 'open edition'}</li>`)
   const productList = [
     ...sold.map(({ slug }) => `<li><strong>${nameOf(slug)}</strong></li>`),
     ...openList,
   ].join('')
-  const cardCount = sold.length + open.reduce((n, o) => n + o.qty, 0)
+  const cardCount = sold.length + open.filter(o => !isAddon(o.slug)).reduce((n, o) => n + o.qty, 0)
 
   // 5. Confirm the order to the buyer. Deliberately no edition number: it is
   // not known until the print is picked, and a number stated here that later
