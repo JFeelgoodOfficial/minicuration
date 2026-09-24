@@ -64,12 +64,6 @@ test.describe('Shop catalog — /shop.html', () => {
     expect(broken, `Card images failed to load: ${broken.join(', ')}`).toHaveLength(0)
   })
 
-  test('summer sale banner is visible', async ({ page }) => {
-    const banner = page.locator('.sale-banner')
-    await expect(banner).toBeVisible()
-    await expect(banner).toContainText('$10')
-  })
-
   test('cart cards: every one has an add-to-cart button, none a link', async ({ page }) => {
     const cartCards = page.locator('.shop-card:not([data-checkout="link"])')
     await expect(cartCards).toHaveCount(26)
@@ -85,6 +79,32 @@ test.describe('Shop catalog — /shop.html', () => {
     const newLimited = page.locator('#limited .shop-card:not([data-checkout="link"]) .card-price')
     await expect(newLimited).toHaveCount(9)
     for (const price of await newLimited.all()) await expect(price).toHaveText('$23')
+  })
+
+  test('Flip turns the card over without leaving the shop; clicking the picture opens its page', async ({ page }) => {
+    const card = page.locator('.shop-card[data-slug="moonsail"]')
+    await card.scrollIntoViewIfNeeded()
+    await card.locator('.flip-toggle').click()
+    await expect(card.locator('.sc-spin-3d')).toHaveClass(/show-back/)
+    await expect(page).toHaveURL(/\/shop(\.html)?(#.*)?$/)
+    // The card spins on hover, so it never settles for Playwright's stability check.
+    await card.locator('.sc-spin-wrap').click({ force: true })
+    await expect(page).toHaveURL(/\/shop\/moonsail(\.html)?$/)
+  })
+
+  test('Add to cart on the shop grid adds without leaving the page', async ({ page }) => {
+    const card = page.locator('.shop-card[data-slug="moonsail"]')
+    await card.scrollIntoViewIfNeeded()
+    await card.locator('[data-add-to-cart]').click()
+    await expect(page.locator('.nav-cart [data-cart-count]')).toHaveText('(1)')
+    await expect(page).toHaveURL(/\/shop(\.html)?(#.*)?$/)
+  })
+
+  test('wide paintings are landscape cards, like Veritas', async ({ page }) => {
+    for (const slug of ['veritas', 'permission', 'summer-field']) {
+      await expect(page.locator(`.shop-card[data-slug="${slug}"] .sc-spin-wrap`)).toHaveClass(/landscape/)
+    }
+    await expect(page.locator('.shop-card[data-slug="moonsail"] .sc-spin-wrap')).not.toHaveClass(/landscape/)
   })
 
   test('the Unlimited filter shows only the unlimited collection', async ({ page }) => {

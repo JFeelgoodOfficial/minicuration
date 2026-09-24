@@ -70,3 +70,16 @@ test.describe(`Product page — ${PRODUCT_URL}`, () => {
     }
   })
 })
+
+// The breadcrumb is also a <nav> and once sat on top of the fixed header,
+// swallowing every click on it.
+for (const url of ['/shop/veritas.html', '/shop/pride.html', '/shop/moonsail.html']) {
+  test.describe(`Header — ${url}`, () => {
+    test('header links are clickable', async ({ page, isMobile }) => {
+      await page.goto(url)
+      if (isMobile) await page.locator('.nav-toggle').click()
+      await page.locator('nav .nav-links a', { hasText: 'About' }).click()
+      await expect(page).toHaveURL(/\/about(\.html)?$/)
+    })
+  })
+}

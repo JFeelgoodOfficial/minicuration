@@ -84,8 +84,8 @@ async function handler(req, res) {
       shipping_options: [{
         shipping_rate_data: {
           type: 'fixed_amount',
-          display_name: SHIPPING.label,
-          fixed_amount: { amount: SHIPPING.amount, currency: 'usd' },
+          display_name: order.shipping ? SHIPPING.label : SHIPPING.freeLabel,
+          fixed_amount: { amount: order.shipping, currency: 'usd' },
         },
       }],
       metadata: { source: 'cart' },

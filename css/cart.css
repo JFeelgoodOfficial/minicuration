@@ -1,9 +1,6 @@
 /* Cart, category sections and the add-to-cart button. Loaded after theme.css
    on shop.html, cart.html and the cart-sold product pages. */
 
-/* Pages with no sale banner: the nav sits flush at the top */
-body.no-banner{--banner-h:0px;}
-
 /* Nav cart link */
 .nav-cart [data-cart-count]{margin-left:4px;}
 
@@ -29,6 +26,7 @@ button.btn-buy[aria-disabled="true"]{cursor:not-allowed;}
 .product-price .bundle-line{display:block;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);font-weight:300;margin-top:6px;}
 .product-images .card-face-label{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);text-align:center;margin-top:-6px;}
 .more-card img.card-img{aspect-ratio:600/816;object-fit:cover;}
+.more-card img.card-img.landscape{aspect-ratio:816/600;}
 
 /* Cart page */
 .cart-wrap{max-width:1040px;margin:0 auto;padding:140px 48px 90px;display:grid;grid-template-columns:1fr 340px;gap:48px;align-items:start;}

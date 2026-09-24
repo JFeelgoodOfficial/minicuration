@@ -46,7 +46,8 @@
     })
     var bundles = Math.floor(open / DATA.bundle.size)
     var discount = bundles * DATA.bundle.discount
-    var shipping = count(c) ? DATA.shipping.amount : 0
+    // Mirrors api/_catalog.js: a full bundle ships free.
+    var shipping = count(c) && !bundles ? DATA.shipping.amount : 0
     return { subtotal: subtotal, open: open, discount: discount, shipping: shipping,
       total: subtotal - discount + shipping,
       toNext: DATA.bundle.size - (open % DATA.bundle.size) }
@@ -102,7 +103,9 @@
       return
     }
     add(slug)
-  })
+  // Capture phase: shop cards stop clicks from bubbling out of their buy area,
+  // and the card itself navigates on click, so this must run first.
+  }, true)
 
   // ── cart.html ────────────────────────────────────────────────────────────
   function esc(s) {
@@ -132,7 +135,7 @@
             '<span>' + qty + '</span>' +
             '<button type="button" data-qty="' + slug + '" data-step="1" aria-label="One more">+</button></div>'
       return '<div class="cart-line">' +
-        '<a href="' + DATA.root + card.url + '" class="cart-thumb"><img src="' + DATA.root + card.img + '" width="600" height="816" alt="' + esc(card.title) + ' card front"/></a>' +
+        '<a href="' + DATA.root + card.url + '" class="cart-thumb"><img src="' + DATA.root + card.img + '" ' + (card.wide ? 'width="816" height="600"' : 'width="600" height="816"') + ' alt="' + esc(card.title) + ' card front"/></a>' +
         '<div class="cart-line-body">' +
           '<a href="' + DATA.root + card.url + '" class="cart-line-title">' + esc(card.title) + '</a>' +
           '<p class="cart-line-kind">' + (card.kind === 'limited' ? 'Limited Edition' : 'Unlimited') + ' &middot; ' + money(card.price) +
@@ -149,12 +152,15 @@
     var disc = summary.querySelector('[data-discount-row]')
     disc.hidden = !t.discount
     summary.querySelector('[data-discount]').textContent = '−' + money(t.discount)
-    summary.querySelector('[data-shipping]').textContent = money(t.shipping)
+    summary.querySelector('[data-shipping]').textContent = t.shipping ? money(t.shipping) : 'Free'
     summary.querySelector('[data-total]').textContent = money(t.total)
     var hint = summary.querySelector('[data-bundle-hint]')
-    hint.textContent = t.open
-      ? 'Add ' + t.toNext + ' more unlimited card' + (t.toNext === 1 ? '' : 's') + ' to take ' + (t.discount ? 'another ' : '') + money(DATA.bundle.discount) + ' off.'
-      : 'Every ' + DATA.bundle.size + ' unlimited cards take ' + money(DATA.bundle.discount) + ' off.'
+    var more = 'Add ' + t.toNext + ' more unlimited card' + (t.toNext === 1 ? '' : 's')
+    hint.textContent = t.discount
+      ? 'Bundle applied: ' + money(t.discount) + ' off and free shipping. ' + more + ' to save another ' + money(DATA.bundle.discount) + '.'
+      : t.open
+        ? more + ': ' + DATA.bundle.size + ' for ' + money(DATA.bundle.price) + ', and shipping is free.'
+        : 'Buy ' + DATA.bundle.size + ' unlimited pieces for ' + money(DATA.bundle.price) + ' (save ' + money(DATA.bundle.discount) + ' & it\'s free shipping!)'
   }
 
   function checkout(btn) {

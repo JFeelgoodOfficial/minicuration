@@ -74,10 +74,16 @@ archive cards — sells through the cart:
 | `js/cart.js`, `cart.html` | the cart, kept in the visitor's browser |
 | `api/checkout.js` | prices the cart from the catalog and opens Stripe Checkout |
 
-Prices: limited $23; unlimited $6 (shown against $15). Every full 10 unlimited
-cards in one order take $10 off (10 cards $50, 20 cards $100), applied as a
-single-use Stripe coupon created for that checkout. Shipping is a flat $9 per
-order. Change any of these in `api/_catalog.js`, run
+Prices: limited $23; unlimited $6 (shown against $15). The bundle is "buy 10
+unlimited pieces for $50 (save $10 & it's free shipping!)": every full 10
+unlimited cards in one order take $10 off (10 cards $50, 20 cards $100),
+applied as a single-use Stripe coupon created for that checkout, and any order
+with a full 10 ships free. Otherwise shipping is a flat $9 per order. Wide
+paintings (`wide: true`) are printed as landscape cards, like Veritas.
+
+The home page used to advertise the $60 six-pack; it now advertises the
+unlimited bundle. The six-pack Payment Link itself still exists in Stripe
+until it is deactivated there, and the webhook still handles it. Change any of these in `api/_catalog.js`, run
 `node scripts/build-cards.js`, and commit.
 
 Checkout needs only `STRIPE_SECRET_KEY`, which the webhook already uses — no

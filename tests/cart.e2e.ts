@@ -28,17 +28,19 @@ test.describe('Cart', () => {
     await expect(page.locator('.cart-qty-fixed')).toBeVisible()
   })
 
-  test('ten unlimited cards show the $10 bundle discount', async ({ page }) => {
+  test('ten unlimited cards cost $50 and ship free', async ({ page }) => {
     await page.goto('/cart.html')
     await page.evaluate(() => localStorage.setItem('mc-cart', JSON.stringify({ moonsail: 4, reach: 6 })))
     await page.reload()
     await expect(page.locator('[data-subtotal]')).toHaveText('$60')
     await expect(page.locator('[data-discount-row]')).toBeVisible()
     await expect(page.locator('[data-discount]')).toHaveText('−$10')
-    await expect(page.locator('[data-total]')).toHaveText('$59')
+    await expect(page.locator('[data-shipping]')).toHaveText('Free')
+    await expect(page.locator('[data-total]')).toHaveText('$50')
 
     await page.locator('[data-qty="reach"][data-step="-1"]').click()
     await expect(page.locator('[data-discount-row]')).toBeHidden()
+    await expect(page.locator('[data-shipping]')).toHaveText('$9')
     await expect(page.locator('[data-bundle-hint]')).toContainText('Add 1 more')
   })
 

@@ -26,12 +26,16 @@ const esc = (s) => String(s).replace(/[&<>"']/g, ch => (
 const money = (cents) => '$' + (cents % 100 ? (cents / 100).toFixed(2) : String(cents / 100))
 const decimal = (cents) => (cents / 100).toFixed(2)
 const json = (obj) => JSON.stringify(obj).replace(/</g, '\\u003c')
-const firstSentence = (text) => (text.match(/^.*?[.!?](\s|$)/) || [text])[0].trim()
 
 const isLimited = (c) => c.kind === 'limited'
 const kindLabel = (c) => (isLimited(c) ? 'Limited Edition' : 'Open Edition')
 const front = (c) => `image/cards/${c.slug}-front.webp`
 const back = (c) => `image/cards/${c.slug}-back.webp`
+// Wide paintings are printed as landscape cards, like Veritas.
+const dims = (c) => (c.wide ? 'width="816" height="600"' : 'width="600" height="816"')
+const BUNDLE_PRICE = BUNDLE.size * PRICES.open.price - BUNDLE.discount
+const bundleOffer = () => `Buy ${BUNDLE.size} unlimited pieces for ${money(BUNDLE_PRICE)} (save ${money(BUNDLE.discount)} &amp; it's free shipping!)`
+const medium = (c) => (isLimited(c) ? c.medium : c.material ? `${c.material} · Open edition` : 'Open edition')
 
 function faqs(c) {
   const returns = {
@@ -52,7 +56,7 @@ function faqs(c) {
   }
   return [
     { q: 'Is this card numbered?', a: 'No. Unlimited cards are an open edition: they are not numbered and they stay available. The back carries the painting\'s title, the artist\'s name and minicuration.com.' },
-    { q: 'How does the bundle discount work?', a: `Every ${BUNDLE.size} unlimited cards in one order take ${money(BUNDLE.discount)} off, mixed however you like. ${BUNDLE.size} cards are ${money(BUNDLE.size * PRICES.open.price - BUNDLE.discount)}; ${BUNDLE.size * 2} are ${money(2 * (BUNDLE.size * PRICES.open.price - BUNDLE.discount))}.` },
+    { q: 'How does the bundle work?', a: `Buy ${BUNDLE.size} unlimited pieces for ${money(BUNDLE_PRICE)}, mixed however you like: that saves ${money(BUNDLE.discount)}, and the order ships free. Every further ${BUNDLE.size} saves another ${money(BUNDLE.discount)}, so ${BUNDLE.size * 2} are ${money(2 * BUNDLE_PRICE)}.` },
     size,
     returns,
   ]
@@ -97,7 +101,7 @@ function productPage(c, i, list) {
   const title = `${c.title} by JFeelgood — ${kindLabel(c)} Mini Art Print`
   const description = isLimited(c)
     ? `${c.title} by JFeelgood. ${c.medium}. Limited edition ACEO art card, one of 50 numbered prints, sealed in a magnetic acrylic collector's case. ${money(c.price)}.`
-    : `${c.title} by JFeelgood. Unlimited open-edition ACEO art card, 2.5 x 3.5 in. ${money(c.price)} (regularly ${money(c.was)}); ${money(BUNDLE.discount)} off every ${BUNDLE.size} unlimited cards.`
+    : `${c.title} by JFeelgood. Unlimited open-edition ACEO art card, 2.5 x 3.5 in. ${money(c.price)} (regularly ${money(c.was)}). ${BUNDLE.size} unlimited pieces for ${money(BUNDLE_PRICE)} with free shipping.`
   const faq = faqs(c)
   const same = list.filter(o => o.kind === c.kind)
   const at = same.indexOf(c)
@@ -121,6 +125,7 @@ function productPage(c, i, list) {
         image: `${SITE}/${front(c)}`,
         description: c.description.join(' '),
         ...(isLimited(c) && !/series/i.test(c.medium) ? { artMedium: c.medium } : {}),
+        ...(c.material ? { artMedium: c.material } : {}),
         artform: 'Painting',
         artist: { '@type': 'Person', name: 'JFeelgood', url: 'https://jfeelgood.com' },
       },
@@ -151,7 +156,8 @@ function productPage(c, i, list) {
         ['Card dimensions', '2.5&quot; &times; 3.5&quot; &mdash; ACEO standard'],
         ['Edition', 'Open edition &mdash; not numbered'],
         ['Card back', 'Painting title, artist name and minicuration.com'],
-        ['Bundle', `${money(BUNDLE.discount)} off every ${BUNDLE.size} unlimited cards`],
+        ...(c.material ? [['Original', esc(c.material)]] : []),
+        ['Bundle', `${BUNDLE.size} unlimited pieces for ${money(BUNDLE_PRICE)}, free shipping`],
       ]
 
   return `<!DOCTYPE html>
@@ -180,17 +186,15 @@ function productPage(c, i, list) {
   <meta name="twitter:description" content="${esc(description)}"/>
   <meta name="twitter:image" content="${SITE}/${front(c)}"/>
   <link rel="preload" as="image" href="../${front(c)}"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <script type="application/ld+json">
   ${json(ld)}
   </script>
   <link rel="stylesheet" href="/css/theme.css"/>
+  <link rel="stylesheet" href="/css/base.css"/>
   <link rel="stylesheet" href="/css/product.css"/>
   <link rel="stylesheet" href="/css/cart.css"/>
 </head>
-<body class="no-banner"${isLimited(c) ? ` data-slug="${c.slug}"` : ''}>
+<body${isLimited(c) ? ` data-slug="${c.slug}"` : ''}>
 ${nav('../')}
 
   <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -202,11 +206,11 @@ ${nav('../')}
   <div class="product">
     <div class="product-images">
       <div class="product-image-wrap">
-        <img width="600" height="816" src="../${front(c)}" alt="${esc(c.title)} by JFeelgood — card front" fetchpriority="high" decoding="async"/>
+        <img ${dims(c)} src="../${front(c)}" alt="${esc(c.title)} by JFeelgood — card front" fetchpriority="high" decoding="async"/>
       </div>
       <p class="card-face-label">Front</p>
       <div class="product-image-wrap">
-        <img width="600" height="816" src="../${back(c)}" alt="${esc(c.title)} — card back${isLimited(c) ? ' with the artist statement and edition number' : ' with the title and artist name'}" loading="lazy" decoding="async"/>
+        <img ${dims(c)} src="../${back(c)}" alt="${esc(c.title)} — card back${isLimited(c) ? ' with the artist statement and edition number' : ' with the title and artist name'}" loading="lazy" decoding="async"/>
       </div>
       <p class="card-face-label">Back</p>
     </div>
@@ -218,12 +222,13 @@ ${isLimited(c)
     : '      <span class="tag is-open">Unlimited &middot; Open Edition</span>'}
       <h1>${esc(c.title)}</h1>
       <p class="product-meta">by <a href="../artists/jfeelgood.html">JFeelgood</a></p>
-      <p class="product-medium">${isLimited(c) ? esc(c.medium) : 'Open edition &middot; from the JFeelgood archive'}</p>
-${isLimited(c) ? `      <blockquote class="product-quote">&ldquo;${esc(c.quote)}&rdquo;</blockquote>\n` : ''}      <div class="expanded-note">
-        <div class="section-label">${isLimited(c) ? 'Artist Note' : 'About the Painting'}</div>
+      <p class="product-medium">${esc(isLimited(c) ? c.medium : c.material ? `${c.material} · open edition from the JFeelgood archive` : 'Open edition · from the JFeelgood archive')}</p>
+      <blockquote class="product-quote">&ldquo;${esc(c.quote)}&rdquo;</blockquote>
+      <div class="expanded-note">
+        <div class="section-label">Artist Note</div>
 ${c.description.map(p => `        <p>${esc(p)}</p>`).join('\n')}
       </div>
-      <div class="product-price">${priceHtml(c)} <span class="price-note">+ ${money(SHIPPING.amount)} US shipping per order</span>${isLimited(c) ? '' : `<span class="bundle-line">Any ${BUNDLE.size} unlimited cards: ${money(BUNDLE.discount)} off. Mix and match.</span>`}</div>
+      <div class="product-price">${priceHtml(c)} <span class="price-note">+ ${money(SHIPPING.amount)} US shipping per order</span>${isLimited(c) ? '' : `<span class="bundle-line">${bundleOffer()}</span>`}</div>
       <button type="button" class="btn-buy" data-add-to-cart="${c.slug}">Add to cart — ${money(c.price)}</button>
       <p class="trust-row">Secure checkout via Stripe<span class="sep">&middot;</span>Ships in 5&ndash;7 days<span class="sep">&middot;</span>14-day guarantee<span class="sep">&middot;</span><a href="../cart.html">View cart</a></p>
 ${c.original ? `      <div class="original-painting content-section">
@@ -253,7 +258,7 @@ ${faq.map(f => `    <div class="faq-item">
     <h2>More from Minicuration</h2>
     <div class="more-grid">
 ${more.map(o => `      <a href="${o.slug}.html" class="more-card">
-        <img class="card-img" width="600" height="816" src="../${front(o)}" alt="${esc(o.title)} by JFeelgood — ${isLimited(o) ? 'limited edition' : 'open edition'} mini art print" loading="lazy" decoding="async"/>
+        <img class="card-img${o.wide ? ' landscape' : ''}" ${dims(o)} src="../${front(o)}" alt="${esc(o.title)} by JFeelgood — ${isLimited(o) ? 'limited edition' : 'open edition'} mini art print" loading="lazy" decoding="async"/>
         <div class="more-card-body"><h3>${esc(o.title)}</h3><p>by JFeelgood · ${money(o.price)}</p></div>
       </a>`).join('\n')}
     </div>
@@ -270,17 +275,17 @@ ${isLimited(c) ? '  <script defer src="/js/store.js"></script>\n' : ''}  <script
 }
 
 function shopCard(c) {
-  const concept = isLimited(c) ? `&ldquo;${esc(c.quote)}&rdquo;` : esc(firstSentence(c.description[0]))
+  const concept = `&ldquo;${esc(c.quote)}&rdquo;`
   return `    <div class="shop-card" data-slug="${c.slug}" data-kind="${c.kind}" data-status="available" onclick="location.href='shop/${c.slug}.html'">
       <div class="card-flipper" style="position:relative;">
-        <div class="sc-spin-wrap">
+        <div class="sc-spin-wrap${c.wide ? ' landscape' : ''}">
           <div class="sc-spin-scene">
             <div class="sc-spin-3d">
               <div class="sc-face sc-front">
-                <img width="600" height="816" src="${front(c)}" alt="${esc(c.title)} — original painting by JFeelgood" loading="lazy" decoding="async"/>
+                <img ${dims(c)} src="${front(c)}" alt="${esc(c.title)} — original painting by JFeelgood" loading="lazy" decoding="async"/>
               </div>
               <div class="sc-face sc-back">
-                <img width="600" height="816" src="${back(c)}" alt="${esc(c.title)} — collector card back" loading="lazy" decoding="async"/>
+                <img ${dims(c)} src="${back(c)}" alt="${esc(c.title)} — collector card back" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>
@@ -293,7 +298,7 @@ function shopCard(c) {
         <div class="card-top-row"><span class="card-edition${isLimited(c) ? '' : ' is-open'}">${isLimited(c) ? 'Ltd. Ed. of 50' : 'Unlimited'}</span></div>
         <h3 class="card-title">${esc(c.title)}</h3>
         <p class="card-artist">by JFeelgood</p>
-        <p class="card-medium">${isLimited(c) ? esc(c.medium) : 'Open edition'}</p>
+        <p class="card-medium">${esc(medium(c))}</p>
         <p class="card-concept">${concept}</p>
         <div class="card-price-row">
           <span class="card-price">${priceHtml(c)}</span>
@@ -358,11 +363,11 @@ function build() {
 
   const data = {
     root: '/',
-    bundle: BUNDLE,
+    bundle: { ...BUNDLE, price: BUNDLE.size * PRICES.open.price - BUNDLE.discount },
     shipping: SHIPPING,
     cards: Object.fromEntries(CARDS.map(c => [c.slug, {
       title: c.title, kind: c.kind, price: c.price, was: c.was,
-      img: front(c), url: `shop/${c.slug}.html`,
+      img: front(c), url: `shop/${c.slug}.html`, wide: !!c.wide,
     }])),
   }
   fs.writeFileSync(path.join(ROOT, 'js', 'catalog-data.js'),

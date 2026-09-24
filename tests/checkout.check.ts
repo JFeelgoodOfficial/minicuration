@@ -62,9 +62,9 @@ test.describe('catalog pricing — quote()', () => {
     expect(open(1)).toMatchObject({ subtotal: 600, discount: 0, shipping: 900, total: 1500 })
   })
 
-  test('$10 off every full 10 unlimited cards', () => {
-    expect(open(9).discount).toBe(0)
-    expect(open(10)).toMatchObject({ subtotal: 6000, discount: 1000, total: 5900 })
+  test('10 unlimited pieces for $50 with free shipping; $10 off every full 10', () => {
+    expect(open(9)).toMatchObject({ discount: 0, shipping: 900 })
+    expect(open(10)).toMatchObject({ subtotal: 6000, discount: 1000, shipping: 0, total: 5000 })
     expect(open(13)).toMatchObject({ subtotal: 7800, discount: 1000 })
     expect(open(20)).toMatchObject({ subtotal: 12000, discount: 2000 })
   })
@@ -105,6 +105,8 @@ test.describe('/api/checkout', () => {
     const { calls } = await checkout({ items: [{ slug: 'moonsail', qty: 4 }, { slug: 'reach', qty: 6 }] })
     const coupon = calls.find(c => c.kind === 'coupon')!.args
     expect(coupon).toMatchObject({ amount_off: 1000, currency: 'usd', max_redemptions: 1 })
+    const session = calls.find(c => c.kind === 'session')!.args as { shipping_options: { shipping_rate_data: { fixed_amount: { amount: number } } }[] }
+    expect(session.shipping_options[0].shipping_rate_data.fixed_amount.amount).toBe(0)
     expect(calls.find(c => c.kind === 'session')!.args.discounts).toEqual([{ coupon: 'co_test' }])
   })
 
