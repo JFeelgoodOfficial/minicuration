@@ -28,17 +28,19 @@ test.describe('Cart', () => {
     await expect(page.locator('.cart-qty-fixed')).toBeVisible()
   })
 
-  test('ten unlimited cards show the $10 bundle discount', async ({ page }) => {
+  test('ten unlimited cards cost $50 and ship free', async ({ page }) => {
     await page.goto('/cart.html')
     await page.evaluate(() => localStorage.setItem('mc-cart', JSON.stringify({ moonsail: 4, reach: 6 })))
     await page.reload()
     await expect(page.locator('[data-subtotal]')).toHaveText('$60')
     await expect(page.locator('[data-discount-row]')).toBeVisible()
     await expect(page.locator('[data-discount]')).toHaveText('−$10')
-    await expect(page.locator('[data-total]')).toHaveText('$59')
+    await expect(page.locator('[data-shipping]')).toHaveText('Free')
+    await expect(page.locator('[data-total]')).toHaveText('$50')
 
     await page.locator('[data-qty="reach"][data-step="-1"]').click()
     await expect(page.locator('[data-discount-row]')).toBeHidden()
+    await expect(page.locator('[data-shipping]')).toHaveText('$9')
     await expect(page.locator('[data-bundle-hint]')).toContainText('Add 1 more')
   })
 
@@ -68,5 +70,40 @@ test.describe('Cart', () => {
     await page.locator('[data-checkout]').click()
     await expect(page.locator('[data-cart-status]')).toContainText('Lush has just sold out')
     await expect(page.locator('.cart-line')).toHaveCount(1)
+  })
+
+  test('the add-on checkboxes add a $4 case and a $1 stand with the card', async ({ page }) => {
+    await page.goto('/shop/moonsail.html')
+    await page.locator('[data-addon-for="moonsail"][value="acrylic-case"]').check()
+    await page.locator('[data-addon-for="moonsail"][value="acrylic-stand"]').check()
+    await page.locator('[data-add-to-cart="moonsail"]').click()
+    await expect(page.locator('[data-addon-for="moonsail"]:checked')).toHaveCount(0)
+    await page.goto('/cart.html')
+    await expect(page.locator('.cart-line')).toHaveCount(3)
+    await expect(page.locator('.cart-line').nth(1)).toContainText('Magnetic Acrylic Case')
+    await expect(page.locator('.cart-line').nth(2)).toContainText('Acrylic Stand')
+    await expect(page.locator('[data-subtotal]')).toHaveText('$11')
+    await expect(page.locator('.cart-upsell')).toHaveCount(0)
+  })
+
+  test('limited pages offer no add-ons (they come with a case and stand)', async ({ page }) => {
+    await page.goto('/shop/pride.html')
+    await expect(page.locator('[data-addon-for]')).toHaveCount(0)
+    await expect(page.locator('.edition-table')).toContainText('Acrylic display stand included')
+  })
+
+  test('cases stay capped at one per unlimited card', async ({ page }) => {
+    await page.goto('/cart.html')
+    await page.evaluate(() => localStorage.setItem('mc-cart', JSON.stringify({ moonsail: 2, reach: 1 })))
+    await page.reload()
+    const addCase = page.locator('[data-add-addon="acrylic-case"]')
+    await addCase.click()
+    await addCase.click()
+    await addCase.click()
+    await expect(addCase).toHaveCount(0)
+    await expect(page.locator('[data-add-addon="acrylic-stand"]')).toHaveCount(1)
+    await expect(page.locator('[data-qty="acrylic-case"][data-step="1"]')).toBeDisabled()
+    await page.locator('[data-remove="moonsail"]').click()
+    await expect(page.locator('.cart-line', { hasText: 'Acrylic Case' }).locator('.cart-qty span')).toHaveText('1')
   })
 })

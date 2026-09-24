@@ -1,9 +1,6 @@
 /* Cart, category sections and the add-to-cart button. Loaded after theme.css
    on shop.html, cart.html and the cart-sold product pages. */
 
-/* Pages with no sale banner: the nav sits flush at the top */
-body.no-banner{--banner-h:0px;}
-
 /* Nav cart link */
 .nav-cart [data-cart-count]{margin-left:4px;}
 
@@ -24,11 +21,23 @@ button.btn-buy[aria-disabled="true"]{cursor:not-allowed;}
 .bundle-note{display:inline-block;margin-top:6px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);}
 .shop-card .card-edition.is-open{color:var(--link);}
 
+/* Product page: the acrylic case add-on */
+.addon-opt{display:flex;align-items:center;gap:10px;margin:-8px 0 14px;font-size:13px;color:var(--text);cursor:pointer;}
+.addon-opt input{width:16px;height:16px;accent-color:var(--accent);}
+.addon-opt span{color:var(--muted);}
+
+/* Cart: the case line and the prompt to add one */
+.cart-thumb-case{width:84px;aspect-ratio:600/816;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:3px;background:var(--surface);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);text-align:center;}
+.cart-upsell{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:16px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--muted);}
+.cart-upsell button{background:none;border:1px solid var(--accent);color:var(--accent);padding:8px 14px;border-radius:2px;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;}
+.cart-upsell button:hover{background:var(--accent-soft);}
+
 /* Product page: open-edition tag, bundle note under the price */
 .product-info .tag.is-open{border-color:var(--link);color:var(--link);}
 .product-price .bundle-line{display:block;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);font-weight:300;margin-top:6px;}
 .product-images .card-face-label{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);text-align:center;margin-top:-6px;}
 .more-card img.card-img{aspect-ratio:600/816;object-fit:cover;}
+.more-card img.card-img.landscape{aspect-ratio:816/600;}
 
 /* Cart page */
 .cart-wrap{max-width:1040px;margin:0 auto;padding:140px 48px 90px;display:grid;grid-template-columns:1fr 340px;gap:48px;align-items:start;}

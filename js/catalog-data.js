@@ -3,11 +3,13 @@ window.MC_CATALOG = {
  "root": "/",
  "bundle": {
   "size": 10,
-  "discount": 1000
+  "discount": 1000,
+  "price": 5000
  },
  "shipping": {
   "amount": 900,
-  "label": "US shipping"
+  "label": "US shipping",
+  "freeLabel": "Free US shipping"
  },
  "cards": {
   "poetry-of-solace": {
@@ -16,7 +18,8 @@ window.MC_CATALOG = {
    "price": 2300,
    "was": null,
    "img": "image/cards/poetry-of-solace-front.webp",
-   "url": "shop/poetry-of-solace.html"
+   "url": "shop/poetry-of-solace.html",
+   "wide": true
   },
   "adonis": {
    "title": "Adonis",
@@ -24,7 +27,8 @@ window.MC_CATALOG = {
    "price": 2300,
    "was": null,
    "img": "image/cards/adonis-front.webp",
-   "url": "shop/adonis.html"
+   "url": "shop/adonis.html",
+   "wide": true
   },
   "vanity": {
    "title": "Vanity",
@@ -32,7 +36,8 @@ window.MC_CATALOG = {
    "price": 2300,
    "was": null,
    "img": "image/cards/vanity-front.webp",
-   "url": "shop/vanity.html"
+   "url": "shop/vanity.html",
+   "wide": false
   },
   "the-king": {
    "title": "The King",
@@ -40,7 +45,8 @@ window.MC_CATALOG = {
    "price": 2300,
    "was": null,
    "img": "image/cards/the-king-front.webp",
-   "url": "shop/the-king.html"
+   "url": "shop/the-king.html",
+   "wide": false
   },
   "pride": {
    "title": "Pride",
@@ -48,7 +54,8 @@ window.MC_CATALOG = {
    "price": 2300,
    "was": null,
    "img": "image/cards/pride-front.webp",
-   "url": "shop/pride.html"
+   "url": "shop/pride.html",
+   "wide": false
   },
   "lush": {
    "title": "Lush",
@@ -56,7 +63,8 @@ window.MC_CATALOG = {
    "price": 2300,
    "was": null,
    "img": "image/cards/lush-front.webp",
-   "url": "shop/lush.html"
+   "url": "shop/lush.html",
+   "wide": false
   },
   "businessman": {
    "title": "Businessman",
@@ -64,7 +72,8 @@ window.MC_CATALOG = {
    "price": 2300,
    "was": null,
    "img": "image/cards/businessman-front.webp",
-   "url": "shop/businessman.html"
+   "url": "shop/businessman.html",
+   "wide": false
   },
   "best-friend": {
    "title": "Best Friend",
@@ -72,7 +81,8 @@ window.MC_CATALOG = {
    "price": 2300,
    "was": null,
    "img": "image/cards/best-friend-front.webp",
-   "url": "shop/best-friend.html"
+   "url": "shop/best-friend.html",
+   "wide": false
   },
   "permission": {
    "title": "Permission",
@@ -80,7 +90,8 @@ window.MC_CATALOG = {
    "price": 2300,
    "was": null,
    "img": "image/cards/permission-front.webp",
-   "url": "shop/permission.html"
+   "url": "shop/permission.html",
+   "wide": true
   },
   "affordable-housing": {
    "title": "Affordable Housing",
@@ -88,7 +99,8 @@ window.MC_CATALOG = {
    "price": 600,
    "was": 1500,
    "img": "image/cards/affordable-housing-front.webp",
-   "url": "shop/affordable-housing.html"
+   "url": "shop/affordable-housing.html",
+   "wide": true
   },
   "cornerstones": {
    "title": "Cornerstones",
@@ -96,7 +108,8 @@ window.MC_CATALOG = {
    "price": 600,
    "was": 1500,
    "img": "image/cards/cornerstones-front.webp",
-   "url": "shop/cornerstones.html"
+   "url": "shop/cornerstones.html",
+   "wide": true
   },
   "gentrification": {
    "title": "Gentrification",
@@ -104,7 +117,8 @@ window.MC_CATALOG = {
    "price": 600,
    "was": 1500,
    "img": "image/cards/gentrification-front.webp",
-   "url": "shop/gentrification.html"
+   "url": "shop/gentrification.html",
+   "wide": true
   },
   "grecia-monroc": {
    "title": "Grecia Monroc",
@@ -112,7 +126,8 @@ window.MC_CATALOG = {
    "price": 600,
    "was": 1500,
    "img": "image/cards/grecia-monroc-front.webp",
-   "url": "shop/grecia-monroc.html"
+   "url": "shop/grecia-monroc.html",
+   "wide": false
   },
   "ronin": {
    "title": "Ronin",
@@ -120,7 +135,8 @@ window.MC_CATALOG = {
    "price": 600,
    "was": 1500,
    "img": "image/cards/ronin-front.webp",
-   "url": "shop/ronin.html"
+   "url": "shop/ronin.html",
+   "wide": false
   },
   "supernova": {
    "title": "Supernova",
@@ -128,7 +144,8 @@ window.MC_CATALOG = {
    "price": 600,
    "was": 1500,
    "img": "image/cards/supernova-front.webp",
-   "url": "shop/supernova.html"
+   "url": "shop/supernova.html",
+   "wide": false
   },
   "reach": {
    "title": "Reach",
@@ -136,7 +153,8 @@ window.MC_CATALOG = {
    "price": 600,
    "was": 1500,
    "img": "image/cards/reach-front.webp",
-   "url": "shop/reach.html"
+   "url": "shop/reach.html",
+   "wide": false
   },
   "little-wanderer": {
    "title": "Little Wanderer",
@@ -144,15 +162,8 @@ window.MC_CATALOG = {
    "price": 600,
    "was": 1500,
    "img": "image/cards/little-wanderer-front.webp",
-   "url": "shop/little-wanderer.html"
-  },
-  "portal": {
-   "title": "Portal",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/portal-front.webp",
-   "url": "shop/portal.html"
+   "url": "shop/little-wanderer.html",
+   "wide": true
   },
   "summer-field": {
    "title": "Summer Field",
@@ -160,15 +171,8 @@ window.MC_CATALOG = {
    "price": 600,
    "was": 1500,
    "img": "image/cards/summer-field-front.webp",
-   "url": "shop/summer-field.html"
-  },
-  "eye-of-the-storm": {
-   "title": "Eye of the Storm",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/eye-of-the-storm-front.webp",
-   "url": "shop/eye-of-the-storm.html"
+   "url": "shop/summer-field.html",
+   "wide": true
   },
   "hidden-grove": {
    "title": "Hidden Grove",
@@ -176,7 +180,8 @@ window.MC_CATALOG = {
    "price": 600,
    "was": 1500,
    "img": "image/cards/hidden-grove-front.webp",
-   "url": "shop/hidden-grove.html"
+   "url": "shop/hidden-grove.html",
+   "wide": false
   },
   "moonsail": {
    "title": "Moonsail",
@@ -184,7 +189,8 @@ window.MC_CATALOG = {
    "price": 600,
    "was": 1500,
    "img": "image/cards/moonsail-front.webp",
-   "url": "shop/moonsail.html"
+   "url": "shop/moonsail.html",
+   "wide": false
   },
   "tidewatcher": {
    "title": "Tidewatcher",
@@ -192,7 +198,8 @@ window.MC_CATALOG = {
    "price": 600,
    "was": 1500,
    "img": "image/cards/tidewatcher-front.webp",
-   "url": "shop/tidewatcher.html"
+   "url": "shop/tidewatcher.html",
+   "wide": false
   },
   "awakening": {
    "title": "Awakening",
@@ -200,7 +207,8 @@ window.MC_CATALOG = {
    "price": 600,
    "was": 1500,
    "img": "image/cards/awakening-front.webp",
-   "url": "shop/awakening.html"
+   "url": "shop/awakening.html",
+   "wide": false
   },
   "gilded-cage": {
    "title": "Gilded Cage",
@@ -208,7 +216,8 @@ window.MC_CATALOG = {
    "price": 600,
    "was": 1500,
    "img": "image/cards/gilded-cage-front.webp",
-   "url": "shop/gilded-cage.html"
+   "url": "shop/gilded-cage.html",
+   "wide": false
   },
   "le-verbeux": {
    "title": "Le Verbeux",
@@ -216,7 +225,30 @@ window.MC_CATALOG = {
    "price": 600,
    "was": 1500,
    "img": "image/cards/le-verbeux-front.webp",
-   "url": "shop/le-verbeux.html"
+   "url": "shop/le-verbeux.html",
+   "wide": false
+  },
+  "acrylic-case": {
+   "title": "Magnetic Acrylic Case",
+   "kind": "addon",
+   "price": 400,
+   "was": null,
+   "note": "Magnetically sealed, one per unlimited card",
+   "upsell": "Upgrade a card from its plastic slip to a magnetically sealed acrylic case",
+   "short": "Acrylic case"
+  },
+  "acrylic-stand": {
+   "title": "Acrylic Stand",
+   "kind": "addon",
+   "price": 100,
+   "was": null,
+   "note": "Display stand, one per unlimited card",
+   "upsell": "Stand a card up on your shelf with an acrylic display stand",
+   "short": "Acrylic stand"
   }
- }
+ },
+ "addons": [
+  "acrylic-case",
+  "acrylic-stand"
+ ]
 }

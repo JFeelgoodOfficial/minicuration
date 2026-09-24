@@ -335,30 +335,10 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://minicuration.com/shop/portal.html</loc>
-    <image:image>
-      <image:loc>https://minicuration.com/image/cards/portal-front.webp</image:loc>
-      <image:title>Portal by JFeelgood — Open Edition Mini Art Print</image:title>
-    </image:image>
-    <lastmod>2026-09-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://minicuration.com/shop/summer-field.html</loc>
     <image:image>
       <image:loc>https://minicuration.com/image/cards/summer-field-front.webp</image:loc>
       <image:title>Summer Field by JFeelgood — Open Edition Mini Art Print</image:title>
-    </image:image>
-    <lastmod>2026-09-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://minicuration.com/shop/eye-of-the-storm.html</loc>
-    <image:image>
-      <image:loc>https://minicuration.com/image/cards/eye-of-the-storm-front.webp</image:loc>
-      <image:title>Eye of the Storm by JFeelgood — Open Edition Mini Art Print</image:title>
     </image:image>
     <lastmod>2026-09-24</lastmod>
     <changefreq>monthly</changefreq>

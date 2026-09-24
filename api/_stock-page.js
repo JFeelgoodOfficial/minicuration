@@ -64,9 +64,8 @@ function renderStockPage(inventory, problem) {
 <link rel="stylesheet" href="/css/theme.css"/>
 <link rel="stylesheet" href="/css/base.css"/>
 <style>
-  /* Site pages put a .sale-banner above the fixed nav, which is what
-     --banner-h offsets it by. This page has no banner, so the nav sits flush
-     at the top and the content clears its full height instead. */
+  /* No promo banner here, whatever the rest of the site runs: the nav sits
+     flush at the top and the content clears its full height instead. */
   body{--banner-h:0px;}
   .stock-wrap{max-width:1040px;margin:0 auto;
     padding:clamp(104px,17vw,152px) clamp(18px,5vw,40px) 80px;}
