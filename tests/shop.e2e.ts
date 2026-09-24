@@ -9,10 +9,10 @@ test.describe('Shop catalog — /shop.html', () => {
     await page.goto('/shop.html')
   })
 
-  test('both collections are present: 15 limited, 17 unlimited', async ({ page }) => {
-    await expect(page.locator('.shop-card')).toHaveCount(32)
+  test('both collections are present: 15 limited, 15 unlimited', async ({ page }) => {
+    await expect(page.locator('.shop-card')).toHaveCount(30)
     await expect(page.locator('#limited .shop-card')).toHaveCount(15)
-    await expect(page.locator('#unlimited .shop-card')).toHaveCount(17)
+    await expect(page.locator('#unlimited .shop-card')).toHaveCount(15)
   })
 
   test('no Buy Now button has href="#"', async ({ page }) => {
@@ -66,8 +66,8 @@ test.describe('Shop catalog — /shop.html', () => {
 
   test('cart cards: every one has an add-to-cart button, none a link', async ({ page }) => {
     const cartCards = page.locator('.shop-card:not([data-checkout="link"])')
-    await expect(cartCards).toHaveCount(26)
-    await expect(cartCards.locator('button[data-add-to-cart]')).toHaveCount(26)
+    await expect(cartCards).toHaveCount(24)
+    await expect(cartCards.locator('button[data-add-to-cart]')).toHaveCount(24)
     await expect(cartCards.locator('a.btn-buy')).toHaveCount(0)
   })
 

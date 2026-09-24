@@ -29,7 +29,7 @@ const SHIPPING = { amount: 900, label: 'US shipping', freeLabel: 'Free US shippi
 const LIMITED = [
   {
     slug: 'poetry-of-solace', wide: true, title: 'Poetry of Solace', medium: 'From the series “The Lost”',
-    quote: 'A solitary figure on a vividly lit path beneath a star-studded sky – a meditation on solitude, resilience, and the way memory can still glow in the dark.',
+    quote: 'All suffering has cracks and crevices where life grows new... whether in tribulation or solace, the grand treasure is truth.',
     description: [
       'A solitary figure on a vividly lit path beneath a star-studded sky – a meditation on solitude, resilience, and the way memory can still glow in the dark.',
     ],
@@ -122,131 +122,43 @@ const LIMITED = [
   },
 ]
 
-// Archive works with no description on jfeelgood.com: the quotes and artist
-// notes were written for the cards, and the untitled works were named for
-// them. `wide` cards are printed landscape, like Veritas; `focus` and `zoom`
+// Archive works with no description on jfeelgood.com: each carries the
+// artist's line for it (`quote`, or `description` for a plain caption), and
+// the untitled works were named for the cards. `wide` cards are printed landscape, like Veritas; `focus` and `zoom`
 // set the crop.
 const A = 'assets/images/archives/'
 const OPEN = [
   { slug: 'affordable-housing', title: 'Affordable Housing', painting: A + 'full/Affordable Housing.webp', wide: true,
-    quote: 'A roof is a promise. Some of us live in the fine print.',
-    description: [
-      'The tent is small, and for tonight it is enough.',
-      'Beside it the tower climbs in rows of the same mark, window after window, a thousand doors that were never built to open for the one outside.',
-      'I painted the grass as green as I could. The ground belongs to whoever is standing on it.',
-    ] },
+    quote: 'We can all go outside' },
   { slug: 'cornerstones', title: 'Cornerstones', painting: A + 'full/Cornerstones.webp', wide: true,
-    quote: 'Every house is built on the things we were told to sit quietly with.',
-    description: [
-      'A child\'s bear waits where two walls meet, the place you were sent to think about what you did.',
-      'The outlet watches with its small, startled face.',
-      'The corners of a room hold our first lessons: comfort and danger, an arm\'s length apart.',
-    ] },
+    quote: 'We often take for granted the most important things' },
   { slug: 'gentrification', title: 'Gentrification', painting: A + 'full/Gentrification.webp', wide: true,
-    quote: 'They raised the floor and called it progress. I held on to the string.',
-    description: [
-      'The block kept growing until the only place left to stand was the edge.',
-      'Below there is only water.',
-      'The balloon is what I carried out of the old neighborhood: light enough to take with me, too light to hold me up.',
-    ] },
+    quote: 'Every change has a price' },
   { slug: 'grecia-monroc', title: 'Grecia Monroc', painting: A + 'full/Grecia Monroc.webp',
-    quote: 'She wears her sorrow like jewelry: small, polished, close to the heart.',
-    description: [
-      'Her eyes are fixed somewhere above the frame, on something she was promised.',
-      'Gold curls at the corners like the edge of an old invitation.',
-      'Grace, sometimes, is only the practice of looking up.',
-    ] },
+    description: ['Portrait of multidisciplinary artist Grecia Monroc.'] },
   { slug: 'ronin', title: 'Ronin', painting: A + 'full/Ronin.webp',
-    quote: 'A warrior without a master still keeps the code.',
-    description: [
-      'No lord, no banner. Only the rain, and paint piled on like armor.',
-      'The face gives nothing away. The colors give everything away.',
-      'Wandering is its own kind of loyalty.',
-    ] },
+    quote: 'Some would have their spirit share their tale' },
   { slug: 'supernova', title: 'Supernova', painting: A + 'full/Supernova.webp',
-    quote: 'A star is never brighter than the moment it lets go.',
-    description: [
-      'She kneels at the doorway of a world still bursting into color, trees dripping like candles, the ground blooming pink and gold.',
-      'Everything beautiful in the room is in the middle of coming apart.',
-      'She doesn\'t step in. She stays and watches it shine.',
-    ] },
+    quote: 'We miss the beauty of the universe while lost in our thoughts' },
   { slug: 'reach', title: 'Reach', painting: A + 'full/JFeelgood painting 008.webp',
-    quote: 'Growth is only reaching, repeated.',
-    description: [
-      'The canvas is tall and narrow as a hallway, and the tree doesn\'t know how high the ceiling goes.',
-      'It keeps climbing through the violet, leaving a little green behind on every branch.',
-      'That is what trying looks like from the outside.',
-    ] },
+    quote: 'All adventure has an origin' },
   { slug: 'little-wanderer', title: 'Little Wanderer', painting: A + 'full/JFeelgood painting 077.webp', wide: true,
-    quote: 'Every wanderer is loyal to something just past the horizon.',
-    description: [
-      'A small dog far from home, sparkling on a field that moves like weather.',
-      'He isn\'t lost. He\'s listening.',
-      'Home, for some of us, is simply the direction we\'re facing.',
-    ] },
-  { slug: 'portal', title: 'Portal', painting: A + 'full/JFeelgood painting 122.webp',
-    quote: 'Every door I\'ve walked through was a shape I didn\'t understand yet.',
-    description: [
-      'A circle and a triangle float in the fog: two openings, two kinds of dark.',
-      'Light crosses beneath them like a decision being made.',
-      'Some doors are round and patient. Some come to a point.',
-    ] },
+    quote: 'A good friend is a precious thing' },
   { slug: 'summer-field', title: 'Summer Field', painting: A + 'thumbs/JFeelgood painting 145.webp', wide: true,
-    quote: 'Some memories are only a tree, a field, and a warmth I didn\'t know to keep.',
-    description: [
-      'The green tree stands here and now. The willow glows behind it like something remembered rather than seen.',
-      'Summer does that. It paints the present and the past into the same afternoon.',
-    ] },
-  { slug: 'eye-of-the-storm', title: 'Eye of the Storm', painting: A + 'thumbs/JFeelgood painting 148.webp',
-    quote: 'Peace isn\'t the absence of the storm. It\'s the center of it.',
-    description: [
-      'The wind is scratched in black and white, around and around.',
-      'In the middle the world sits blue and green and quiet, and something reaches across the water toward it.',
-      'The calm was always there. I only had to stop spinning to see it.',
-    ] },
+    quote: 'You may not be here but I remember where you stood' },
   { slug: 'hidden-grove', title: 'Hidden Grove', painting: A + 'thumbs/JFeelgood painting 150.webp',
-    quote: 'Keep something growing where no one thinks to look.',
-    description: [
-      'The paint is heaped like stone: rust, silver and ash.',
-      'Deep inside, a small white tree glows in its own clearing while dark branches reach in from the outside.',
-      'What we protect most, we bury deepest.',
-    ] },
+    quote: 'Love in the hardest of times' },
   { slug: 'moonsail', title: 'Moonsail', painting: A + 'thumbs/JFeelgood painting 155.webp', zoom: 1.1,
-    quote: 'What carries us is not always what we see.',
-    description: [
-      'The sail catches the moonlight and gets all the credit.',
-      'Underneath, something larger moves through the dark water, unnoticed, keeping pace.',
-      'Every crossing has its hidden companion.',
-    ] },
+    quote: 'We don\'t always see what carries us.' },
   { slug: 'tidewatcher', title: 'Tidewatcher', painting: A + 'thumbs/JFeelgood painting 160.webp',
-    quote: 'Stay still long enough and the tide comes to you.',
-    description: [
-      'Everything around her is motion, the sea folding over itself in marbled turns.',
-      'She sits, collar bright, eyes bright, and waits.',
-      'Patience isn\'t doing nothing. It\'s watching the ocean make up its mind.',
-    ] },
+    quote: 'Curiosity is the universal language' },
   { slug: 'awakening', title: 'Awakening', painting: A + 'thumbs/JFeelgood painting 163.webp',
-    quote: 'Waking up was the loudest quiet thing I ever did.',
-    description: [
-      'The rings spin outward like a held breath finally let go.',
-      'At the center, a figure opens her arms inside the dark she has just come through.',
-      'Every awakening looks like this from the inside: light at the edges, and the nerve to stand up in the middle of it.',
-    ] },
+    quote: 'Always remember to stretch' },
   { slug: 'gilded-cage', title: 'Gilded Cage', painting: A + 'thumbs/JFeelgood painting 165.webp',
-    quote: 'The bars were beautiful, so I stayed.',
-    description: [
-      'The cage is set into gold, and the gold is set into the sky.',
-      'The door is shut and the cage is empty. Either the bird escaped, or it was never there.',
-      'Comfort can be the most convincing lock.',
-    ] },
+    quote: 'You can build anything but remember you are not bound to it.' },
   { slug: 'le-verbeux', title: 'Le Verbeux', painting: A + 'full/JFeelgood painting 166.webp',
     material: 'Charcoal on Canvas', focus: 'center 88%',
-    quote: 'She hasn\'t said a word, and she has already told you everything.',
-    description: [
-      'Le Verbeux: the wordy one.',
-      'Eyes closed, head resting on her hand, nothing but charcoal and bare canvas. She is the quietest thing I have drawn.',
-      'A picture is worth a thousand words. This one uses every one of them.',
-    ] },
+    quote: 'If a picture is worth a thousand words, how much is a dream?' },
 ]
 
 // Two portrait images carry the open-edition backs; they alternate down the list.

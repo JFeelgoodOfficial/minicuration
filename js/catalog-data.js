@@ -165,15 +165,6 @@ window.MC_CATALOG = {
    "url": "shop/little-wanderer.html",
    "wide": true
   },
-  "portal": {
-   "title": "Portal",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/portal-front.webp",
-   "url": "shop/portal.html",
-   "wide": false
-  },
   "summer-field": {
    "title": "Summer Field",
    "kind": "open",
@@ -182,15 +173,6 @@ window.MC_CATALOG = {
    "img": "image/cards/summer-field-front.webp",
    "url": "shop/summer-field.html",
    "wide": true
-  },
-  "eye-of-the-storm": {
-   "title": "Eye of the Storm",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/eye-of-the-storm-front.webp",
-   "url": "shop/eye-of-the-storm.html",
-   "wide": false
   },
   "hidden-grove": {
    "title": "Hidden Grove",

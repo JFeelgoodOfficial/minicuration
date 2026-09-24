@@ -124,7 +124,7 @@ function productPage(c, i, list) {
         '@type': 'VisualArtwork',
         name: c.title,
         image: `${SITE}/${front(c)}`,
-        description: c.description.join(' '),
+        description: c.quote || c.description.join(' '),
         ...(isLimited(c) && !/series/i.test(c.medium) ? { artMedium: c.medium } : {}),
         ...(c.material ? { artMedium: c.material } : {}),
         artform: 'Painting',
@@ -227,12 +227,10 @@ ${isLimited(c)
       <h1>${esc(c.title)}</h1>
       <p class="product-meta">by <a href="../artists/jfeelgood.html">JFeelgood</a></p>
       <p class="product-medium">${esc(isLimited(c) ? c.medium : c.material ? `${c.material} · open edition from the JFeelgood archive` : 'Open edition · from the JFeelgood archive')}</p>
-      <blockquote class="product-quote">&ldquo;${esc(c.quote)}&rdquo;</blockquote>
-      <div class="expanded-note">
-        <div class="section-label">Artist Note</div>
+${c.quote ? `      <blockquote class="product-quote">&ldquo;${esc(c.quote)}&rdquo;</blockquote>\n` : ''}${c.description ? `      <div class="expanded-note">
+        <div class="section-label">${c.quote ? 'Artist Note' : 'About the Painting'}</div>
 ${c.description.map(p => `        <p>${esc(p)}</p>`).join('\n')}
-      </div>
-      <div class="product-price">${priceHtml(c)} <span class="price-note">+ ${money(SHIPPING.amount)} US shipping per order</span>${isLimited(c) ? '' : `<span class="bundle-line">${bundleOffer()}</span>`}</div>
+      </div>\n` : ''}      <div class="product-price">${priceHtml(c)} <span class="price-note">+ ${money(SHIPPING.amount)} US shipping per order</span>${isLimited(c) ? '' : `<span class="bundle-line">${bundleOffer()}</span>`}</div>
 ${isLimited(c) ? '' : ADDONS.map(a => `      <label class="addon-opt"><input type="checkbox" data-addon-for="${c.slug}" value="${a.slug}"/> ${esc(a.offer)} <span>+${money(a.price)}</span></label>\n`).join('')}      <button type="button" class="btn-buy" data-add-to-cart="${c.slug}">Add to cart — ${money(c.price)}</button>
       <p class="trust-row">Secure checkout via Stripe<span class="sep">&middot;</span>Ships in 5&ndash;7 days<span class="sep">&middot;</span>14-day guarantee<span class="sep">&middot;</span><a href="../cart.html">View cart</a></p>
 ${c.original ? `      <div class="original-painting content-section">
@@ -279,7 +277,7 @@ ${isLimited(c) ? '  <script defer src="/js/store.js"></script>\n' : ''}  <script
 }
 
 function shopCard(c) {
-  const concept = `&ldquo;${esc(c.quote)}&rdquo;`
+  const concept = c.quote ? `&ldquo;${esc(c.quote)}&rdquo;` : esc(c.description[0])
   return `    <div class="shop-card" data-slug="${c.slug}" data-kind="${c.kind}" data-status="available" onclick="location.href='shop/${c.slug}.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap${c.wide ? ' landscape' : ''}">
