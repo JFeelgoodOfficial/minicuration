@@ -63,7 +63,7 @@ Vercel functions require env vars — use `vercel dev` with a `.env.local` for l
 ## The cart: more limited editions and the unlimited run
 
 The six original designs sell through their own Stripe Payment Links. Every
-other card — ten more limited editions of 50 and the unlimited (open-edition)
+other card — nine more limited editions of 50 and the unlimited (open-edition)
 archive cards — sells through the cart:
 
 | file | what it does |

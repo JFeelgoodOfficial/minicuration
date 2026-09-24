@@ -7,13 +7,13 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Cart', () => {
   test('an unlimited card page adds to the cart and the nav counts it', async ({ page }) => {
-    await page.goto('/shop/ember.html')
+    await page.goto('/shop/moonsail.html')
     await expect(page.locator('.product-price')).toContainText('$6')
     await expect(page.locator('.product-price s.price-was')).toContainText('$15')
-    await page.locator('[data-add-to-cart="ember"]').click()
-    await page.locator('[data-add-to-cart="ember"]').click()
+    await page.locator('[data-add-to-cart="moonsail"]').click()
+    await page.locator('[data-add-to-cart="moonsail"]').click()
     await expect(page.locator('.nav-cart [data-cart-count]')).toHaveText('(2)')
-    await expect(page.locator('[data-add-to-cart="ember"]')).toContainText('2 in cart')
+    await expect(page.locator('[data-add-to-cart="moonsail"]')).toContainText('2 in cart')
   })
 
   test('a limited card goes in once, then its button leads to the cart', async ({ page }) => {
@@ -30,7 +30,7 @@ test.describe('Cart', () => {
 
   test('ten unlimited cards show the $10 bundle discount', async ({ page }) => {
     await page.goto('/cart.html')
-    await page.evaluate(() => localStorage.setItem('mc-cart', JSON.stringify({ ember: 4, reach: 6 })))
+    await page.evaluate(() => localStorage.setItem('mc-cart', JSON.stringify({ moonsail: 4, reach: 6 })))
     await page.reload()
     await expect(page.locator('[data-subtotal]')).toHaveText('$60')
     await expect(page.locator('[data-discount-row]')).toBeVisible()
@@ -51,11 +51,11 @@ test.describe('Cart', () => {
       await route.fulfill({ json: { url: '/thanks?order=cs_test_123' } })
     })
     await page.goto('/cart.html')
-    await page.evaluate(() => localStorage.setItem('mc-cart', JSON.stringify({ ember: 2, lush: 1 })))
+    await page.evaluate(() => localStorage.setItem('mc-cart', JSON.stringify({ moonsail: 2, lush: 1 })))
     await page.reload()
     await page.locator('[data-checkout]').click()
     await expect(page).toHaveURL(/\/thanks\?order=cs_test_123/)
-    expect(sent).toEqual({ items: [{ slug: 'ember', qty: 2 }, { slug: 'lush', qty: 1 }] })
+    expect(sent).toEqual({ items: [{ slug: 'moonsail', qty: 2 }, { slug: 'lush', qty: 1 }] })
     await expect.poll(() => page.evaluate(() => localStorage.getItem('mc-cart'))).toBe('{}')
   })
 
@@ -63,7 +63,7 @@ test.describe('Cart', () => {
     await page.route('**/api/checkout', route =>
       route.fulfill({ status: 409, json: { error: 'sold_out', slugs: ['lush'] } }))
     await page.goto('/cart.html')
-    await page.evaluate(() => localStorage.setItem('mc-cart', JSON.stringify({ ember: 1, lush: 1 })))
+    await page.evaluate(() => localStorage.setItem('mc-cart', JSON.stringify({ moonsail: 1, lush: 1 })))
     await page.reload()
     await page.locator('[data-checkout]').click()
     await expect(page.locator('[data-cart-status]')).toContainText('Lush has just sold out')

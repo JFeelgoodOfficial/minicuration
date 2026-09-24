@@ -56,7 +56,7 @@ async function checkout(
 }
 
 test.describe('catalog pricing — quote()', () => {
-  const open = (qty: number) => quote([{ slug: 'ember', qty }])
+  const open = (qty: number) => quote([{ slug: 'moonsail', qty }])
 
   test('unlimited cards are $6 each and ship for $9', () => {
     expect(open(1)).toMatchObject({ subtotal: 600, discount: 0, shipping: 900, total: 1500 })
@@ -70,24 +70,24 @@ test.describe('catalog pricing — quote()', () => {
   })
 
   test('the bundle counts across different unlimited cards, and ignores limited ones', () => {
-    const q = quote([{ slug: 'pride', qty: 1 }, { slug: 'ember', qty: 6 }, { slug: 'reach', qty: 4 }])
+    const q = quote([{ slug: 'pride', qty: 1 }, { slug: 'moonsail', qty: 6 }, { slug: 'reach', qty: 4 }])
     expect(q).toMatchObject({ openCount: 10, subtotal: 2300 + 6000, discount: 1000 })
-    expect(quote([{ slug: 'pride', qty: 1 }, { slug: 'ember', qty: 9 }]).discount).toBe(0)
+    expect(quote([{ slug: 'pride', qty: 1 }, { slug: 'moonsail', qty: 9 }]).discount).toBe(0)
   })
 
   test('refuses what the browser should never send', () => {
     expect(quote([]).error).toBe('empty_cart')
     expect(quote([{ slug: 'veritas', qty: 1 }]).error).toBe('unknown_card')
     expect(quote([{ slug: 'pride', qty: 2 }]).error).toBe('one_per_limited')
-    expect(quote([{ slug: 'ember', qty: 0 }]).error).toBe('bad_quantity')
-    expect(quote([{ slug: 'ember', qty: 1.5 }]).error).toBe('bad_quantity')
-    expect(quote([{ slug: 'ember', qty: 1 }, { slug: 'ember', qty: 1 }]).error).toBe('duplicate_card')
+    expect(quote([{ slug: 'moonsail', qty: 0 }]).error).toBe('bad_quantity')
+    expect(quote([{ slug: 'moonsail', qty: 1.5 }]).error).toBe('bad_quantity')
+    expect(quote([{ slug: 'moonsail', qty: 1 }, { slug: 'moonsail', qty: 1 }]).error).toBe('duplicate_card')
   })
 })
 
 test.describe('/api/checkout', () => {
   test('builds a Stripe session priced from the catalog, with each card named in metadata', async () => {
-    const { status, body, calls } = await checkout({ items: [{ slug: 'ember', qty: 3 }, { slug: 'pride', qty: 1 }] })
+    const { status, body, calls } = await checkout({ items: [{ slug: 'moonsail', qty: 3 }, { slug: 'pride', qty: 1 }] })
     expect(status).toBe(200)
     expect(body.url).toContain('checkout.stripe.com')
     const session = calls.find(c => c.kind === 'session')!.args as {
@@ -95,21 +95,21 @@ test.describe('/api/checkout', () => {
       discounts?: unknown; metadata: Record<string, string>; success_url: string
     }
     expect(session.line_items.map(l => [l.price_data.product_data.metadata.slug, l.quantity, l.price_data.unit_amount]))
-      .toEqual([['ember', 3, 600], ['pride', 1, 2300]])
+      .toEqual([['moonsail', 3, 600], ['pride', 1, 2300]])
     expect(session.discounts).toBeUndefined()
     expect(session.metadata.source).toBe('cart')
     expect(session.success_url).toBe('https://minicuration.com/thanks.html?order={CHECKOUT_SESSION_ID}')
   })
 
   test('ten unlimited cards get a single-use $10 coupon', async () => {
-    const { calls } = await checkout({ items: [{ slug: 'ember', qty: 4 }, { slug: 'reach', qty: 6 }] })
+    const { calls } = await checkout({ items: [{ slug: 'moonsail', qty: 4 }, { slug: 'reach', qty: 6 }] })
     const coupon = calls.find(c => c.kind === 'coupon')!.args
     expect(coupon).toMatchObject({ amount_off: 1000, currency: 'usd', max_redemptions: 1 })
     expect(calls.find(c => c.kind === 'session')!.args.discounts).toEqual([{ coupon: 'co_test' }])
   })
 
   test('a price sent by the browser is ignored', async () => {
-    const { calls } = await checkout({ items: [{ slug: 'ember', qty: 1, price: 1 }] })
+    const { calls } = await checkout({ items: [{ slug: 'moonsail', qty: 1, price: 1 }] })
     const session = calls.find(c => c.kind === 'session')!.args as { line_items: { price_data: { unit_amount: number } }[] }
     expect(session.line_items[0].price_data.unit_amount).toBe(600)
   })
@@ -127,7 +127,7 @@ test.describe('/api/checkout', () => {
   })
 
   test('unlimited-only carts do not need the inventory sheet', async () => {
-    const { status } = await checkout({ items: [{ slug: 'ember', qty: 2 }] }, { stockFails: true })
+    const { status } = await checkout({ items: [{ slug: 'moonsail', qty: 2 }] }, { stockFails: true })
     expect(status).toBe(200)
   })
 
@@ -138,10 +138,10 @@ test.describe('/api/checkout', () => {
   })
 
   test('return URLs follow a Vercel preview but never an arbitrary host', async () => {
-    const preview = await checkout({ items: [{ slug: 'ember', qty: 1 }] }, { host: 'minicuration-git-x.vercel.app' })
+    const preview = await checkout({ items: [{ slug: 'moonsail', qty: 1 }] }, { host: 'minicuration-git-x.vercel.app' })
     expect((preview.calls.find(c => c.kind === 'session')!.args as { cancel_url: string }).cancel_url)
       .toBe('https://minicuration-git-x.vercel.app/cart.html')
-    const evil = await checkout({ items: [{ slug: 'ember', qty: 1 }] }, { host: 'evil.example' })
+    const evil = await checkout({ items: [{ slug: 'moonsail', qty: 1 }] }, { host: 'evil.example' })
     expect((evil.calls.find(c => c.kind === 'session')!.args as { cancel_url: string }).cancel_url)
       .toBe('https://minicuration.com/cart.html')
   })

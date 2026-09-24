@@ -79,8 +79,8 @@ test.describe('webhook — product resolution', () => {
   test('a cart checkout reads each card from its product metadata', () => {
     const cart = (slug: string, kind: string, quantity = 1) =>
       ({ quantity, description: 'x', price: { id: 'price_inline', product: { name: 'x', metadata: { slug, kind } } } })
-    expect(resolveSlugs([cart('pride', 'limited'), cart('ember', 'open', 12), cart('reach', 'open')]))
-      .toEqual({ slugs: ['pride'], isBundle: false, open: [{ slug: 'ember', qty: 12 }, { slug: 'reach', qty: 1 }] })
+    expect(resolveSlugs([cart('pride', 'limited'), cart('moonsail', 'open', 12), cart('reach', 'open')]))
+      .toEqual({ slugs: ['pride'], isBundle: false, open: [{ slug: 'moonsail', qty: 12 }, { slug: 'reach', qty: 1 }] })
   })
 
   test('a cart of only unlimited cards reserves no numbered print', () => {

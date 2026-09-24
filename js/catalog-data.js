@@ -26,14 +26,6 @@ window.MC_CATALOG = {
    "img": "image/cards/adonis-front.webp",
    "url": "shop/adonis.html"
   },
-  "path-of-privilege": {
-   "title": "Path of Privilege",
-   "kind": "limited",
-   "price": 2300,
-   "was": null,
-   "img": "image/cards/path-of-privilege-front.webp",
-   "url": "shop/path-of-privilege.html"
-  },
   "vanity": {
    "title": "Vanity",
    "kind": "limited",
@@ -90,14 +82,6 @@ window.MC_CATALOG = {
    "img": "image/cards/permission-front.webp",
    "url": "shop/permission.html"
   },
-  "adventure-awaits": {
-   "title": "Adventure Awaits",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/adventure-awaits-front.webp",
-   "url": "shop/adventure-awaits.html"
-  },
   "affordable-housing": {
    "title": "Affordable Housing",
    "kind": "open",
@@ -105,14 +89,6 @@ window.MC_CATALOG = {
    "was": 1500,
    "img": "image/cards/affordable-housing-front.webp",
    "url": "shop/affordable-housing.html"
-  },
-  "chelsea-contemporary": {
-   "title": "Chelsea Contemporary",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/chelsea-contemporary-front.webp",
-   "url": "shop/chelsea-contemporary.html"
   },
   "cornerstones": {
    "title": "Cornerstones",
@@ -138,22 +114,6 @@ window.MC_CATALOG = {
    "img": "image/cards/grecia-monroc-front.webp",
    "url": "shop/grecia-monroc.html"
   },
-  "le-monarch": {
-   "title": "Le Monarch",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/le-monarch-front.webp",
-   "url": "shop/le-monarch.html"
-  },
-  "liberty": {
-   "title": "Liberty",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/liberty-front.webp",
-   "url": "shop/liberty.html"
-  },
   "ronin": {
    "title": "Ronin",
    "kind": "open",
@@ -178,14 +138,6 @@ window.MC_CATALOG = {
    "img": "image/cards/reach-front.webp",
    "url": "shop/reach.html"
   },
-  "the-sun-room": {
-   "title": "The Sun Room",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/the-sun-room-front.webp",
-   "url": "shop/the-sun-room.html"
-  },
   "little-wanderer": {
    "title": "Little Wanderer",
    "kind": "open",
@@ -201,46 +153,6 @@ window.MC_CATALOG = {
    "was": 1500,
    "img": "image/cards/portal-front.webp",
    "url": "shop/portal.html"
-  },
-  "wild-stripes": {
-   "title": "Wild Stripes",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/wild-stripes-front.webp",
-   "url": "shop/wild-stripes.html"
-  },
-  "blue-curve": {
-   "title": "Blue Curve",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/blue-curve-front.webp",
-   "url": "shop/blue-curve.html"
-  },
-  "golden-repose": {
-   "title": "Golden Repose",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/golden-repose-front.webp",
-   "url": "shop/golden-repose.html"
-  },
-  "checkmate": {
-   "title": "Checkmate",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/checkmate-front.webp",
-   "url": "shop/checkmate.html"
-  },
-  "rooted": {
-   "title": "Rooted",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/rooted-front.webp",
-   "url": "shop/rooted.html"
   },
   "summer-field": {
    "title": "Summer Field",
@@ -258,14 +170,6 @@ window.MC_CATALOG = {
    "img": "image/cards/eye-of-the-storm-front.webp",
    "url": "shop/eye-of-the-storm.html"
   },
-  "blue-siren": {
-   "title": "Blue Siren",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/blue-siren-front.webp",
-   "url": "shop/blue-siren.html"
-  },
   "hidden-grove": {
    "title": "Hidden Grove",
    "kind": "open",
@@ -274,30 +178,6 @@ window.MC_CATALOG = {
    "img": "image/cards/hidden-grove-front.webp",
    "url": "shop/hidden-grove.html"
   },
-  "ember": {
-   "title": "Ember",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/ember-front.webp",
-   "url": "shop/ember.html"
-  },
-  "evening-stripes": {
-   "title": "Evening Stripes",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/evening-stripes-front.webp",
-   "url": "shop/evening-stripes.html"
-  },
-  "blue-temple": {
-   "title": "Blue Temple",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/blue-temple-front.webp",
-   "url": "shop/blue-temple.html"
-  },
   "moonsail": {
    "title": "Moonsail",
    "kind": "open",
@@ -305,22 +185,6 @@ window.MC_CATALOG = {
    "was": 1500,
    "img": "image/cards/moonsail-front.webp",
    "url": "shop/moonsail.html"
-  },
-  "silver-current": {
-   "title": "Silver Current",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/silver-current-front.webp",
-   "url": "shop/silver-current.html"
-  },
-  "shore-pup": {
-   "title": "Shore Pup",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/shore-pup-front.webp",
-   "url": "shop/shore-pup.html"
   },
   "tidewatcher": {
    "title": "Tidewatcher",
@@ -337,14 +201,6 @@ window.MC_CATALOG = {
    "was": 1500,
    "img": "image/cards/awakening-front.webp",
    "url": "shop/awakening.html"
-  },
-  "blue-canopy": {
-   "title": "Blue Canopy",
-   "kind": "open",
-   "price": 600,
-   "was": 1500,
-   "img": "image/cards/blue-canopy-front.webp",
-   "url": "shop/blue-canopy.html"
   },
   "gilded-cage": {
    "title": "Gilded Cage",
