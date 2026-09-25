@@ -27,7 +27,7 @@ Limited edition ACEO-sized art prints by JFeelgood. 50 numbered editions per des
 ├── journal.html
 ├── journal/                # Individual journal articles
 ├── shop/                   # Individual product pages
-├── artists/                # Artist pages
+├── artists/                # JFeelgood's artist page (/artists redirects here)
 ├── css/
 │   └── base.css            # Shared nav, footer, reset, fonts
 ├── fonts/                  # Self-hosted woff2 (Cormorant Garamond, DM Sans)

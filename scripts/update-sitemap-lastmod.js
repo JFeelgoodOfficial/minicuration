@@ -12,7 +12,6 @@ const urlToFile = {
   'https://minicuration.com/': 'index.html',
   'https://minicuration.com/shop.html': 'shop.html',
   'https://minicuration.com/about.html': 'about.html',
-  'https://minicuration.com/artists/index.html': 'artists/index.html',
   'https://minicuration.com/artists/jfeelgood.html': 'artists/jfeelgood.html',
   'https://minicuration.com/policies.html': 'policies.html',
   'https://minicuration.com/journal.html': 'journal.html',
