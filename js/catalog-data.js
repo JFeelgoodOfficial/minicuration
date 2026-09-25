@@ -85,6 +85,15 @@ window.MC_CATALOG = {
    "url": "shop/best-friend.html",
    "wide": false
   },
+  "vicarious": {
+   "title": "Vicarious",
+   "kind": "limited",
+   "price": 1000,
+   "was": 2300,
+   "img": "image/cards/vicarious-front.webp",
+   "url": "shop/vicarious.html",
+   "wide": false
+  },
   "permission": {
    "title": "Permission",
    "kind": "limited",

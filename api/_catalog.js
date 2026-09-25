@@ -109,6 +109,17 @@ const LIMITED = [
     painting: 'assets/images/opt/Best Friend by JFeelgood.webp',
   },
   {
+    slug: 'vicarious', title: 'Vicarious', medium: 'Acrylic on Canvas, Epoxy Resin',
+    quote: 'Living in the throes of imagination, I am aged by experiences of a thousand lifetimes, at the cost of growing closer to real people.',
+    description: [
+      'Living in the throes of imagination, I am aged by experiences of a thousand lifetimes, at the cost of growing closer to real people.',
+    ],
+    original: '29.5" × 30.5"', series: 'Self Work',
+    // The card was printed before this catalog existed: its images in
+    // image/cards/ are the printed front and back, not re-rendered.
+    painting: 'assets/images/opt/Vicarious by JFeelgood.webp',
+  },
+  {
     slug: 'permission', wide: true, title: 'Permission', medium: 'Acrylic on Canvas, Epoxy Resin',
     quote: 'Brilliant and mighty power. Sometimes, I seek it from others long before I consider it coming from myself.',
     description: [

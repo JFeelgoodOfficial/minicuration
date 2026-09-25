@@ -257,6 +257,16 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://minicuration.com/shop/vicarious.html</loc>
+    <image:image>
+      <image:loc>https://minicuration.com/image/cards/vicarious-front.webp</image:loc>
+      <image:title>Vicarious by JFeelgood — Limited Edition Mini Art Print</image:title>
+    </image:image>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://minicuration.com/shop/permission.html</loc>
     <image:image>
       <image:loc>https://minicuration.com/image/cards/permission-front.webp</image:loc>
