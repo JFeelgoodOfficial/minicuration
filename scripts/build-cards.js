@@ -31,8 +31,9 @@ const isLimited = (c) => c.kind === 'limited'
 const kindLabel = (c) => (isLimited(c) ? 'Limited Edition' : 'Open Edition')
 const front = (c) => `image/cards/${c.slug}-front.webp`
 const back = (c) => `image/cards/${c.slug}-back.webp`
-// Wide paintings are printed as landscape cards, like Veritas.
+// Wide paintings get a landscape front; every back is portrait.
 const dims = (c) => (c.wide ? 'width="816" height="600"' : 'width="600" height="816"')
+const backDims = 'width="600" height="816"'
 const BUNDLE_PRICE = BUNDLE.size * PRICES.open.price - BUNDLE.discount
 const bundleOffer = () => `Buy ${BUNDLE.size} unlimited pieces for ${money(BUNDLE_PRICE)} (save ${money(BUNDLE.discount)} &amp; it's free shipping!)`
 const medium = (c) => (isLimited(c) ? c.medium : c.material ? `${c.material} · Open edition` : 'Open edition')
@@ -214,7 +215,7 @@ ${nav('../')}
       </div>
       <p class="card-face-label">Front</p>
       <div class="product-image-wrap">
-        <img ${dims(c)} src="../${back(c)}" alt="${esc(c.title)} — card back${isLimited(c) ? ' with the artist statement and edition number' : ' with the title and artist name'}" loading="lazy" decoding="async"/>
+        <img ${backDims} src="../${back(c)}" alt="${esc(c.title)} — card back${isLimited(c) ? ' with the artist statement and edition number' : ' with the title and artist name'}" loading="lazy" decoding="async"/>
       </div>
       <p class="card-face-label">Back</p>
     </div>
@@ -230,12 +231,12 @@ ${isLimited(c)
 ${c.quote ? `      <blockquote class="product-quote">&ldquo;${esc(c.quote)}&rdquo;</blockquote>\n` : ''}${c.description ? `      <div class="expanded-note">
         <div class="section-label">${c.quote ? 'Artist Note' : 'About the Painting'}</div>
 ${c.description.map(p => `        <p>${esc(p)}</p>`).join('\n')}
-      </div>\n` : ''}      <div class="product-price">${priceHtml(c)} <span class="price-note">+ ${money(SHIPPING.amount)} US shipping per order</span>${isLimited(c) ? '' : `<span class="bundle-line">${bundleOffer()}</span>`}</div>
+      </div>\n` : ''}      <div class="product-price">${priceHtml(c)} <span class="price-note">+ ${money(SHIPPING.perCard)} US shipping per card, free on orders of ${money(SHIPPING.freeFrom)}+</span>${isLimited(c) ? '' : `<span class="bundle-line">${bundleOffer()}</span>`}</div>
 ${isLimited(c) ? '' : ADDONS.map(a => `      <label class="addon-opt"><input type="checkbox" data-addon-for="${c.slug}" value="${a.slug}"/> ${esc(a.offer)} <span>+${money(a.price)}</span></label>\n`).join('')}      <button type="button" class="btn-buy" data-add-to-cart="${c.slug}">Add to cart — ${money(c.price)}</button>
       <p class="trust-row">Secure checkout via Stripe<span class="sep">&middot;</span>Ships in 5&ndash;7 days<span class="sep">&middot;</span>14-day guarantee<span class="sep">&middot;</span><a href="../cart.html">View cart</a></p>
 ${c.original ? `      <div class="original-painting content-section">
         <div class="section-label">The Original Painting</div>
-        <p>The original ${esc(c.title)} is ${esc(c.medium.toLowerCase())}, ${esc(c.original)}, from the ${esc(c.series)} series.</p>
+        <p>The original ${esc(c.title)} is ${esc(c.medium.toLowerCase())}, ${esc(c.original)}, from the ${esc(c.series)} series.${c.series === 'Self Work' ? ' <a href="../journal/self-work-series.html">Read about the Self Work series</a>.' : ''}</p>
       </div>
 ` : ''}
       <div class="edition-details content-section">
@@ -287,7 +288,7 @@ function shopCard(c) {
                 <img ${dims(c)} src="${front(c)}" alt="${esc(c.title)} — original painting by JFeelgood" loading="lazy" decoding="async"/>
               </div>
               <div class="sc-face sc-back">
-                <img ${dims(c)} src="${back(c)}" alt="${esc(c.title)} — collector card back" loading="lazy" decoding="async"/>
+                <img ${backDims} src="${back(c)}" alt="${esc(c.title)} — collector card back" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>

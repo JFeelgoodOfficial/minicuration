@@ -89,6 +89,7 @@ async function handler(req, res) {
         shipping_rate_data: {
           type: 'fixed_amount',
           display_name: order.shipping ? SHIPPING.label : SHIPPING.freeLabel,
+          // $4 a card, free from $50; quote() has already worked it out.
           fixed_amount: { amount: order.shipping, currency: 'usd' },
         },
       }],

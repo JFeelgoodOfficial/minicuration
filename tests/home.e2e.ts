@@ -44,4 +44,26 @@ test.describe('Homepage — /', () => {
 
     expect(errors, `Console errors on load:\n${errors.join('\n')}`).toHaveLength(0)
   })
+
+  test('the spotlight arrow swaps the card front and back', async ({ page }) => {
+    await page.goto('/')
+    const swap = page.locator('[data-swap]').first()
+    const btn = swap.locator('.swap-btn')
+    await swap.scrollIntoViewIfNeeded()
+    await expect(swap).not.toHaveClass(/is-flipped/)
+    await btn.click()
+    await expect(swap).toHaveClass(/is-flipped/)
+    await expect(btn).toHaveAttribute('aria-pressed', 'true')
+    await btn.click()
+    await expect(swap).not.toHaveClass(/is-flipped/)
+  })
+
+  test('clicking the card behind brings it to the front', async ({ page }) => {
+    await page.goto('/')
+    const swap = page.locator('[data-swap]').first()
+    await swap.scrollIntoViewIfNeeded()
+    // The back card peeks out above and left of the front one.
+    await swap.locator('.swap-back').click({ position: { x: 20, y: 20 } })
+    await expect(swap).toHaveClass(/is-flipped/)
+  })
 })

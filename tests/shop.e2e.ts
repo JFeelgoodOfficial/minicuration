@@ -9,9 +9,9 @@ test.describe('Shop catalog — /shop.html', () => {
     await page.goto('/shop.html')
   })
 
-  test('both collections are present: 15 limited, 15 unlimited', async ({ page }) => {
-    await expect(page.locator('.shop-card')).toHaveCount(30)
-    await expect(page.locator('#limited .shop-card')).toHaveCount(15)
+  test('both collections are present: 16 limited, 15 unlimited', async ({ page }) => {
+    await expect(page.locator('.shop-card')).toHaveCount(31)
+    await expect(page.locator('#limited .shop-card')).toHaveCount(16)
     await expect(page.locator('#unlimited .shop-card')).toHaveCount(15)
   })
 
@@ -66,19 +66,22 @@ test.describe('Shop catalog — /shop.html', () => {
 
   test('cart cards: every one has an add-to-cart button, none a link', async ({ page }) => {
     const cartCards = page.locator('.shop-card:not([data-checkout="link"])')
-    await expect(cartCards).toHaveCount(24)
-    await expect(cartCards.locator('button[data-add-to-cart]')).toHaveCount(24)
+    await expect(cartCards).toHaveCount(25)
+    await expect(cartCards.locator('button[data-add-to-cart]')).toHaveCount(25)
     await expect(cartCards.locator('a.btn-buy')).toHaveCount(0)
   })
 
-  test('unlimited pricing: $6 with struck $15; new limited cards $23', async ({ page }) => {
+  test('unlimited pricing: $6 with struck $15; new limited cards $10 with struck $23', async ({ page }) => {
     for (const price of await page.locator('#unlimited .card-price').all()) {
       await expect(price).toContainText('$6')
       await expect(price.locator('s.price-was')).toContainText('$15')
     }
     const newLimited = page.locator('#limited .shop-card:not([data-checkout="link"]) .card-price')
-    await expect(newLimited).toHaveCount(9)
-    for (const price of await newLimited.all()) await expect(price).toHaveText('$23')
+    await expect(newLimited).toHaveCount(10)
+    for (const price of await newLimited.all()) {
+      await expect(price).toContainText('$10')
+      await expect(price.locator('s.price-was')).toContainText('$23')
+    }
   })
 
   test('Flip turns the card over without leaving the shop; clicking the picture opens its page', async ({ page }) => {

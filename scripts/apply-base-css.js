@@ -115,7 +115,6 @@ const targets = [
   '404.html',
   'policies.html',
   'artists/jfeelgood.html',
-  'artists/index.html',
 ]
 
 for (const f of targets) {

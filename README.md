@@ -27,7 +27,7 @@ Limited edition ACEO-sized art prints by JFeelgood. 50 numbered editions per des
 ├── journal.html
 ├── journal/                # Individual journal articles
 ├── shop/                   # Individual product pages
-├── artists/                # Artist pages
+├── artists/                # JFeelgood's artist page (/artists redirects here)
 ├── css/
 │   └── base.css            # Shared nav, footer, reset, fonts
 ├── fonts/                  # Self-hosted woff2 (Cormorant Garamond, DM Sans)
@@ -63,7 +63,7 @@ Vercel functions require env vars — use `vercel dev` with a `.env.local` for l
 ## The cart: more limited editions and the unlimited run
 
 The six original designs sell through their own Stripe Payment Links. Every
-other card — nine more limited editions of 50 and the unlimited (open-edition)
+other card — ten more limited editions of 50 and the unlimited (open-edition)
 archive cards — sells through the cart:
 
 | file | what it does |
@@ -74,11 +74,14 @@ archive cards — sells through the cart:
 | `js/cart.js`, `cart.html` | the cart, kept in the visitor's browser |
 | `api/checkout.js` | prices the cart from the catalog and opens Stripe Checkout |
 
-Prices: limited $23; unlimited $6 (shown against $15). The bundle is "buy 10
+Prices: limited $10 (on sale, shown against $23); unlimited $6 (shown against $15). The bundle is "buy 10
 unlimited pieces for $50 (save $10 & it's free shipping!)": every full 10
 unlimited cards in one order take $10 off (10 cards $50, 20 cards $100),
-applied as a single-use Stripe coupon created for that checkout, and any order
-with a full 10 ships free. Otherwise shipping is a flat $9 per order. Unlimited cards ship in a protective
+applied as a single-use Stripe coupon created for that checkout. US shipping
+on cart orders is $4 per card (add-ons ride free), and free once the order
+comes to $50 or more after the discount, which every full bundle does. The six
+original designs still charge whatever shipping their Payment Links are set
+to in Stripe. Unlimited cards ship in a protective
 plastic slip; a magnetically sealed acrylic case ($4) and an acrylic display
 stand ($1) are add-ons (`ADDONS` in the catalog), at most one of each per
 unlimited card in the order. Limited editions already come with both. Add-ons

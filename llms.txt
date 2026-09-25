@@ -1,6 +1,6 @@
 # Minicuration
 
-Minicuration produces museum-quality reproductions of original paintings on 2.5Ã—3.5-inch trading cards (ACEO format), in two collections. Limited editions are restricted to exactly 50 numbered prints per design and sealed in a rigid magnetic acrylic display case with a standing easel included. Unlimited cards are an open-edition run of archive paintings, not numbered. Every print reproduces a hand-painted original in acrylic, mixed media, and found materials (such as spray paint, ink, joint compound, latex, and epoxy resin) on canvas or wood panel. All work is currently by a single artist, JFeelgood (https://jfeelgood.com). The back of each card carries the artist name, medium, edition number, and the artist's own statement about the work. All prints are on sale for $10 USD through August 31, 2026 (regularly $23 USD); Sweet Dreams is $8 USD.
+Minicuration produces museum-quality reproductions of original paintings on 2.5Ã—3.5-inch trading cards (ACEO format), in two collections. Limited editions are restricted to exactly 50 numbered prints per design and sealed in a rigid magnetic acrylic display case with a standing easel included. Unlimited cards are an open-edition run of archive paintings, not numbered. Every print reproduces a hand-painted original in acrylic, mixed media, and found materials (such as spray paint, ink, joint compound, latex, and epoxy resin) on canvas or wood panel. Minicuration is the trading-card label of the artist JFeelgood (https://jfeelgood.com): every card on the site is JFeelgood's work, and the site sells no other artist's. The back of each card carries the artist name, medium, edition number, and the artist's own statement about the work. Limited editions are on sale for $10 USD (regularly $23 USD); Sweet Dreams is $8 USD.
 
 ## Key URLs
 
@@ -18,7 +18,7 @@ Minicuration produces museum-quality reproductions of original paintings on 2.5Ã
 - Veritas: https://minicuration.com/shop/veritas.html
 - Sweet Dreams: https://minicuration.com/shop/sweet-dreams.html
 
-## More limited editions ($23 USD, 50 numbered editions each, sold through the cart)
+## More limited editions (on sale at $10 USD, regularly $23; 50 numbered editions each, sold through the cart)
 
 - Poetry of Solace: https://minicuration.com/shop/poetry-of-solace.html
 - Adonis: https://minicuration.com/shop/adonis.html
@@ -28,11 +28,12 @@ Minicuration produces museum-quality reproductions of original paintings on 2.5Ã
 - Lush: https://minicuration.com/shop/lush.html
 - Businessman: https://minicuration.com/shop/businessman.html
 - Best Friend: https://minicuration.com/shop/best-friend.html
+- Vicarious: https://minicuration.com/shop/vicarious.html
 - Permission: https://minicuration.com/shop/permission.html
 
 ## Unlimited cards (open edition, $6 USD, regularly $15; 10 unlimited pieces for $50 USD with free shipping)
 
-Open-edition cards of archive paintings by JFeelgood. Not numbered and not limited; the card back carries the painting's title, the artist's name and minicuration.com. Each ships in a protective plastic slip; a magnetically sealed acrylic case ($4 USD) and an acrylic display stand ($1 USD) are add-ons, one of each per card. Limited editions already include a case and a stand. Shipping is $9 USD per order within the US, free on any order with 10 or more unlimited cards. Every further 10 unlimited cards in the same order saves another $10.
+Open-edition cards of archive paintings by JFeelgood. Not numbered and not limited; the card back carries the painting's title, the artist's name and minicuration.com. Each ships in a protective plastic slip; a magnetically sealed acrylic case ($4 USD) and an acrylic display stand ($1 USD) are add-ons, one of each per card. Limited editions already include a case and a stand. US shipping is $4 USD per card, free on orders of $50 USD or more. Every further 10 unlimited cards in the same order saves another $10.
 
 - Affordable Housing: https://minicuration.com/shop/affordable-housing.html
 - Cornerstones: https://minicuration.com/shop/cornerstones.html
@@ -62,6 +63,9 @@ Open-edition cards of archive paintings by JFeelgood. Not numbered and not limit
 
 ## Journal
 
+- Self Work, the series (sobriety, ego and growth; exhibited in Marfa during Chinati Weekend and at Central Machine Works on the East Austin Studio Tour): https://minicuration.com/journal/self-work-series.html
+- Limited Edition or Unlimited? How the two collections differ: https://minicuration.com/journal/limited-vs-unlimited.html
+- How to display and protect your cards: https://minicuration.com/journal/display-and-protect-cards.html
 - What Is ACEO: https://minicuration.com/journal/what-is-aceo.html
 - How Paintings Become Prints: https://minicuration.com/journal/how-paintings-become-prints.html
 - How to Collect ACEO: https://minicuration.com/journal/how-to-collect-aceo.html
