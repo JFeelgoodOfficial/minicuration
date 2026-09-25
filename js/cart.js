@@ -60,9 +60,11 @@
     })
     var bundles = Math.floor(open / DATA.bundle.size)
     var discount = bundles * DATA.bundle.discount
-    // Mirrors api/_catalog.js: a full bundle ships free.
-    var shipping = count(c) && !bundles ? DATA.shipping.amount : 0
+    var cards = 0
+    Object.keys(c).forEach(function (slug) { if (DATA.cards[slug].kind !== 'addon') cards += c[slug] })
+    var shipping = subtotal - discount >= DATA.shipping.freeFrom ? 0 : cards * DATA.shipping.perCard
     return { subtotal: subtotal, open: open, discount: discount, shipping: shipping,
+      toFree: Math.max(0, DATA.shipping.freeFrom - (subtotal - discount)),
       total: subtotal - discount + shipping,
       toNext: DATA.bundle.size - (open % DATA.bundle.size) }
   }
@@ -189,11 +191,12 @@
     summary.querySelector('[data-total]').textContent = money(t.total)
     var hint = summary.querySelector('[data-bundle-hint]')
     var more = 'Add ' + t.toNext + ' more unlimited card' + (t.toNext === 1 ? '' : 's')
-    hint.textContent = t.discount
-      ? 'Bundle applied: ' + money(t.discount) + ' off and free shipping. ' + more + ' to save another ' + money(DATA.bundle.discount) + '.'
+    var ship = t.shipping ? ' Add ' + money(t.toFree) + ' more for free shipping.' : ''
+    hint.textContent = (t.discount
+      ? 'Bundle applied: ' + money(t.discount) + ' off. ' + more + ' to save another ' + money(DATA.bundle.discount) + '.'
       : t.open
-        ? more + ': ' + DATA.bundle.size + ' for ' + money(DATA.bundle.price) + ', and shipping is free.'
-        : 'Buy ' + DATA.bundle.size + ' unlimited pieces for ' + money(DATA.bundle.price) + ' (save ' + money(DATA.bundle.discount) + ' & it\'s free shipping!)'
+        ? more + ': ' + DATA.bundle.size + ' for ' + money(DATA.bundle.price) + ', shipped free.'
+        : 'Buy ' + DATA.bundle.size + ' unlimited pieces for ' + money(DATA.bundle.price) + ' (save ' + money(DATA.bundle.discount) + ' & it\'s free shipping!)') + ship
   }
 
   function checkout(btn) {

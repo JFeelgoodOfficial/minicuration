@@ -71,14 +71,17 @@ test.describe('Shop catalog — /shop.html', () => {
     await expect(cartCards.locator('a.btn-buy')).toHaveCount(0)
   })
 
-  test('unlimited pricing: $6 with struck $15; new limited cards $23', async ({ page }) => {
+  test('unlimited pricing: $6 with struck $15; new limited cards $10 with struck $23', async ({ page }) => {
     for (const price of await page.locator('#unlimited .card-price').all()) {
       await expect(price).toContainText('$6')
       await expect(price.locator('s.price-was')).toContainText('$15')
     }
     const newLimited = page.locator('#limited .shop-card:not([data-checkout="link"]) .card-price')
     await expect(newLimited).toHaveCount(9)
-    for (const price of await newLimited.all()) await expect(price).toHaveText('$23')
+    for (const price of await newLimited.all()) {
+      await expect(price).toContainText('$10')
+      await expect(price.locator('s.price-was')).toContainText('$23')
+    }
   })
 
   test('Flip turns the card over without leaving the shop; clicking the picture opens its page', async ({ page }) => {

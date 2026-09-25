@@ -14,17 +14,19 @@
 
 // Prices in cents.
 const PRICES = {
-  limited: { price: 2300, was: null },
+  limited: { price: 1000, was: 2300 },
   open:    { price: 600,  was: 1500 },
 }
 
 // "Buy 10 unlimited pieces for $50": every full set of this many open-edition
 // cards in one order takes the discount off (10 cards $50, 20 cards $100,
-// 13 cards $68), and any order holding a full set ships free.
+// 13 cards $68).
 const BUNDLE = { size: 10, discount: 1000 }
 
-// One flat rate per order, the same $9 the Payment Links charge; free with a bundle.
-const SHIPPING = { amount: 900, label: 'US shipping', freeLabel: 'Free US shipping' }
+// US shipping is per card (add-ons ride along free), and any order whose
+// merchandise comes to $50 or more after the bundle discount ships free, which
+// includes every full bundle of ten.
+const SHIPPING = { perCard: 400, freeFrom: 5000, label: 'US shipping', freeLabel: 'Free US shipping' }
 
 const LIMITED = [
   {
@@ -213,10 +215,12 @@ function quote(items) {
   const bundles = Math.floor(openCount / BUNDLE.size)
   const subtotal = lines.reduce((sum, l) => sum + l.amount, 0)
   const discount = bundles * BUNDLE.discount
+  const cards = count('limited') + openCount
+  const shipping = subtotal - discount >= SHIPPING.freeFrom ? 0 : cards * SHIPPING.perCard
   return {
     lines, openCount, bundles, subtotal, discount,
-    shipping: bundles ? 0 : SHIPPING.amount,
-    total: subtotal - discount + (bundles ? 0 : SHIPPING.amount),
+    shipping,
+    total: subtotal - discount + shipping,
   }
 }
 

@@ -19,7 +19,7 @@ test.describe('Cart', () => {
   test('a limited card goes in once, then its button leads to the cart', async ({ page }) => {
     await page.goto('/shop/pride.html')
     const add = page.locator('[data-add-to-cart="pride"]')
-    await expect(add).toContainText('$23')
+    await expect(add).toContainText('$10')
     await add.click()
     await expect(page.locator('.nav-cart [data-cart-count]')).toHaveText('(1)')
     await add.click()
@@ -40,8 +40,15 @@ test.describe('Cart', () => {
 
     await page.locator('[data-qty="reach"][data-step="-1"]').click()
     await expect(page.locator('[data-discount-row]')).toBeHidden()
-    await expect(page.locator('[data-shipping]')).toHaveText('$9')
-    await expect(page.locator('[data-bundle-hint]')).toContainText('Add 1 more')
+    // Nine cards are $54: past $50, so still free.
+    await expect(page.locator('[data-shipping]')).toHaveText('Free')
+    await page.locator('[data-remove="reach"]').click()
+    // Four cards, $24: $4 a card.
+    await expect(page.locator('[data-shipping]')).toHaveText('$16')
+    await expect(page.locator('[data-bundle-hint]')).toContainText('Add $26 more for free shipping')
+    await page.locator('[data-qty="moonsail"][data-step="1"]').click()
+    await page.locator('[data-qty="moonsail"][data-step="-1"]').click()
+    await expect(page.locator('[data-bundle-hint]')).toContainText('Add 6 more')
   })
 
   test('checkout posts slugs and quantities only, then the thanks page empties the cart', async ({ page }) => {

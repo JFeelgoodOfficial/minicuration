@@ -7,7 +7,8 @@ window.MC_CATALOG = {
   "price": 5000
  },
  "shipping": {
-  "amount": 900,
+  "perCard": 400,
+  "freeFrom": 5000,
   "label": "US shipping",
   "freeLabel": "Free US shipping"
  },
@@ -15,8 +16,8 @@ window.MC_CATALOG = {
   "poetry-of-solace": {
    "title": "Poetry of Solace",
    "kind": "limited",
-   "price": 2300,
-   "was": null,
+   "price": 1000,
+   "was": 2300,
    "img": "image/cards/poetry-of-solace-front.webp",
    "url": "shop/poetry-of-solace.html",
    "wide": true
@@ -24,8 +25,8 @@ window.MC_CATALOG = {
   "adonis": {
    "title": "Adonis",
    "kind": "limited",
-   "price": 2300,
-   "was": null,
+   "price": 1000,
+   "was": 2300,
    "img": "image/cards/adonis-front.webp",
    "url": "shop/adonis.html",
    "wide": true
@@ -33,8 +34,8 @@ window.MC_CATALOG = {
   "vanity": {
    "title": "Vanity",
    "kind": "limited",
-   "price": 2300,
-   "was": null,
+   "price": 1000,
+   "was": 2300,
    "img": "image/cards/vanity-front.webp",
    "url": "shop/vanity.html",
    "wide": false
@@ -42,8 +43,8 @@ window.MC_CATALOG = {
   "the-king": {
    "title": "The King",
    "kind": "limited",
-   "price": 2300,
-   "was": null,
+   "price": 1000,
+   "was": 2300,
    "img": "image/cards/the-king-front.webp",
    "url": "shop/the-king.html",
    "wide": false
@@ -51,8 +52,8 @@ window.MC_CATALOG = {
   "pride": {
    "title": "Pride",
    "kind": "limited",
-   "price": 2300,
-   "was": null,
+   "price": 1000,
+   "was": 2300,
    "img": "image/cards/pride-front.webp",
    "url": "shop/pride.html",
    "wide": false
@@ -60,8 +61,8 @@ window.MC_CATALOG = {
   "lush": {
    "title": "Lush",
    "kind": "limited",
-   "price": 2300,
-   "was": null,
+   "price": 1000,
+   "was": 2300,
    "img": "image/cards/lush-front.webp",
    "url": "shop/lush.html",
    "wide": false
@@ -69,8 +70,8 @@ window.MC_CATALOG = {
   "businessman": {
    "title": "Businessman",
    "kind": "limited",
-   "price": 2300,
-   "was": null,
+   "price": 1000,
+   "was": 2300,
    "img": "image/cards/businessman-front.webp",
    "url": "shop/businessman.html",
    "wide": false
@@ -78,8 +79,8 @@ window.MC_CATALOG = {
   "best-friend": {
    "title": "Best Friend",
    "kind": "limited",
-   "price": 2300,
-   "was": null,
+   "price": 1000,
+   "was": 2300,
    "img": "image/cards/best-friend-front.webp",
    "url": "shop/best-friend.html",
    "wide": false
@@ -87,8 +88,8 @@ window.MC_CATALOG = {
   "permission": {
    "title": "Permission",
    "kind": "limited",
-   "price": 2300,
-   "was": null,
+   "price": 1000,
+   "was": 2300,
    "img": "image/cards/permission-front.webp",
    "url": "shop/permission.html",
    "wide": true

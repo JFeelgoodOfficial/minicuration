@@ -136,7 +136,11 @@
 
     /* Spinning card (shop grid — portrait 5:7 and landscape 7:5) */
     .sc-spin-wrap{position:relative;width:100%;aspect-ratio:5/7;}
-    .sc-spin-wrap.landscape{aspect-ratio:7/5;}
+    .sc-spin-wrap.landscape{aspect-ratio:7/5;transition:aspect-ratio .3s;}
+
+    /* A landscape card has a portrait back: flipped, the card stands up; mid-spin, the back sits whole inside the landscape frame. */
+    .sc-spin-wrap.landscape.flipped{aspect-ratio:5/7;}
+    .sc-spin-wrap.landscape .sc-back img{object-fit:contain;}
     .sc-spin-scene{perspective:800px;position:absolute;inset:0;}
     .sc-spin-3d{will-change:transform;width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:none;transform:rotateY(0deg);transition:transform .6s cubic-bezier(.4,0,.2,1);}
     .sc-spin-3d:hover{animation:sc-spin 14s linear infinite;}
@@ -219,7 +223,7 @@
   <div class="page-header">
     <p class="eyebrow">The Collection</p>
     <h1>50 prints. Pocket-sized.</h1>
-    <p>Reproductions of original paintings in two collections: numbered limited editions of 50, magnetically sealed in an acrylic case, and an unlimited run from the archive. Hover any card to set it spinning &mdash; or tap <strong>Flip</strong> to see the back. $9 US shipping per order.</p>
+    <p>Reproductions of original paintings in two collections: numbered limited editions of 50, magnetically sealed in an acrylic case, and an unlimited run from the archive. Hover any card to set it spinning &mdash; or tap <strong>Flip</strong> to see the back. US shipping is $4 a card, free on orders of $50+.</p>
     <div class="divider"></div>
   </div>
 
@@ -455,7 +459,7 @@
                 <img width="816" height="600" src="image/cards/poetry-of-solace-front.webp" alt="Poetry of Solace — original painting by JFeelgood" loading="lazy" decoding="async"/>
               </div>
               <div class="sc-face sc-back">
-                <img width="816" height="600" src="image/cards/poetry-of-solace-back.webp" alt="Poetry of Solace — collector card back" loading="lazy" decoding="async"/>
+                <img width="600" height="816" src="image/cards/poetry-of-solace-back.webp" alt="Poetry of Solace — collector card back" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>
@@ -471,12 +475,12 @@
         <p class="card-medium">From the series “The Lost”</p>
         <p class="card-concept">&ldquo;All suffering has cracks and crevices where life grows new... whether in tribulation or solace, the grand treasure is truth.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$23</span>
+          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="poetry-of-solace">Add to cart — $23</button>
+        <button type="button" class="btn-buy" data-add-to-cart="poetry-of-solace">Add to cart — $10</button>
         <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
@@ -489,7 +493,7 @@
                 <img width="816" height="600" src="image/cards/adonis-front.webp" alt="Adonis — original painting by JFeelgood" loading="lazy" decoding="async"/>
               </div>
               <div class="sc-face sc-back">
-                <img width="816" height="600" src="image/cards/adonis-back.webp" alt="Adonis — collector card back" loading="lazy" decoding="async"/>
+                <img width="600" height="816" src="image/cards/adonis-back.webp" alt="Adonis — collector card back" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>
@@ -505,12 +509,12 @@
         <p class="card-medium">Acrylic on Canvas</p>
         <p class="card-concept">&ldquo;A simple, honest look at vulnerability, beauty, and the stories we carry behind our gaze.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$23</span>
+          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="adonis">Add to cart — $23</button>
+        <button type="button" class="btn-buy" data-add-to-cart="adonis">Add to cart — $10</button>
         <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
@@ -539,12 +543,12 @@
         <p class="card-medium">Acrylic on Canvas, Epoxy Resin</p>
         <p class="card-concept">&ldquo;When I am selective in hearing, I feed the monster only what it wants to hear, instead of being open to opportunities for growth.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$23</span>
+          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="vanity">Add to cart — $23</button>
+        <button type="button" class="btn-buy" data-add-to-cart="vanity">Add to cart — $10</button>
         <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
@@ -573,12 +577,12 @@
         <p class="card-medium">Acrylic on Canvas, Epoxy Resin</p>
         <p class="card-concept">&ldquo;In being too bossy or vindictive, I lose sight of purpose and push others away due to uncouth behavior.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$23</span>
+          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="the-king">Add to cart — $23</button>
+        <button type="button" class="btn-buy" data-add-to-cart="the-king">Add to cart — $10</button>
         <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
@@ -607,12 +611,12 @@
         <p class="card-medium">Acrylic on Canvas, Epoxy Resin</p>
         <p class="card-concept">&ldquo;Work, no matter the urgency or size, has purpose. If I do not enjoy it, then the effort means nothing and I miss out on life.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$23</span>
+          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="pride">Add to cart — $23</button>
+        <button type="button" class="btn-buy" data-add-to-cart="pride">Add to cart — $10</button>
         <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
@@ -641,12 +645,12 @@
         <p class="card-medium">Acrylic on Canvas, Epoxy Resin</p>
         <p class="card-concept">&ldquo;Without them, I am the blank canvas… open to new ideas, new feelings, a new me.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$23</span>
+          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="lush">Add to cart — $23</button>
+        <button type="button" class="btn-buy" data-add-to-cart="lush">Add to cart — $10</button>
         <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
@@ -675,12 +679,12 @@
         <p class="card-medium">Acrylic on Canvas, Wood Panel, Epoxy Resin</p>
         <p class="card-concept">&ldquo;Alignment solely with wealth building and material systems keeps my emotional and spiritual growth inhibited.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$23</span>
+          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="businessman">Add to cart — $23</button>
+        <button type="button" class="btn-buy" data-add-to-cart="businessman">Add to cart — $10</button>
         <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
@@ -709,12 +713,12 @@
         <p class="card-medium">Acrylic on Canvas, Wood Panel, Epoxy Resin</p>
         <p class="card-concept">&ldquo;Vulnerability is the precursor to authenticity. I grow bigger than my fears because I have them.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$23</span>
+          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="best-friend">Add to cart — $23</button>
+        <button type="button" class="btn-buy" data-add-to-cart="best-friend">Add to cart — $10</button>
         <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
@@ -727,7 +731,7 @@
                 <img width="816" height="600" src="image/cards/permission-front.webp" alt="Permission — original painting by JFeelgood" loading="lazy" decoding="async"/>
               </div>
               <div class="sc-face sc-back">
-                <img width="816" height="600" src="image/cards/permission-back.webp" alt="Permission — collector card back" loading="lazy" decoding="async"/>
+                <img width="600" height="816" src="image/cards/permission-back.webp" alt="Permission — collector card back" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>
@@ -743,12 +747,12 @@
         <p class="card-medium">Acrylic on Canvas, Epoxy Resin</p>
         <p class="card-concept">&ldquo;Brilliant and mighty power. Sometimes, I seek it from others long before I consider it coming from myself.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$23</span>
+          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="permission">Add to cart — $23</button>
+        <button type="button" class="btn-buy" data-add-to-cart="permission">Add to cart — $10</button>
         <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
       </div>
     </div>
@@ -772,7 +776,7 @@
                 <img width="816" height="600" src="image/cards/affordable-housing-front.webp" alt="Affordable Housing — original painting by JFeelgood" loading="lazy" decoding="async"/>
               </div>
               <div class="sc-face sc-back">
-                <img width="816" height="600" src="image/cards/affordable-housing-back.webp" alt="Affordable Housing — collector card back" loading="lazy" decoding="async"/>
+                <img width="600" height="816" src="image/cards/affordable-housing-back.webp" alt="Affordable Housing — collector card back" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>
@@ -806,7 +810,7 @@
                 <img width="816" height="600" src="image/cards/cornerstones-front.webp" alt="Cornerstones — original painting by JFeelgood" loading="lazy" decoding="async"/>
               </div>
               <div class="sc-face sc-back">
-                <img width="816" height="600" src="image/cards/cornerstones-back.webp" alt="Cornerstones — collector card back" loading="lazy" decoding="async"/>
+                <img width="600" height="816" src="image/cards/cornerstones-back.webp" alt="Cornerstones — collector card back" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>
@@ -840,7 +844,7 @@
                 <img width="816" height="600" src="image/cards/gentrification-front.webp" alt="Gentrification — original painting by JFeelgood" loading="lazy" decoding="async"/>
               </div>
               <div class="sc-face sc-back">
-                <img width="816" height="600" src="image/cards/gentrification-back.webp" alt="Gentrification — collector card back" loading="lazy" decoding="async"/>
+                <img width="600" height="816" src="image/cards/gentrification-back.webp" alt="Gentrification — collector card back" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>
@@ -1010,7 +1014,7 @@
                 <img width="816" height="600" src="image/cards/little-wanderer-front.webp" alt="Little Wanderer — original painting by JFeelgood" loading="lazy" decoding="async"/>
               </div>
               <div class="sc-face sc-back">
-                <img width="816" height="600" src="image/cards/little-wanderer-back.webp" alt="Little Wanderer — collector card back" loading="lazy" decoding="async"/>
+                <img width="600" height="816" src="image/cards/little-wanderer-back.webp" alt="Little Wanderer — collector card back" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>
@@ -1044,7 +1048,7 @@
                 <img width="816" height="600" src="image/cards/summer-field-front.webp" alt="Summer Field — original painting by JFeelgood" loading="lazy" decoding="async"/>
               </div>
               <div class="sc-face sc-back">
-                <img width="816" height="600" src="image/cards/summer-field-back.webp" alt="Summer Field — collector card back" loading="lazy" decoding="async"/>
+                <img width="600" height="816" src="image/cards/summer-field-back.webp" alt="Summer Field — collector card back" loading="lazy" decoding="async"/>
               </div>
             </div>
           </div>
