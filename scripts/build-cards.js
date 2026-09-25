@@ -236,7 +236,7 @@ ${isLimited(c) ? '' : ADDONS.map(a => `      <label class="addon-opt"><input typ
       <p class="trust-row">Secure checkout via Stripe<span class="sep">&middot;</span>Ships in 5&ndash;7 days<span class="sep">&middot;</span>14-day guarantee<span class="sep">&middot;</span><a href="../cart.html">View cart</a></p>
 ${c.original ? `      <div class="original-painting content-section">
         <div class="section-label">The Original Painting</div>
-        <p>The original ${esc(c.title)} is ${esc(c.medium.toLowerCase())}, ${esc(c.original)}, from the ${esc(c.series)} series.</p>
+        <p>The original ${esc(c.title)} is ${esc(c.medium.toLowerCase())}, ${esc(c.original)}, from the ${esc(c.series)} series.${c.series === 'Self Work' ? ' <a href="../journal/self-work-series.html">Read about the Self Work series</a>.' : ''}</p>
       </div>
 ` : ''}
       <div class="edition-details content-section">
