@@ -109,7 +109,7 @@ const LIMITED = [
     painting: 'assets/images/opt/Best Friend by JFeelgood.webp',
   },
   {
-    slug: 'vicarious', title: 'Vicarious', medium: 'Acrylic on Canvas, Epoxy Resin',
+    slug: 'vicarious', title: 'Vicarious', medium: 'Acrylic, Latex, Torn Canvas, Epoxy Resin',
     quote: 'Living in the throes of imagination, I am aged by experiences of a thousand lifetimes, at the cost of growing closer to real people.',
     description: [
       'Living in the throes of imagination, I am aged by experiences of a thousand lifetimes, at the cost of growing closer to real people.',
