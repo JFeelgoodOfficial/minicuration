@@ -78,8 +78,11 @@ Prices: limited $10 (on sale, shown against $23); unlimited $6 (shown against $1
 unlimited pieces for $50 (save $10 & it's free shipping!)": every full 10
 unlimited cards in one order take $10 off (10 cards $50, 20 cards $100),
 applied as a single-use Stripe coupon created for that checkout. US shipping
-on cart orders is $4 per card (add-ons ride free), and free once the order
-comes to $50 or more after the discount, which every full bundle does. The six
+on cart orders is charged per order: $2 by stamped letter (untracked) when the
+cart holds only unlimited cards, $7 as a tracked Ground Advantage package when
+it holds a limited edition or any add-on, and free once the order comes to $50
+or more after the discount, which every full bundle does. The Stripe session's
+`ship` metadata (`letter` or `parcel`) says which way to send it. The six
 original designs still charge whatever shipping their Payment Links are set
 to in Stripe. Unlimited cards ship in a protective
 plastic slip; a magnetically sealed acrylic case ($4) and an acrylic display

@@ -7,9 +7,11 @@ window.MC_CATALOG = {
   "price": 5000
  },
  "shipping": {
-  "perCard": 400,
+  "letter": 200,
+  "parcel": 700,
   "freeFrom": 5000,
-  "label": "US shipping",
+  "letterLabel": "US shipping (letter mail, untracked)",
+  "parcelLabel": "US shipping (tracked package)",
   "freeLabel": "Free US shipping"
  },
  "cards": {

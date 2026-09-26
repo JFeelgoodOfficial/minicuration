@@ -43,8 +43,9 @@ test.describe('Cart', () => {
     // Nine cards are $54: past $50, so still free.
     await expect(page.locator('[data-shipping]')).toHaveText('Free')
     await page.locator('[data-remove="reach"]').click()
-    // Four cards, $24: $4 a card.
-    await expect(page.locator('[data-shipping]')).toHaveText('$16')
+    // Four unlimited cards, $24: one letter, $2.
+    await expect(page.locator('[data-shipping]')).toHaveText('$2')
+    await expect(page.locator('[data-shipping-how]')).toHaveText('(letter mail)')
     await expect(page.locator('[data-bundle-hint]')).toContainText('Add $26 more for free shipping')
     await page.locator('[data-qty="moonsail"][data-step="1"]').click()
     await page.locator('[data-qty="moonsail"][data-step="-1"]').click()
@@ -99,6 +100,9 @@ test.describe('Cart', () => {
     await expect(page.locator('.cart-line').nth(1)).toContainText('Magnetic Acrylic Case')
     await expect(page.locator('.cart-line').nth(2)).toContainText('Acrylic Stand')
     await expect(page.locator('[data-subtotal]')).toHaveText('$11')
+    // The case makes it a tracked package.
+    await expect(page.locator('[data-shipping]')).toHaveText('$7')
+    await expect(page.locator('[data-shipping-how]')).toHaveText('(tracked)')
     await expect(page.locator('.cart-upsell')).toHaveCount(0)
   })
 

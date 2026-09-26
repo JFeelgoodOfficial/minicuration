@@ -60,10 +60,9 @@
     })
     var bundles = Math.floor(open / DATA.bundle.size)
     var discount = bundles * DATA.bundle.discount
-    var cards = 0
-    Object.keys(c).forEach(function (slug) { if (DATA.cards[slug].kind !== 'addon') cards += c[slug] })
-    var shipping = subtotal - discount >= DATA.shipping.freeFrom ? 0 : cards * DATA.shipping.perCard
-    return { subtotal: subtotal, open: open, discount: discount, shipping: shipping,
+    var parcel = Object.keys(c).some(function (slug) { return DATA.cards[slug].kind !== 'open' })
+    var shipping = subtotal - discount >= DATA.shipping.freeFrom ? 0 : DATA.shipping[parcel ? 'parcel' : 'letter']
+    return { subtotal: subtotal, open: open, discount: discount, shipping: shipping, parcel: parcel,
       toFree: Math.max(0, DATA.shipping.freeFrom - (subtotal - discount)),
       total: subtotal - discount + shipping,
       toNext: DATA.bundle.size - (open % DATA.bundle.size) }
@@ -188,6 +187,7 @@
     disc.hidden = !t.discount
     summary.querySelector('[data-discount]').textContent = '−' + money(t.discount)
     summary.querySelector('[data-shipping]').textContent = t.shipping ? money(t.shipping) : 'Free'
+    summary.querySelector('[data-shipping-how]').textContent = t.parcel ? '(tracked)' : '(letter mail)'
     summary.querySelector('[data-total]').textContent = money(t.total)
     var hint = summary.querySelector('[data-bundle-hint]')
     var more = 'Add ' + t.toNext + ' more unlimited card' + (t.toNext === 1 ? '' : 's')

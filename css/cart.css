@@ -60,6 +60,7 @@ button.btn-buy[aria-disabled="true"]{cursor:not-allowed;}
 .cart-summary dl{display:grid;grid-template-columns:1fr auto;gap:10px 0;font-size:14px;margin-bottom:18px;}
 .cart-summary dl>div{display:contents;}
 .cart-summary dt{color:var(--muted);}
+.cart-ship-how{font-size:12px;}
 .cart-summary dd{text-align:right;padding-left:16px;}
 .cart-summary .row-total{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--text);padding-top:10px;border-top:1px solid var(--border);}
 .cart-summary [hidden]{display:none;}

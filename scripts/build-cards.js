@@ -231,7 +231,9 @@ ${isLimited(c)
 ${c.quote ? `      <blockquote class="product-quote">&ldquo;${esc(c.quote)}&rdquo;</blockquote>\n` : ''}${c.description ? `      <div class="expanded-note">
         <div class="section-label">${c.quote ? 'Artist Note' : 'About the Painting'}</div>
 ${c.description.map(p => `        <p>${esc(p)}</p>`).join('\n')}
-      </div>\n` : ''}      <div class="product-price">${priceHtml(c)} <span class="price-note">+ ${money(SHIPPING.perCard)} US shipping per card, free on orders of ${money(SHIPPING.freeFrom)}+</span>${isLimited(c) ? '' : `<span class="bundle-line">${bundleOffer()}</span>`}</div>
+      </div>\n` : ''}      <div class="product-price">${priceHtml(c)} <span class="price-note">${isLimited(c)
+        ? `+ ${money(SHIPPING.parcel)} tracked US shipping per order, free on orders of ${money(SHIPPING.freeFrom)}+`
+        : `+ ${money(SHIPPING.letter)} US shipping per order by letter mail (${money(SHIPPING.parcel)} tracked with a limited card, case or stand), free on orders of ${money(SHIPPING.freeFrom)}+`}</span>${isLimited(c) ? '' : `<span class="bundle-line">${bundleOffer()}</span>`}</div>
 ${isLimited(c) ? '' : ADDONS.map(a => `      <label class="addon-opt"><input type="checkbox" data-addon-for="${c.slug}" value="${a.slug}"/> ${esc(a.offer)} <span>+${money(a.price)}</span></label>\n`).join('')}      <button type="button" class="btn-buy" data-add-to-cart="${c.slug}">Add to cart — ${money(c.price)}</button>
       <p class="trust-row">Secure checkout via Stripe<span class="sep">&middot;</span>Ships in 5&ndash;7 days<span class="sep">&middot;</span>14-day guarantee<span class="sep">&middot;</span><a href="../cart.html">View cart</a></p>
 ${c.original ? `      <div class="original-painting content-section">
