@@ -78,8 +78,11 @@ Prices: limited $10 (on sale, shown against $23); unlimited $6 (shown against $1
 unlimited pieces for $50 (save $10 & it's free shipping!)": every full 10
 unlimited cards in one order take $10 off (10 cards $50, 20 cards $100),
 applied as a single-use Stripe coupon created for that checkout. US shipping
-on cart orders is $4 per card (add-ons ride free), and free once the order
-comes to $50 or more after the discount, which every full bundle does. The six
+on cart orders is charged per order: $2 by stamped letter (untracked) when the
+cart holds only unlimited cards, $7 as a tracked Ground Advantage package when
+it holds a limited edition or any add-on, and free once the order comes to $50
+or more after the discount, which every full bundle does. The Stripe session's
+`ship` metadata (`letter` or `parcel`) says which way to send it. The six
 original designs still charge whatever shipping their Payment Links are set
 to in Stripe. Unlimited cards ship in a protective
 plastic slip; a magnetically sealed acrylic case ($4) and an acrylic display
@@ -88,9 +91,9 @@ unlimited card in the order. Limited editions already come with both. Add-ons
 are logged in the `sales` tab with `edition_number` set to `add-on`. Wide
 paintings (`wide: true`) are printed as landscape cards, like Veritas.
 
-The home page used to advertise the $60 six-pack; it now advertises the
-unlimited bundle. The six-pack Payment Link itself still exists in Stripe
-until it is deactivated there, and the webhook still handles it. Change any of these in `api/_catalog.js`, run
+The $60 six-pack is retired. Deactivate its Payment Link in Stripe; a late
+purchase through it matches no product and arrives as an "ACTION NEEDED"
+email. Change any of the prices above in `api/_catalog.js`, run
 `node scripts/build-cards.js`, and commit.
 
 Checkout needs only `STRIPE_SECRET_KEY`, which the webhook already uses — no
@@ -238,9 +241,8 @@ Telling the buyer is deliberately a human step. A number stated automatically
 and later found wrong is worse than one stated a day later and correct — that
 drift is what sent a buyer the wrong number once already.
 
-The owner is also emailed on the three cases that need a human: a checkout that
-matched no product, an oversell refund, and a six-pack that included a sold-out
-edition. Email failures are logged but never fail the webhook — returning an
+The owner is also emailed on the cases that need a human: a checkout that
+matched no product, and an oversell refund. Email failures are logged but never fail the webhook — returning an
 error to Stripe would trigger a retry and decrement stock twice.
 
 Both emails require `RESEND_API_KEY` and a Resend-verified `minicuration.com`

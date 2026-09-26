@@ -88,12 +88,16 @@ async function handler(req, res) {
       shipping_options: [{
         shipping_rate_data: {
           type: 'fixed_amount',
-          display_name: order.shipping ? SHIPPING.label : SHIPPING.freeLabel,
-          // $4 a card, free from $50; quote() has already worked it out.
+          display_name: order.shipping
+            ? (order.method === 'parcel' ? SHIPPING.parcelLabel : SHIPPING.letterLabel)
+            : SHIPPING.freeLabel,
+          // Letter or tracked package, free from $50; quote() has already
+          // worked it out.
           fixed_amount: { amount: order.shipping, currency: 'usd' },
         },
       }],
-      metadata: { source: 'cart' },
+      // ship tells whoever packs the order: an envelope, or a tracked package.
+      metadata: { source: 'cart', ship: order.method },
       success_url: `${site}/thanks.html?order={CHECKOUT_SESSION_ID}`,
       cancel_url: `${site}/cart.html`,
     })

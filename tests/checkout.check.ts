@@ -58,17 +58,23 @@ async function checkout(
 test.describe('catalog pricing — quote()', () => {
   const open = (qty: number) => quote([{ slug: 'moonsail', qty }])
 
-  test('unlimited cards are $6 each; shipping is $4 a card', () => {
-    expect(open(1)).toMatchObject({ subtotal: 600, discount: 0, shipping: 400, total: 1000 })
-    expect(open(3)).toMatchObject({ subtotal: 1800, shipping: 1200, total: 3000 })
+  test('unlimited cards are $6 each and go by letter: $2 an order, however many', () => {
+    expect(open(1)).toMatchObject({ subtotal: 600, discount: 0, method: 'letter', shipping: 200, total: 800 })
+    expect(open(3)).toMatchObject({ subtotal: 1800, method: 'letter', shipping: 200, total: 2000 })
   })
 
-  test('orders of $50 or more ship free; add-ons count toward $50 but pay no shipping', () => {
-    expect(open(8)).toMatchObject({ subtotal: 4800, shipping: 3200 })
+  test('a limited card, case or stand makes it a $7 tracked package', () => {
+    expect(quote([{ slug: 'pride', qty: 1 }, { slug: 'lush', qty: 1 }])).toMatchObject({ subtotal: 2000, method: 'parcel', shipping: 700 })
+    expect(quote([{ slug: 'pride', qty: 1 }, { slug: 'moonsail', qty: 2 }])).toMatchObject({ method: 'parcel', shipping: 700 })
+    expect(quote([{ slug: 'moonsail', qty: 1 }, { slug: 'acrylic-case', qty: 1 }])).toMatchObject({ method: 'parcel', shipping: 700 })
+    expect(quote([{ slug: 'moonsail', qty: 1 }, { slug: 'acrylic-stand', qty: 1 }])).toMatchObject({ method: 'parcel', shipping: 700 })
+  })
+
+  test('orders of $50 or more ship free, add-ons included in the $50', () => {
+    expect(open(8)).toMatchObject({ subtotal: 4800, shipping: 200 })
     expect(open(9)).toMatchObject({ subtotal: 5400, shipping: 0 })
-    expect(quote([{ slug: 'pride', qty: 1 }, { slug: 'lush', qty: 1 }])).toMatchObject({ subtotal: 2000, shipping: 800 })
-    expect(quote([{ slug: 'moonsail', qty: 1 }, { slug: 'acrylic-case', qty: 1 }, { slug: 'acrylic-stand', qty: 1 }]))
-      .toMatchObject({ subtotal: 1100, shipping: 400 })
+    expect(quote([{ slug: 'moonsail', qty: 7 }, { slug: 'acrylic-case', qty: 2 }]))
+      .toMatchObject({ subtotal: 5000, method: 'parcel', shipping: 0 })
   })
 
   test('10 unlimited pieces for $50 with free shipping; $10 off every full 10', () => {
@@ -86,7 +92,7 @@ test.describe('catalog pricing — quote()', () => {
 
   test('the acrylic case is $4, one per unlimited card, and not part of the bundle', () => {
     expect(quote([{ slug: 'moonsail', qty: 2 }, { slug: 'acrylic-case', qty: 2 }]))
-      .toMatchObject({ openCount: 2, subtotal: 1200 + 800, discount: 0, total: 2000 + 800 })
+      .toMatchObject({ openCount: 2, subtotal: 1200 + 800, discount: 0, shipping: 700, total: 2000 + 700 })
     expect(quote([{ slug: 'moonsail', qty: 1 }, { slug: 'acrylic-case', qty: 2 }]).error).toBe('too_many_addons')
     expect(quote([{ slug: 'pride', qty: 1 }, { slug: 'acrylic-case', qty: 1 }]).error).toBe('too_many_addons')
     expect(quote([{ slug: 'moonsail', qty: 9 }, { slug: 'acrylic-case', qty: 9 }]).discount).toBe(0)
@@ -121,7 +127,7 @@ test.describe('/api/checkout', () => {
     expect(session.line_items.map(l => [l.price_data.product_data.metadata.slug, l.quantity, l.price_data.unit_amount]))
       .toEqual([['moonsail', 3, 600], ['pride', 1, 1000]])
     expect(session.discounts).toBeUndefined()
-    expect(session.metadata.source).toBe('cart')
+    expect(session.metadata).toEqual({ source: 'cart', ship: 'parcel' })
     expect(session.success_url).toBe('https://minicuration.com/thanks.html?order={CHECKOUT_SESSION_ID}')
   })
 
@@ -138,7 +144,11 @@ test.describe('/api/checkout', () => {
     const { calls } = await checkout({ items: [{ slug: 'moonsail', qty: 1 }, { slug: 'acrylic-case', qty: 1 }] })
     const session = calls.find(c => c.kind === 'session')!.args as {
       line_items: { quantity: number; price_data: { unit_amount: number; product_data: { name: string; metadata: Record<string, string> } } }[]
+      shipping_options: { shipping_rate_data: { display_name: string; fixed_amount: { amount: number } } }[]
     }
+    expect(session.shipping_options[0].shipping_rate_data).toMatchObject({
+      display_name: 'US shipping (tracked package)', fixed_amount: { amount: 700 },
+    })
     const line = session.line_items[1]
     expect(line.price_data.unit_amount).toBe(400)
     expect(line.price_data.product_data.metadata).toEqual({ slug: 'acrylic-case', kind: 'addon' })

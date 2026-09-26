@@ -3,7 +3,6 @@ const Stripe = require('stripe')
 const {
   store, sendMail, notifyEmail, orderNumberFrom, PRODUCT_NAMES, EDITION_SIZE,
 } = require('./_lib.js')
-const { SIX_PACK_SLUGS } = require('./_constants.js')
 const { BY_SLUG } = require('./_catalog.js')
 
 const nameOf = (slug) => PRODUCT_NAMES[slug] || BY_SLUG[slug]?.title || slug
@@ -36,15 +35,7 @@ const PRICE_TO_SLUG = {
   'price_1TYGcr2mxhfkNl2YAUNVRpw4':        'sweet-dreams',
 }
 
-// Prices that sell every edition in one checkout (the $60 six-pack).
-const BUNDLE_PRICE_IDS = new Set([
-  'price_1U07vq2mxhfkNl2Y8cgwskpF',
-])
-
 const ALL_SLUGS = Object.keys(PRODUCT_NAMES)
-
-// The six-pack sells every edition of the original six in one checkout.
-const BUNDLE_PATTERN = /six[\s-]?pack|bundle|complete\s+(set|collection)|all\s+six/i
 
 // "Dream Mountain — Limited Edition Mini Art Print" → 'dream-mountain'
 function slugFromName(name) {
@@ -59,8 +50,9 @@ function slugFromName(name) {
 // name each card in the product's metadata: limited cards become slugs, which
 // reserve a numbered print, and open-edition cards and add-ons are listed with their
 // quantity, since they have no inventory. Payment Link checkouts carry no
-// metadata: a six-pack there is all six originals, otherwise one slug per
-// line item, found by price ID or product name.
+// metadata: one slug per line item, found by price ID or product name. The
+// retired $60 six-pack link matches nothing, so a late purchase through it
+// lands in the "matched no product" email for a human to fulfil.
 function resolveSlugs(lineItems) {
   const slugs = []
   const open = []
@@ -76,18 +68,13 @@ function resolveSlugs(lineItems) {
     }
   }
 
-  const isBundle = legacy.some(item =>
-    BUNDLE_PRICE_IDS.has(item.price?.id)
-    || BUNDLE_PATTERN.test(item.description || item.price?.product?.name || ''))
-  if (isBundle) return { slugs: [...SIX_PACK_SLUGS], isBundle: true, open }
-
   for (const item of legacy) {
     const slug = PRICE_TO_SLUG[item.price?.id]
       || slugFromName(item.price?.product?.name)
       || slugFromName(item.description)
     if (slug) slugs.push(slug)
   }
-  return { slugs: [...new Set(slugs)], isBundle: false, open }
+  return { slugs: [...new Set(slugs)], open }
 }
 
 // ── Deactivate a Payment Link so it can no longer be purchased ────────────────
@@ -206,7 +193,7 @@ async function handler(req, res) {
     limit: 100,
     expand: ['data.price.product'],
   })
-  const { slugs, isBundle, open } = resolveSlugs(lineItems.data)
+  const { slugs, open } = resolveSlugs(lineItems.data)
   const fromCart = session.metadata?.source === 'cart'
 
   if (!slugs.length && !open.length) {
@@ -239,7 +226,6 @@ async function handler(req, res) {
   const sold      = []  // { slug, editionNumber } — editionNumber is provisional
   const soldOut   = []  // nothing left to reserve when this purchase landed
   let   emptiedAn = false
-  let   emptiedSix = false  // one of the six-pack designs just ran out
 
   for (const slug of slugs) {
     const { data: row, error } = await store().claimEdition(slug, session.id)
@@ -252,20 +238,12 @@ async function handler(req, res) {
     if (row.claimed == null) { soldOut.push(slug); continue }
 
     sold.push({ slug, editionNumber: row.claimed })
-    if (row.remaining === 0) {
-      emptiedAn = true
-      if (SIX_PACK_SLUGS.includes(slug)) emptiedSix = true
-    }
+    if (row.remaining === 0) emptiedAn = true
   }
-  if (soldOut.some(slug => SIX_PACK_SLUGS.includes(slug))) emptiedSix = true
 
-  // A sold-out edition also makes the six-pack unfulfillable, so close that link
-  // too when its ID is configured. Cart checkouts have no link of their own;
-  // api/checkout.js refuses a sold-out design before payment instead.
-  if (emptiedAn || soldOut.length) {
-    await deactivatePaymentLink(session.payment_link)
-    if (!isBundle && emptiedSix) await deactivatePaymentLink(process.env.STRIPE_BUNDLE_LINK_ID)
-  }
+  // Close a Payment Link whose design just ran out. Cart checkouts have no link
+  // of their own; api/checkout.js refuses a sold-out design before payment.
+  if (emptiedAn || soldOut.length) await deactivatePaymentLink(session.payment_link)
 
   // A cart can hold several cards, so a limited card that lost the race for its
   // last print is refunded on its own and everything else still ships.
@@ -305,30 +283,6 @@ async function handler(req, res) {
       return res.status(200).json({ received: true, warning: 'sold_out_refunded' })
     }
   } else if (soldOut.length) {
-    if (isBundle) {
-      // Never auto-refund a whole six-pack: the other editions in it are valid
-      // and shipping. Refund amount is a judgement call, so escalate instead.
-      console.error(
-        `MANUAL REVIEW — six-pack ${orderNumber} included sold-out edition(s): ${soldOut.join(', ')}. ` +
-        `Fulfilled: ${sold.map(s => s.slug).join(', ') || 'none'}. Partial refund required.`)
-      await sendMail({
-        to:      notifyEmail(),
-        subject: `ACTION NEEDED — six-pack ${orderNumber} needs a partial refund`,
-        html: `
-          <p>A six-pack sold, but ${soldOut.length} edition(s) in it were already gone.
-             Nothing was refunded automatically — the rest of the set is valid and shipping.</p>
-          <p><strong>Order:</strong> ${orderNumber}<br>
-             <strong>Sold out:</strong> ${soldOut.join(', ')}<br>
-             <strong>Fulfilled:</strong> ${sold.map(s => `${s.slug} #${s.editionNumber}`).join(', ') || 'none'}<br>
-             <strong>Total paid:</strong> ${formatAmount(session)}<br>
-             <strong>Buyer:</strong> ${session.customer_details?.email || 'unknown'}<br>
-             <strong>Stripe session:</strong> ${session.id}</p>
-          <p>Issue a partial refund in Stripe and tell the buyer what shipped.</p>
-        `,
-      })
-      return res.status(200).json({ received: true, warning: 'bundle_partial_sold_out', soldOut })
-    }
-
     // Single print that was already gone: close the link and refund in full.
     console.error(`OVERSELL BLOCKED: ${soldOut.join(', ')} already sold out — refunding ${session.id}`)
     let refunded = false
@@ -383,7 +337,7 @@ async function handler(req, res) {
 
   // No buyer name or address in logs — the order number is enough to find the
   // sale in the ledger or Stripe, and log retention is not the place for PII.
-  console.log(`Sold${isBundle ? ' (six-pack)' : ''} ${orderNumber}: ` +
+  console.log(`Sold ${orderNumber}: ` +
     [...sold.map(s => `${s.slug} (provisional edition ${s.editionNumber}/${EDITION_SIZE})`),
      ...open.map(o => `${o.slug} ×${o.qty} (open edition)`)].join(', '))
 
@@ -400,12 +354,10 @@ async function handler(req, res) {
   // turns out wrong is worse than one stated a day later and correct.
   await sendMail({
     to:      session.customer_details?.email,
-    subject: isBundle
-      ? `Order ${orderNumber} — your Minicuration six-pack is confirmed`
-      : `Order ${orderNumber} — your Minicuration ${cardCount > 1 ? 'order' : 'print'} is confirmed`,
+    subject: `Order ${orderNumber} — your Minicuration ${cardCount > 1 ? 'order' : 'print'} is confirmed`,
     html: `
       <p>Thank you for your order. Your order number is <strong>${orderNumber}</strong>.</p>
-      <p>You ordered${isBundle ? ' the complete collection:' : ':'}</p>
+      <p>You ordered:</p>
       <ul>${productList}</ul>
       ${sold.length ? `<p>${sold.length > 1 ? 'Each limited print is' : 'Your limited print is'} hand-numbered from an
          edition of ${EDITION_SIZE}. We confirm
@@ -422,7 +374,7 @@ async function handler(req, res) {
     to:      notifyEmail(),
     subject: `New order ${orderNumber} — ${[...sold.map(s => nameOf(s.slug)), ...open.map(o => nameOf(o.slug))].join(', ')}`,
     html: `
-      <p><strong>${orderNumber}</strong>${isBundle ? ' — six-pack' : ''}</p>
+      <p><strong>${orderNumber}</strong></p>
       <ul>${sold.map(({ slug, editionNumber }) =>
         `<li><strong>${nameOf(slug)}</strong> — reserved box
          <strong>${editionNumber}</strong> (provisional)</li>`).join('')}${openList.join('')}</ul>
@@ -448,7 +400,7 @@ async function handler(req, res) {
     `,
   })
 
-  return res.status(200).json({ received: true, orderNumber, isBundle, sold, open })
+  return res.status(200).json({ received: true, orderNumber, sold, open })
 }
 
 // Disable Vercel's body parser so we can read the raw body for Stripe verification

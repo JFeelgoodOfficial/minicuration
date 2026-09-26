@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test'
 //
 /* eslint-disable @typescript-eslint/no-var-requires */
 const SHEETS = require.resolve('../api/_sheets.js')
-const { PRODUCT_NAMES, SIX_PACK_SLUGS, EDITION_SIZE } = require('../api/_constants.js')
+const { PRODUCT_NAMES, ORIGINAL_SLUGS, EDITION_SIZE } = require('../api/_constants.js')
 
 const EDITION_COLUMNS = ['slug', 'edition_number', 'status', 'reserved_by', 'reserved_at', 'updated_at']
 const SALES_COLUMNS = ['id', 'slug', 'edition_number', 'order_number', 'buyer_email', 'buyer_name', 'stripe_session', 'created_at', 'shipped_at']
@@ -190,9 +190,9 @@ test.describe('sheets store — recording an order', () => {
     expect(row.buyer_email).toBe('ada@example.com')
   })
 
-  test('a six-pack appends one row per print, all sharing the order number', async () => {
+  test('an order of several prints appends one row per print, all sharing the order number', async () => {
     const { store, tabs } = newStore()
-    const bundle = SIX_PACK_SLUGS.map((slug: string, i: number) => ({
+    const bundle = ORIGINAL_SLUGS.map((slug: string, i: number) => ({
       slug, edition_number: i + 1, order_number: 'MC-BUNDLE01',
       buyer_email: 'ada@example.com', buyer_name: 'Ada', stripe_session: 'cs_live_bundle',
     }))

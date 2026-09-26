@@ -23,10 +23,18 @@ const PRICES = {
 // 13 cards $68).
 const BUNDLE = { size: 10, discount: 1000 }
 
-// US shipping is per card (add-ons ride along free), and any order whose
+// US shipping is charged per order, by how it has to travel. Unlimited cards in
+// their plastic slips go as a stamped letter (untracked). Anything rigid, which
+// is every limited edition (it comes cased, with a stand) and any case or stand
+// add-on, goes as a tracked Ground Advantage package. Any order whose
 // merchandise comes to $50 or more after the bundle discount ships free, which
 // includes every full bundle of ten.
-const SHIPPING = { perCard: 400, freeFrom: 5000, label: 'US shipping', freeLabel: 'Free US shipping' }
+const SHIPPING = {
+  letter: 200, parcel: 700, freeFrom: 5000,
+  letterLabel: 'US shipping (letter mail, untracked)',
+  parcelLabel: 'US shipping (tracked package)',
+  freeLabel: 'Free US shipping',
+}
 
 const LIMITED = [
   {
@@ -226,11 +234,11 @@ function quote(items) {
   const bundles = Math.floor(openCount / BUNDLE.size)
   const subtotal = lines.reduce((sum, l) => sum + l.amount, 0)
   const discount = bundles * BUNDLE.discount
-  const cards = count('limited') + openCount
-  const shipping = subtotal - discount >= SHIPPING.freeFrom ? 0 : cards * SHIPPING.perCard
+  const method = count('limited') + count('addon') ? 'parcel' : 'letter'
+  const shipping = subtotal - discount >= SHIPPING.freeFrom ? 0 : SHIPPING[method]
   return {
     lines, openCount, bundles, subtotal, discount,
-    shipping,
+    method, shipping,
     total: subtotal - discount + shipping,
   }
 }

@@ -8,14 +8,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="theme-color" content="#f5efe4"/>
   <title>Thank You — Your Order Is Confirmed | Minicuration</title>
-  <meta name="description" content="Your Minicuration order is confirmed. Your numbered limited edition print ships within 5–7 business days."/>
+  <meta name="description" content="Your Minicuration order is confirmed and ships within 5–7 business days."/>
   <meta name="robots" content="noindex, follow"/>
   <link rel="canonical" href="https://minicuration.com/thanks.html"/>
   <link rel="stylesheet" href="/css/theme.css"/>
   <link rel="stylesheet" href="/css/base.css"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     .thanks{min-height:70vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:160px 24px 60px;}
     .thanks .eyebrow{font-size:11px;letter-spacing:.35em;text-transform:uppercase;color:var(--crimson);margin-bottom:20px;}
@@ -39,14 +36,14 @@
     .cross{padding:80px 48px;max-width:1100px;margin:0 auto;text-align:center;}
     .cross .section-label{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--crimson);margin-bottom:12px;}
     .cross h2{font-family:'Cormorant Garamond',serif;font-size:clamp(26px,3vw,40px);font-weight:300;margin-bottom:40px;}
-    .cross-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+    .cross-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:24px;}
     .cross-card{text-decoration:none;color:var(--text);border:1px solid var(--border);border-radius:6px;overflow:hidden;transition:border-color .3s,transform .3s;}
     .cross-card:hover{border-color:rgb(158 43 24 / 45%);transform:translateY(-4px);}
-    .cross-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
+    .cross-card img{width:100%;aspect-ratio:600/816;object-fit:cover;display:block;}
     .cross-card-body{padding:14px 16px;}
     .cross-card-body h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;margin-bottom:4px;}
     .cross-card-body p{font-size:12px;color:var(--muted);}
-    @media(max-width:768px){.cross{padding:60px 20px;}.cross-grid{grid-template-columns:1fr;}.thanks{padding:130px 20px 50px;}}
+    @media(max-width:768px){.cross{padding:60px 20px;}.cross-grid{grid-template-columns:repeat(2,1fr);gap:14px;}.thanks{padding:130px 20px 50px;}}
   </style>
 </head>
 <body>
@@ -57,24 +54,25 @@
       <li><a href="shop.html">Shop</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="journal.html">Journal</a></li>
+      <li><a href="cart.html" class="nav-cart">Cart<span data-cart-count></span></a></li>
       <li><a href="shop.html" class="nav-cta">Shop Prints</a></li>
     </ul>
   </nav>
 
   <section class="thanks">
     <p class="eyebrow">Order Confirmed</p>
-    <h1>Thank you. Your edition is reserved.</h1>
-    <p>We've received your order. A freshly printed limited edition Minicuration is heading to your mailbox — that number is yours alone, and no other collector holds it.</p>
+    <h1>Thank you for your order.</h1>
+    <p>We&rsquo;ve received it, and a confirmation with your order number is on its way to your inbox. We&rsquo;ll email you again when it ships.</p>
     <div class="divider"></div>
     <div class="order-facts">
-      <div><strong>Ships in 5–7 days</strong>Tracked, packed flat and protected</div>
-      <div><strong>Numbered for you</strong>Edition + artist statement on the back</div>
+      <div><strong>Ships in 5–7 days</strong>Packed flat and protected</div>
+      <div><strong>Questions?</strong>Reply to your confirmation email</div>
     </div>
   </section>
 
   <section class="reclaim">
     <h2>Don't miss the next drop</h2>
-    <p>Every design is capped at 50 and never reprinted. Get notified the moment the next edition lands.</p>
+    <p>New cards arrive as JFeelgood paints them. Get a note when the next ones land.</p>
     <form class="email-form" data-newsletter-source="thanks" action="https://formspree.io/f/mzdwrrpa" method="POST">
       <input type="email" name="email" placeholder="your@email.com" aria-label="Email address" required/>
       <button type="submit">Notify Me</button>
@@ -83,22 +81,25 @@
   </section>
 
   <section class="cross">
-    <p class="section-label">Complete the Set</p>
-    <h2>Collectors rarely stop at one.</h2>
-    <div class="cross-grid">
-      <a href="shop/dreamfall.html" class="cross-card">
-        <img width="800" height="800" src="image/dreamfall-case1.webp" alt="Dreamfall by JFeelgood — limited edition mini art print" loading="lazy" decoding="async"/>
-        <div class="cross-card-body"><h3>Dreamfall</h3><p>by JFeelgood · $10</p></div>
+    <p class="section-label">Keep Collecting</p>
+    <h2>More from JFeelgood</h2>
+    <!-- Filled with four cards picked at random from the catalog; the three
+         below stay if JavaScript is off. -->
+    <div class="cross-grid" id="more-cards">
+      <a href="shop/vanity.html" class="cross-card">
+        <img width="600" height="816" src="image/cards/vanity-front.webp" alt="Vanity by JFeelgood — limited edition card" loading="lazy" decoding="async"/>
+        <div class="cross-card-body"><h3>Vanity</h3><p>Limited edition</p></div>
       </a>
-      <a href="shop/dream-mountain.html" class="cross-card">
-        <img width="800" height="800" src="image/dreammountain-case1.webp" alt="Dream Mountain by JFeelgood — limited edition mini art print" loading="lazy" decoding="async"/>
-        <div class="cross-card-body"><h3>Dream Mountain</h3><p>by JFeelgood · $10</p></div>
+      <a href="shop/moonsail.html" class="cross-card">
+        <img width="600" height="816" src="image/cards/moonsail-front.webp" alt="Moonsail by JFeelgood — unlimited card" loading="lazy" decoding="async"/>
+        <div class="cross-card-body"><h3>Moonsail</h3><p>Unlimited</p></div>
       </a>
-      <a href="shop/veritas.html" class="cross-card">
-        <img width="800" height="800" src="image/veritas-case1.webp" alt="Veritas by JFeelgood — limited edition mini art print" loading="lazy" decoding="async"/>
-        <div class="cross-card-body"><h3>Veritas</h3><p>by JFeelgood · $10</p></div>
+      <a href="shop/lush.html" class="cross-card">
+        <img width="600" height="816" src="image/cards/lush-front.webp" alt="Lush by JFeelgood — limited edition card" loading="lazy" decoding="async"/>
+        <div class="cross-card-body"><h3>Lush</h3><p>Limited edition</p></div>
       </a>
     </div>
+    <p style="margin-top:36px;"><a href="shop.html" class="btn-primary" style="display:inline-block;background:var(--accent);color:var(--on-accent);padding:14px 32px;text-decoration:none;font-size:12px;letter-spacing:.15em;text-transform:uppercase;border-radius:2px;">Browse the shop</a></p>
   </section>
 
   <footer>
@@ -115,6 +116,31 @@
   <!-- Empties the cart after a cart checkout (it returns here with ?order=). -->
   <script defer src="/js/catalog-data.js"></script>
   <script defer src="/js/cart.js"></script>
+  <script>
+    // Four cards at random from the cart catalog (js/catalog-data.js, loaded
+    // deferred above), with their current price.
+    document.addEventListener('DOMContentLoaded', function () {
+      const data = window.MC_CATALOG
+      const grid = document.getElementById('more-cards')
+      if (!data || !grid) return
+      const cards = Object.keys(data.cards)
+        .map(function (slug) { return Object.assign({ slug: slug }, data.cards[slug]) })
+        // Upright cards only, so the row lines up; add-ons are not cards.
+        .filter(function (c) { return (c.kind === 'limited' || c.kind === 'open') && !c.wide })
+      for (let i = cards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        const t = cards[i]; cards[i] = cards[j]; cards[j] = t
+      }
+      const esc = function (v) { return String(v).replace(/[&<>"]/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch] }) }
+      const money = function (c) { return '$' + (c % 100 ? (c / 100).toFixed(2) : c / 100) }
+      grid.innerHTML = cards.slice(0, 4).map(function (c) {
+        const kind = c.kind === 'limited' ? 'Limited edition' : 'Unlimited'
+        return '<a href="' + data.root + c.url + '" class="cross-card">' +
+          '<img width="600" height="816" src="' + data.root + c.img + '" alt="' + esc(c.title) + ' by JFeelgood" loading="lazy" decoding="async"/>' +
+          '<div class="cross-card-body"><h3>' + esc(c.title) + '</h3><p>' + kind + ' · ' + money(c.price) + '</p></div></a>'
+      }).join('')
+    })
+  </script>
   <script defer src="/js/analytics.js"></script>
   <script src="/js/nav.js"></script>
 </body>
