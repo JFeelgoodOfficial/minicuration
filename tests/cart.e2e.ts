@@ -68,6 +68,15 @@ test.describe('Cart', () => {
     await expect.poll(() => page.evaluate(() => localStorage.getItem('mc-cart'))).toBe('{}')
   })
 
+  test('the thanks page is generic and suggests four cards from the catalog', async ({ page }) => {
+    await page.goto('/thanks?order=cs_test_123')
+    await expect(page.locator('h1')).toHaveText('Thank you for your order.')
+    const cards = page.locator('#more-cards .cross-card')
+    await expect(cards).toHaveCount(4)
+    await expect(cards.first()).toHaveAttribute('href', /^\/shop\/[a-z0-9-]+\.html$/)
+    await expect(cards.first()).toContainText(/(Limited edition|Unlimited) · \$\d+/)
+  })
+
   test('a card that sold out at checkout is taken out of the cart with a note', async ({ page }) => {
     await page.route('**/api/checkout', route =>
       route.fulfill({ status: 409, json: { error: 'sold_out', slugs: ['lush'] } }))

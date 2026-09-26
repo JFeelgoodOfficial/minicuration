@@ -15,7 +15,7 @@
 const fs = require('fs')
 const path = require('path')
 const { CARDS, ADDONS, CASE, STAND, PRICES, BUNDLE, SHIPPING } = require('../api/_catalog.js')
-const { PRODUCT_NAMES, SIX_PACK_SLUGS } = require('../api/_constants.js')
+const { PRODUCT_NAMES, ORIGINAL_SLUGS } = require('../api/_constants.js')
 
 const ROOT = path.join(__dirname, '..')
 const SITE = 'https://minicuration.com'
@@ -351,7 +351,7 @@ function build() {
   splice('shop.html', 'cards:limited', limited.map(shopCard).join('\n'))
   splice('shop.html', 'cards:open', open.map(shopCard).join('\n'))
   const items = [
-    ...SIX_PACK_SLUGS.map(slug => ({ slug, name: PRODUCT_NAMES[slug] })),
+    ...ORIGINAL_SLUGS.map(slug => ({ slug, name: PRODUCT_NAMES[slug] })),
     ...CARDS.map(c => ({ slug: c.slug, name: c.title })),
   ]
   splice('shop.html', 'cards:itemlist', `  <script type="application/ld+json">

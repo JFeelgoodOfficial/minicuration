@@ -2,8 +2,9 @@ import { test, expect } from '@playwright/test'
 
 // The webhook decides which editions a checkout consumes. Price IDs change
 // every time a product is re-priced (the summer sale created new ones), so
-// resolution must also work from the Stripe product name — and a six-pack
-// purchase must consume all six editions, not one.
+// resolution must also work from the Stripe product name. The $60 six-pack is
+// retired: a purchase through its old link must resolve to nothing, so the
+// owner is told by email instead of the wrong prints being reserved.
 //
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { resolveSlugs, slugFromName, orderNumberFrom, draftEditionEmail } = require('../api/webhook.js')
@@ -39,48 +40,39 @@ test.describe('webhook — product resolution', () => {
     }
     for (const [priceId, slug] of Object.entries(CURRENT)) {
       expect(resolveSlugs([{ price: { id: priceId } }]), `${slug} price ID`)
-        .toEqual({ slugs: [slug], isBundle: false, open: [] })
+        .toEqual({ slugs: [slug], open: [] })
     }
   })
 
   test('superseded price IDs still resolve (in-flight checkouts)', () => {
     expect(resolveSlugs([{ price: { id: 'price_1TYe162mxhfkNl2YfTEeMam4' } }]))
-      .toEqual({ slugs: ['dreamfall'], isBundle: false, open: [] })
+      .toEqual({ slugs: ['dreamfall'], open: [] })
     expect(resolveSlugs([{ price: { id: 'price_1TYGcr2mxhfkNl2YAUNVRpw4' } }]))
-      .toEqual({ slugs: ['sweet-dreams'], isBundle: false, open: [] })
-  })
-
-  test('the six-pack price ID consumes all six editions', () => {
-    const result = resolveSlugs([{ price: { id: 'price_1U07vq2mxhfkNl2Y8cgwskpF' } }])
-    expect(result.isBundle).toBe(true)
-    expect(result.slugs.sort()).toEqual([...ALL_SLUGS].sort())
+      .toEqual({ slugs: ['sweet-dreams'], open: [] })
   })
 
   test('a price ID absent from the map resolves via product name', () => {
     // This is the sale case: new $10 prices whose IDs were never hardcoded.
     expect(resolveSlugs([{ price: { id: 'price_unknown', product: { name: 'Veritas' } } }]))
-      .toEqual({ slugs: ['veritas'], isBundle: false, open: [] })
+      .toEqual({ slugs: ['veritas'], open: [] })
   })
 
-  test('a six-pack consumes all six editions', () => {
+  test('a single print resolves to its design', () => {
+    expect(resolveSlugs([{ description: 'Dreamfall' }]).slugs).toEqual(['dreamfall'])
+  })
+
+  test('the retired six-pack resolves to nothing, by price ID or by name', () => {
+    expect(resolveSlugs([{ price: { id: 'price_1U07vq2mxhfkNl2Y8cgwskpF' } }]).slugs).toEqual([])
     for (const name of ['Six-Pack', 'Six Pack Bundle', 'The Complete Collection', 'All Six Prints']) {
-      const result = resolveSlugs([{ description: name }])
-      expect(result.isBundle, `${name} should be detected as a bundle`).toBe(true)
-      expect(result.slugs.sort()).toEqual([...ALL_SLUGS].sort())
+      expect(resolveSlugs([{ description: name }]).slugs, name).toEqual([])
     }
-  })
-
-  test('a single print is not treated as a bundle', () => {
-    const result = resolveSlugs([{ description: 'Dreamfall' }])
-    expect(result.isBundle).toBe(false)
-    expect(result.slugs).toEqual(['dreamfall'])
   })
 
   test('a cart checkout reads each card from its product metadata', () => {
     const cart = (slug: string, kind: string, quantity = 1) =>
       ({ quantity, description: 'x', price: { id: 'price_inline', product: { name: 'x', metadata: { slug, kind } } } })
     expect(resolveSlugs([cart('pride', 'limited'), cart('moonsail', 'open', 12), cart('reach', 'open')]))
-      .toEqual({ slugs: ['pride'], isBundle: false, open: [{ slug: 'moonsail', qty: 12 }, { slug: 'reach', qty: 1 }] })
+      .toEqual({ slugs: ['pride'], open: [{ slug: 'moonsail', qty: 12 }, { slug: 'reach', qty: 1 }] })
   })
 
   test('a cart of only unlimited cards reserves no numbered print', () => {
@@ -96,11 +88,6 @@ test.describe('webhook — product resolution', () => {
     ])
     expect(result.slugs).toEqual([])
     expect(result.open).toEqual([{ slug: 'moonsail', qty: 2 }, { slug: 'acrylic-case', qty: 2 }])
-  })
-
-  test('the six-pack is still the original six, not every limited design', () => {
-    const result = resolveSlugs([{ description: 'Complete Collection Six-Pack' }])
-    expect(result.slugs.sort()).toEqual([...ALL_SLUGS].sort())
   })
 
   test('unrecognised checkouts resolve to nothing rather than guessing', () => {
@@ -146,7 +133,7 @@ test.describe('webhook — the buyer\'s edition-number draft', () => {
     expect(body).toContain('MC-AAAA0001')
   })
 
-  test('a six-pack lists every print with its own blank', () => {
+  test('an order of several prints lists each with its own blank', () => {
     const sold = ALL_SLUGS.map(slug => ({ slug }))
     const body = new URL(draftEditionEmail('MC-BUNDLE01', sold, session))
       .searchParams.get('body')
