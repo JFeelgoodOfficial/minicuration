@@ -77,7 +77,7 @@
     c[slug] = card.kind === 'limited' ? 1 : Math.min((c[slug] || 0) + 1, 50)
     if (card.kind === 'open') (withAddons || []).forEach(function (a) { c[a] = (c[a] || 0) + 1 })
     write(c)
-    if (window.mcTrack) window.mcTrack('add_to_cart', { slug: slug, kind: card.kind })
+    if (window.mcTrack) window.mcTrack('add_to_cart', { slug: slug, kind: card.kind, value: card.price / 100, currency: 'USD' })
     return true
   }
 
@@ -205,7 +205,7 @@
     btn.disabled = true
     btn.textContent = 'Opening secure checkout…'
     status.textContent = ''
-    if (window.mcTrack) window.mcTrack('begin_checkout', { items: count(c), source: 'cart' })
+    if (window.mcTrack) window.mcTrack('begin_checkout', { items: count(c), source: 'cart', value: totals(c).total / 100, currency: 'USD' })
     fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -245,8 +245,15 @@
     if (go) checkout(go)
   })
 
-  // A completed cart checkout returns to thanks.html?order=cs_…
-  if (/\/thanks(\.html)?$/.test(location.pathname) && /[?&]order=cs_/.test(location.search)) write({})
+  // A completed cart checkout returns to thanks.html?order=cs_… : note what was
+  // bought for js/analytics.js to report as a purchase, then empty the cart.
+  // Reloading the page finds the cart empty, so the purchase counts once.
+  var order = /\/thanks(\.html)?$/.test(location.pathname) && /[?&]order=(cs_[^&]+)/.exec(location.search)
+  if (order) {
+    var bought = cart()
+    if (count(bought)) window.mcOrder = { id: order[1], items: count(bought), value: totals(bought).total / 100 }
+    write({})
+  }
 
   // Another tab changed the cart.
   window.addEventListener('storage', function (e) { if (e.key === KEY) { memory = read(); refresh() } })

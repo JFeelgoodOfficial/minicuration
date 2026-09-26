@@ -90,6 +90,18 @@ test.describe('Cart', () => {
     await expect(page.locator('[data-total]')).toHaveText('$25')
   })
 
+  test('the thanks page reports the purchase once, with its value, then empties the cart', async ({ page }) => {
+    await page.goto('/cart.html')
+    await page.evaluate(() => localStorage.setItem('mc-cart', JSON.stringify({ moonsail: 2, lush: 1 })))
+    await page.goto('/thanks?order=cs_test_456')
+    const purchases = () => page.evaluate(() =>
+      (window as unknown as { dataLayer: Record<string, unknown>[] }).dataLayer.filter(e => e.event === 'purchase'))
+    // $12 + $10, $7 tracked shipping.
+    await expect.poll(purchases).toEqual([{ event: 'purchase', transaction_id: 'cs_test_456', value: 29, currency: 'USD', items: 3 }])
+    await page.reload()
+    await expect.poll(purchases).toEqual([])
+  })
+
   test('a card that sold out at checkout is taken out of the cart with a note', async ({ page }) => {
     await page.route('**/api/checkout', route =>
       route.fulfill({ status: 409, json: { error: 'sold_out', slugs: ['lush'] } }))
