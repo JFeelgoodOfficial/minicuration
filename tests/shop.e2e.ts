@@ -21,25 +21,6 @@ test.describe('Shop catalog — /shop.html', () => {
     await expect(deadLinks).toHaveCount(0)
   })
 
-  test('every Buy Now button links to a real Stripe URL', async ({ page }) => {
-    // This catches the Sentiments bug where the href points to a product page
-    // instead of https://buy.stripe.com/…
-    // The six original designs sell through Payment Links; every other card
-    // is a <button data-add-to-cart> that goes through the cart.
-    const buyButtons = page.locator('a.btn-buy')
-    const count = await buyButtons.count()
-    expect(count, 'Expected 6 Payment Link buttons (the original six)').toBe(6)
-
-    for (let i = 0; i < count; i++) {
-      const btn = buyButtons.nth(i)
-      const href = await btn.getAttribute('href')
-      expect(
-        href,
-        `Buy button ${i + 1} has href="${href}" — must start with https://buy.stripe.com/`,
-      ).toMatch(/^https:\/\/buy\.stripe\.com\//)
-    }
-  })
-
   test('all card front images load without broken src', async ({ page }) => {
     // Shop cards render the artwork inside .sc-front (3D spin front face).
     const images = page.locator('.sc-front img')
@@ -64,20 +45,20 @@ test.describe('Shop catalog — /shop.html', () => {
     expect(broken, `Card images failed to load: ${broken.join(', ')}`).toHaveLength(0)
   })
 
-  test('cart cards: every one has an add-to-cart button, none a link', async ({ page }) => {
-    const cartCards = page.locator('.shop-card:not([data-checkout="link"])')
-    await expect(cartCards).toHaveCount(25)
-    await expect(cartCards.locator('button[data-add-to-cart]')).toHaveCount(25)
-    await expect(cartCards.locator('a.btn-buy')).toHaveCount(0)
+  test('every card, the original six included, has an add-to-cart button and none a link', async ({ page }) => {
+    const cards = page.locator('.shop-card')
+    await expect(cards).toHaveCount(31)
+    await expect(cards.locator('button[data-add-to-cart]')).toHaveCount(31)
+    await expect(page.locator('a.btn-buy')).toHaveCount(0)
   })
 
-  test('unlimited pricing: $6 with struck $15; new limited cards $10 with struck $23', async ({ page }) => {
+  test('unlimited pricing: $6 with struck $15; limited cards $10 with struck $23 (Sweet Dreams aside)', async ({ page }) => {
     for (const price of await page.locator('#unlimited .card-price').all()) {
       await expect(price).toContainText('$6')
       await expect(price.locator('s.price-was')).toContainText('$15')
     }
-    const newLimited = page.locator('#limited .shop-card:not([data-checkout="link"]) .card-price')
-    await expect(newLimited).toHaveCount(10)
+    const newLimited = page.locator('#limited .shop-card:not([data-slug="sweet-dreams"]) .card-price')
+    await expect(newLimited).toHaveCount(15)
     for (const price of await newLimited.all()) {
       await expect(price).toContainText('$10')
       await expect(price.locator('s.price-was')).toContainText('$23')
@@ -116,15 +97,8 @@ test.describe('Shop catalog — /shop.html', () => {
     await expect(page.locator('#unlimited')).toBeVisible()
   })
 
-  test('sale pricing: 5 cards at $10 with struck $23, Sweet Dreams plain $8', async ({ page }) => {
-    const saleCards = page.locator('.shop-card[data-checkout="link"]:not([data-slug="sweet-dreams"])')
-    await expect(saleCards).toHaveCount(5)
-    for (const card of await saleCards.all()) {
-      const price = card.locator('.card-price')
-      await expect(price).toContainText('$10')
-      await expect(price.locator('s.price-was')).toContainText('$23')
-    }
-
+  test('Sweet Dreams is a plain $8, in the grid and in the cart', async ({ page }) => {
+    await expect(page.locator('.shop-card[data-slug="sweet-dreams"] [data-add-to-cart]')).toContainText('$8')
     const sweetDreams = page.locator('.shop-card[data-slug="sweet-dreams"] .card-price')
     await expect(sweetDreams).toContainText('$8')
     await expect(sweetDreams.locator('s.price-was')).toHaveCount(0)

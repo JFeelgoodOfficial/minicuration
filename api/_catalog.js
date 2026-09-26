@@ -1,7 +1,6 @@
 'use strict'
-// The cards sold through the cart: ten limited editions of 50 and the open
-// (unlimited) run. The six original designs are not here: they still sell
-// through their own Stripe Payment Links and live in api/_constants.js.
+// The cards sold through the cart: the six original limited editions, ten more
+// limited editions of 50 and the open (unlimited) run.
 //
 // This file is the one place a card's price, words and pictures are written.
 // api/checkout.js prices every order from it, so nothing the browser sends can
@@ -35,6 +34,18 @@ const SHIPPING = {
   parcelLabel: 'US shipping (tracked package)',
   freeLabel: 'Free US shipping',
 }
+
+// The six original designs. Their product pages and shop tiles are written by
+// hand (handmade: true), so the build leaves them alone; they are here so the
+// cart can sell them. img is the picture the cart shows.
+const ORIGINALS = [
+  { slug: 'dreamfall',           title: 'Dreamfall',           img: 'image/spin/dreamfall_artwork.webp' },
+  { slug: 'dream-mountain',      title: 'Dream Mountain',      img: 'image/spin/dream-mountain_artwork.webp' },
+  { slug: 'sky-miles',           title: 'Sky Miles',           img: 'image/spin/skymiles_artwork.webp' },
+  { slug: 'a-simple-meditation', title: 'A Simple Meditation', img: 'image/spin/asimplemeditation_artwork.webp' },
+  { slug: 'veritas',             title: 'Veritas',             img: 'image/spin/veritas_artwork.webp' },
+  { slug: 'sweet-dreams',        title: 'Sweet Dreams',        img: 'image/spin/sweet-dreams_artwork.webp', price: 800, was: null },
+].map(c => ({ handmade: true, ...PRICES.limited, ...c, kind: 'limited' }))
 
 const LIMITED = [
   {
@@ -186,6 +197,7 @@ const OPEN = [
 OPEN.forEach((card, i) => { card.back = i % 2 ? 'b' : 'a' })
 
 const CARDS = [
+  ...ORIGINALS,
   ...LIMITED.map(c => ({ ...c, kind: 'limited', ...PRICES.limited })),
   ...OPEN.map(c => ({ ...c, kind: 'open', medium: 'Open Edition', ...PRICES.open })),
 ]

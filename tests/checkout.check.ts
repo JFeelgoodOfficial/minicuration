@@ -107,7 +107,8 @@ test.describe('catalog pricing — quote()', () => {
 
   test('refuses what the browser should never send', () => {
     expect(quote([]).error).toBe('empty_cart')
-    expect(quote([{ slug: 'veritas', qty: 1 }]).error).toBe('unknown_card')
+    expect(quote([{ slug: 'not-a-card', qty: 1 }]).error).toBe('unknown_card')
+    expect(quote([{ slug: 'veritas', qty: 2 }]).error).toBe('one_per_limited')
     expect(quote([{ slug: 'pride', qty: 2 }]).error).toBe('one_per_limited')
     expect(quote([{ slug: 'moonsail', qty: 0 }]).error).toBe('bad_quantity')
     expect(quote([{ slug: 'moonsail', qty: 1.5 }]).error).toBe('bad_quantity')

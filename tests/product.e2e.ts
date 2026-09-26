@@ -18,14 +18,11 @@ test.describe(`Product page — ${PRODUCT_URL}`, () => {
     expect(text?.trim().length, 'H1 is empty').toBeGreaterThan(0)
   })
 
-  test('Buy Now button links to a real Stripe URL', async ({ page }) => {
-    const buyBtn = page.locator('a.btn-buy')
+  test('the buy button adds the card to the cart', async ({ page }) => {
+    const buyBtn = page.locator('button.btn-buy[data-add-to-cart="dreamfall"]')
     await expect(buyBtn).toBeVisible()
-    const href = await buyBtn.getAttribute('href')
-    expect(
-      href,
-      `btn-buy href="${href}" must start with https://buy.stripe.com/`,
-    ).toMatch(/^https:\/\/buy\.stripe\.com\//)
+    await buyBtn.click()
+    await expect(page.locator('.nav-cart [data-cart-count]')).toHaveText('(1)')
   })
 
   test('sale pricing: $10 with struck-through $23 regular price', async ({ page }) => {
@@ -33,7 +30,7 @@ test.describe(`Product page — ${PRODUCT_URL}`, () => {
     await expect(price).toContainText('$10')
     await expect(price.locator('s.price-was')).toContainText('$23')
 
-    const buyBtn = page.locator('a.btn-buy')
+    const buyBtn = page.locator('.btn-buy')
     await expect(buyBtn).toContainText('$10')
   })
 

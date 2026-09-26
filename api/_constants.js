@@ -3,7 +3,9 @@
 // requiring api/_lib.js (which requires the store — that would be a cycle).
 const { LIMITED_NAMES } = require('./_catalog.js')
 
-// The six original designs, sold through their own Stripe Payment Links.
+// The six original designs. They sell through the cart now; their old Stripe
+// Payment Links are still recognised here by name so a late purchase through
+// one is recorded.
 const ORIGINAL_NAMES = {
   'dreamfall':           'Dreamfall',
   'dream-mountain':      'Dream Mountain',
