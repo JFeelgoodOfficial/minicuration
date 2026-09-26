@@ -62,9 +62,10 @@ Vercel functions require env vars — use `vercel dev` with a `.env.local` for l
 
 ## The cart: more limited editions and the unlimited run
 
-The six original designs sell through their own Stripe Payment Links. Every
-other card — ten more limited editions of 50 and the unlimited (open-edition)
-archive cards — sells through the cart:
+Every card sells through the cart: the six original designs, ten more limited
+editions of 50, and the unlimited (open-edition) archive cards. The six
+originals keep their hand-written product pages and shop tiles (`handmade: true`
+in the catalog, which the build skips):
 
 | file | what it does |
 |---|---|
@@ -82,17 +83,17 @@ on cart orders is charged per order: $2 by stamped letter (untracked) when the
 cart holds only unlimited cards, $7 as a tracked Ground Advantage package when
 it holds a limited edition or any add-on, and free once the order comes to $50
 or more after the discount, which every full bundle does. The Stripe session's
-`ship` metadata (`letter` or `parcel`) says which way to send it. The six
-original designs still charge whatever shipping their Payment Links are set
-to in Stripe. Unlimited cards ship in a protective
+`ship` metadata (`letter` or `parcel`) says which way to send it. Unlimited cards ship in a protective
 plastic slip; a magnetically sealed acrylic case ($4) and an acrylic display
 stand ($1) are add-ons (`ADDONS` in the catalog), at most one of each per
 unlimited card in the order. Limited editions already come with both. Add-ons
 are logged in the `sales` tab with `edition_number` set to `add-on`. Wide
 paintings (`wide: true`) are printed as landscape cards, like Veritas.
 
-The $60 six-pack is retired. Deactivate its Payment Link in Stripe; a late
-purchase through it matches no product and arrives as an "ACTION NEEDED"
+The $60 six-pack is retired, and the originals' own Payment Links are no
+longer on the site. Deactivate all seven in Stripe. A late purchase through an
+original's link is still recorded (the webhook knows their price IDs); one
+through the six-pack matches no product and arrives as an "ACTION NEEDED"
 email. Change any of the prices above in `api/_catalog.js`, run
 `node scripts/build-cards.js`, and commit.
 
@@ -182,7 +183,7 @@ the price of not running one, and for this shop it is a reasonable price.
 
 ## Operational setup
 
-Three manual steps activate the order, analytics, and post-purchase reclaim flows:
+Two manual steps activate the order and analytics flows:
 
 1. **Register the Stripe webhook.** Stripe Dashboard → **Developers → Webhooks
    → Add endpoint** → `https://minicuration.com/api/webhook`, listening for
@@ -195,15 +196,10 @@ Three manual steps activate the order, analytics, and post-purchase reclaim flow
    custom events — `buy_click`, `begin_checkout`, `newsletter_signup`,
    `flip_back`, `sold_out_click` — and mirrors them to `window.dataLayer` for
    an optional GA4/GTM container.
-3. **Redirect Stripe Payment Links to `/thanks`.** In the Stripe Dashboard,
-   edit each Payment Link → **After payment** → **Redirect customers to your
-   website** → `https://minicuration.com/thanks.html`. This returns buyers
-   on-site (newsletter capture + cross-sell) instead of Stripe's generic
-   receipt. Repeat for any new link.
 
-The Stripe webhook (`api/webhook.js`) enforces scarcity automatically: it
-deactivates a Payment Link when its edition hits zero, and auto-refunds +
-deactivates on any oversell.
+Checkout refuses a limited card that has sold out before anyone pays. If two
+buyers race for the last print, the webhook refunds the one who lost, and for
+a sale through an old Payment Link it also deactivates that link.
 
 ### Orders
 

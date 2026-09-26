@@ -15,6 +15,60 @@ window.MC_CATALOG = {
   "freeLabel": "Free US shipping"
  },
  "cards": {
+  "dreamfall": {
+   "title": "Dreamfall",
+   "kind": "limited",
+   "price": 1000,
+   "was": 2300,
+   "img": "image/spin/dreamfall_artwork.webp",
+   "url": "shop/dreamfall.html",
+   "wide": false
+  },
+  "dream-mountain": {
+   "title": "Dream Mountain",
+   "kind": "limited",
+   "price": 1000,
+   "was": 2300,
+   "img": "image/spin/dream-mountain_artwork.webp",
+   "url": "shop/dream-mountain.html",
+   "wide": false
+  },
+  "sky-miles": {
+   "title": "Sky Miles",
+   "kind": "limited",
+   "price": 1000,
+   "was": 2300,
+   "img": "image/spin/skymiles_artwork.webp",
+   "url": "shop/sky-miles.html",
+   "wide": false
+  },
+  "a-simple-meditation": {
+   "title": "A Simple Meditation",
+   "kind": "limited",
+   "price": 1000,
+   "was": 2300,
+   "img": "image/spin/asimplemeditation_artwork.webp",
+   "url": "shop/a-simple-meditation.html",
+   "wide": false
+  },
+  "veritas": {
+   "title": "Veritas",
+   "kind": "limited",
+   "price": 1000,
+   "was": 2300,
+   "img": "image/spin/veritas_artwork.webp",
+   "url": "shop/veritas.html",
+   "wide": false
+  },
+  "sweet-dreams": {
+   "title": "Sweet Dreams",
+   "kind": "limited",
+   "price": 800,
+   "was": null,
+   "img": "image/spin/sweet-dreams_artwork.webp",
+   "url": "shop/sweet-dreams.html",
+   "wide": false
+  },
   "poetry-of-solace": {
    "title": "Poetry of Solace",
    "kind": "limited",

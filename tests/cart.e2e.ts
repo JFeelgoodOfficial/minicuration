@@ -78,6 +78,18 @@ test.describe('Cart', () => {
     await expect(cards.first()).toContainText(/(Limited edition|Unlimited) · \$\d+/)
   })
 
+  test('an original design goes in the cart with other cards and ships as one order', async ({ page }) => {
+    await page.goto('/shop.html')
+    await page.locator('[data-add-to-cart="veritas"]').click()
+    await page.locator('[data-add-to-cart="sweet-dreams"]').click()
+    await page.goto('/cart.html')
+    await expect(page.locator('.cart-line')).toHaveCount(2)
+    // $10 + $8, one tracked package.
+    await expect(page.locator('[data-subtotal]')).toHaveText('$18')
+    await expect(page.locator('[data-shipping]')).toHaveText('$7')
+    await expect(page.locator('[data-total]')).toHaveText('$25')
+  })
+
   test('a card that sold out at checkout is taken out of the cart with a note', async ({ page }) => {
     await page.route('**/api/checkout', route =>
       route.fulfill({ status: 409, json: { error: 'sold_out', slugs: ['lush'] } }))
