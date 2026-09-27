@@ -35,6 +35,26 @@ const SHIPPING = {
   freeLabel: 'Free US shipping',
 }
 
+// Only the six originals are in stock; every other card is sold on pre-order
+// until the printed stock lands. Pre-order cards are `off` cheaper, and the
+// bundle discount is scaled by the same factor, so "$10 off every ten, then
+// 25% off" comes out the same as "25% off each card, then $7.50 off every ten"
+// (0.75 × (S − B) = 0.75S − 0.75B). The site, Stripe and the order emails all
+// read these fields. To end the pre-order: `active: false`, then
+//
+//   node scripts/build-cards.js
+//
+// and fix the hand-written copy the build lists.
+const PREORDER = { active: false, off: 0.25, ships: '2026-11-01', label: 'on or before Nov 1' }
+
+// What a card costs: the pre-order price while it is on pre-order, else its
+// list price. Add-ons and the originals are never discounted.
+const unitPrice = (card) => (card.preorder ? Math.round(card.price * (1 - PREORDER.off)) : card.price)
+
+// The bundle discount, scaled while the open cards are on pre-order. Every
+// open card is a built card, so they are all on pre-order together.
+const bundleDiscount = () => (PREORDER.active ? Math.round(BUNDLE.discount * (1 - PREORDER.off)) : BUNDLE.discount)
+
 // The six original designs. Their product pages and shop tiles are written by
 // hand (handmade: true), so the build leaves them alone; they are here so the
 // cart can sell them. img is the picture the cart shows.
@@ -45,7 +65,7 @@ const ORIGINALS = [
   { slug: 'a-simple-meditation', title: 'A Simple Meditation', img: 'image/spin/asimplemeditation_artwork.webp' },
   { slug: 'veritas',             title: 'Veritas',             img: 'image/spin/veritas_artwork.webp' },
   { slug: 'sweet-dreams',        title: 'Sweet Dreams',        img: 'image/spin/sweet-dreams_artwork.webp', price: 800, was: null },
-].map(c => ({ handmade: true, ...PRICES.limited, ...c, kind: 'limited' }))
+].map(c => ({ handmade: true, ...PRICES.limited, ...c, kind: 'limited', preorder: false }))
 
 const LIMITED = [
   {
@@ -198,9 +218,9 @@ OPEN.forEach((card, i) => { card.back = i % 2 ? 'b' : 'a' })
 
 const CARDS = [
   ...ORIGINALS,
-  ...LIMITED.map(c => ({ ...c, kind: 'limited', ...PRICES.limited })),
-  ...OPEN.map(c => ({ ...c, kind: 'open', medium: 'Open Edition', ...PRICES.open })),
-]
+  ...LIMITED.map(c => ({ ...c, kind: 'limited', ...PRICES.limited, preorder: PREORDER.active })),
+  ...OPEN.map(c => ({ ...c, kind: 'open', medium: 'Open Edition', ...PRICES.open, preorder: PREORDER.active })),
+].map(c => ({ ...c, unit: unitPrice(c) }))
 // Sold alongside the cards. Unlimited cards ship in a protective plastic slip;
 // limited cards already come with a case and a stand. Each add-on upgrades one
 // unlimited card, so an order holds at most one of each per unlimited card.
@@ -213,7 +233,7 @@ const ADDONS = [
   { slug: 'acrylic-stand', title: 'Acrylic Stand', kind: 'addon', price: 100, was: null,
     offer: 'Add an acrylic display stand', note: 'Display stand, one per unlimited card',
     upsell: 'Stand a card up on your shelf with an acrylic display stand', short: 'Acrylic stand' },
-]
+].map(a => ({ ...a, preorder: false, unit: a.price }))
 const CASE = ADDONS[0]
 const STAND = ADDONS[1]
 
@@ -224,7 +244,9 @@ const LIMITED_NAMES = Object.fromEntries(LIMITED.map(c => [c.slug, c.title]))
 // Prices an order. `items` is [{ slug, qty }] straight from the browser, so
 // anything unknown is rejected, a limited card is capped at one per order (the
 // webhook reserves one numbered print per design per checkout), and each
-// add-on is capped at one per unlimited card.
+// add-on is capped at one per unlimited card. Each line is priced at the
+// card's `unit` (its pre-order price while on pre-order), and `preorder` says
+// whether any of the order has to wait for stock.
 function quote(items) {
   if (!Array.isArray(items) || !items.length) return { error: 'empty_cart' }
   const lines = []
@@ -237,7 +259,7 @@ function quote(items) {
     const qty = Number(item.qty)
     if (!Number.isInteger(qty) || qty < 1 || qty > 50) return { error: 'bad_quantity', slug: card.slug }
     if (card.kind === 'limited' && qty !== 1) return { error: 'one_per_limited', slug: card.slug }
-    lines.push({ card, qty, amount: card.price * qty })
+    lines.push({ card, qty, unit: card.unit, amount: card.unit * qty, preorder: !!card.preorder })
   }
   const count = (kind) => lines.filter(l => l.card.kind === kind).reduce((n, l) => n + l.qty, 0)
   const openCount = count('open')
@@ -245,14 +267,19 @@ function quote(items) {
   if (extra) return { error: 'too_many_addons', slug: extra.card.slug }
   const bundles = Math.floor(openCount / BUNDLE.size)
   const subtotal = lines.reduce((sum, l) => sum + l.amount, 0)
-  const discount = bundles * BUNDLE.discount
+  const discount = bundles * bundleDiscount()
   const method = count('limited') + count('addon') ? 'parcel' : 'letter'
   const shipping = subtotal - discount >= SHIPPING.freeFrom ? 0 : SHIPPING[method]
+  const preorder = lines.some(l => l.preorder)
   return {
     lines, openCount, bundles, subtotal, discount,
     method, shipping,
     total: subtotal - discount + shipping,
+    preorder, ships: preorder ? PREORDER.ships : null,
   }
 }
 
-module.exports = { CARDS, ADDONS, CASE, STAND, BY_SLUG, LIMITED_NAMES, PRICES, BUNDLE, SHIPPING, quote }
+module.exports = {
+  CARDS, ADDONS, CASE, STAND, BY_SLUG, LIMITED_NAMES, PRICES, BUNDLE, SHIPPING, PREORDER,
+  unitPrice, bundleDiscount, quote,
+}

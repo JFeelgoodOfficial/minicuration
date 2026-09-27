@@ -3,10 +3,53 @@ const Stripe = require('stripe')
 const {
   store, sendMail, notifyEmail, orderNumberFrom, PRODUCT_NAMES, EDITION_SIZE,
 } = require('./_lib.js')
-const { BY_SLUG } = require('./_catalog.js')
+const { BY_SLUG, PREORDER, unitPrice } = require('./_catalog.js')
 
 const nameOf = (slug) => PRODUCT_NAMES[slug] || BY_SLUG[slug]?.title || slug
 const isAddon = (slug) => BY_SLUG[slug]?.kind === 'addon'
+
+// ── Pre-orders ───────────────────────────────────────────────────────────────
+// api/checkout.js marks each line sold on pre-order (metadata.preorder = '1')
+// and the session with the promised ship date, so the emails say what was
+// promised at purchase, not what the catalog says when the webhook runs.
+function preorderSlugs(lineItems) {
+  return new Set(lineItems
+    .filter(item => item.price?.product?.metadata?.preorder === '1')
+    .map(item => item.price.product.metadata.slug))
+}
+
+// What the buyer paid per line, after Stripe prorated any coupon across the
+// lines: the right amount to refund if that line cannot be fulfilled.
+function paidBySlug(lineItems) {
+  const paid = {}
+  for (const item of lineItems) {
+    const slug = item.price?.product?.metadata?.slug
+    if (slug && Number.isInteger(item.amount_total)) paid[slug] = item.amount_total
+  }
+  return paid
+}
+
+// Two piles for the packer: what ships now and what waits for stock. Add-ons
+// upgrade an unlimited card, so they travel with the pre-order pile whenever
+// an unlimited card is in it.
+function splitShipments(sold, open, preorder) {
+  const now = [], later = []
+  for (const s of sold) (preorder.has(s.slug) ? later : now).push({ slug: s.slug, qty: 1 })
+  const cards = open.filter(o => !isAddon(o.slug))
+  const addons = open.filter(o => isAddon(o.slug))
+  for (const o of cards) (preorder.has(o.slug) ? later : now).push(o)
+  const addonsWait = cards.some(o => preorder.has(o.slug))
+  for (const a of addons) (addonsWait ? later : now).push(a)
+  return { now, later }
+}
+
+// '2026-11-01' → 'Nov 1, 2026'; falls back to the catalog's wording.
+function shipsLabel(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '')
+  if (!m) return PREORDER.label
+  const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]))
+  return 'on or before ' + new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).format(d)
+}
 
 // ── Lazy singleton (re-used across warm invocations) ─────────────────────────
 let _stripe
@@ -195,6 +238,9 @@ async function handler(req, res) {
   })
   const { slugs, open } = resolveSlugs(lineItems.data)
   const fromCart = session.metadata?.source === 'cart'
+  const preorder = preorderSlugs(lineItems.data)
+  const paid = paidBySlug(lineItems.data)
+  const ships = shipsLabel(session.metadata?.preorder_ships)
 
   if (!slugs.length && !open.length) {
     const items = lineItems.data.map(item => item.description || item.price?.id).join(', ')
@@ -246,9 +292,10 @@ async function handler(req, res) {
   if (emptiedAn || soldOut.length) await deactivatePaymentLink(session.payment_link)
 
   // A cart can hold several cards, so a limited card that lost the race for its
-  // last print is refunded on its own and everything else still ships.
+  // last print is refunded on its own (what was paid for it, after any coupon)
+  // and everything else still ships.
   if (soldOut.length && fromCart) {
-    const amount = soldOut.reduce((sum, slug) => sum + (BY_SLUG[slug]?.price || 0), 0)
+    const amount = soldOut.reduce((sum, slug) => sum + (paid[slug] ?? (BY_SLUG[slug] ? unitPrice(BY_SLUG[slug]) : 0)), 0)
     console.error(`OVERSELL BLOCKED in cart ${orderNumber}: ${soldOut.join(', ')} — refunding ${amount}`)
     let refunded = false
     if (session.payment_intent && amount) {
@@ -349,12 +396,32 @@ async function handler(req, res) {
   ].join('')
   const cardCount = sold.length + open.filter(o => !isAddon(o.slug)).reduce((n, o) => n + o.qty, 0)
 
+  // What ships now and what waits for stock. `mixed` orders go out in two
+  // packages; shipping was charged once.
+  const piles = splitShipments(sold, open, preorder)
+  const mixed = piles.now.length > 0 && piles.later.length > 0
+  const allLater = piles.later.length > 0 && piles.now.length === 0
+  const pileList = (pile) => pile.map(({ slug, qty }) =>
+    `<li><strong>${nameOf(slug)}</strong>${qty > 1 ? ` × ${qty}` : ''}${isAddon(slug) ? ' — add-on' : ''}</li>`).join('')
+  const cancelNote = `If that date changes we will tell you first, and you can cancel any pre-order for a full refund at any time before it ships.`
+  const shipParagraph = mixed
+    ? `<p><strong>Ships now</strong> (within 5–7 business days):</p><ul>${pileList(piles.now)}</ul>
+       <p><strong>Pre-order</strong> (ships ${ships}):</p><ul>${pileList(piles.later)}</ul>
+       <p>Your order goes out in two packages; shipping was charged once. ${cancelNote}
+         Reply to this email with any questions and quote ${orderNumber}.</p>`
+    : allLater
+      ? `<p>This is a pre-order. ${cardCount > 1 ? 'Your cards ship' : 'Your card ships'} <strong>${ships}</strong>,
+         and we will email you when ${cardCount > 1 ? 'they are' : 'it is'} on the way. ${cancelNote}
+         Reply to this email with any questions and quote ${orderNumber}.</p>`
+      : `<p>${cardCount > 1 ? 'Prints ship' : 'Your print ships'} within 5–7 business days.
+         Reply to this email with any questions and quote ${orderNumber}.</p>`
+
   // 5. Confirm the order to the buyer. Deliberately no edition number: it is
   // not known until the print is picked, and a number stated here that later
   // turns out wrong is worse than one stated a day later and correct.
   await sendMail({
     to:      session.customer_details?.email,
-    subject: `Order ${orderNumber} — your Minicuration ${cardCount > 1 ? 'order' : 'print'} is confirmed`,
+    subject: `Order ${orderNumber} — your Minicuration ${allLater ? 'pre-order' : cardCount > 1 ? 'order' : 'print'} is confirmed`,
     html: `
       <p>Thank you for your order. Your order number is <strong>${orderNumber}</strong>.</p>
       <p>You ordered:</p>
@@ -364,20 +431,28 @@ async function handler(req, res) {
          ${sold.length > 1 ? 'your exact edition numbers' : 'your exact edition number'}
          by email the moment ${sold.length > 1 ? 'they are' : 'it is'} packed —
          ${sold.length > 1 ? 'those numbers are' : 'that number is'} yours alone.</p>` : ''}
-      <p>${cardCount > 1 ? 'Prints ship' : 'Your print ships'} within 5–7 business days.
-         Reply to this email with any questions and quote ${orderNumber}.</p>
+      ${shipParagraph}
     `,
   })
 
-  // 6. Tell the shop owner there is something to pack
+  // 6. Tell the shop owner there is something to pack, and what has to wait.
+  const packedList = `<ul>${sold.map(({ slug, editionNumber }) =>
+    `<li><strong>${nameOf(slug)}</strong> — reserved box
+     <strong>${editionNumber}</strong> (provisional)${preorder.has(slug) ? ' — pre-order' : ''}</li>`).join('')}${openList.join('')}</ul>`
+  const ownerPiles = piles.later.length
+    ? `<p><strong>PACK NOW</strong>${piles.now.length ? '' : ' — nothing'}:</p>${piles.now.length ? `<ul>${pileList(piles.now)}</ul>` : ''}
+       <p><strong>PRE-ORDER — hold until the stock lands, ship ${ships}</strong>:</p><ul>${pileList(piles.later)}</ul>
+       <p>Shipping was charged once${mixed ? '; this order goes out as two packages' : ''}. Reserved editions are listed below.</p>`
+    : ''
   await sendMail({
     to:      notifyEmail(),
-    subject: `New order ${orderNumber} — ${[...sold.map(s => nameOf(s.slug)), ...open.map(o => nameOf(o.slug))].join(', ')}`,
+    subject: piles.later.length
+      ? `New order ${orderNumber} — ${piles.now.length} to pack now, ${piles.later.length} pre-order`
+      : `New order ${orderNumber} — ${[...sold.map(s => nameOf(s.slug)), ...open.map(o => nameOf(o.slug))].join(', ')}`,
     html: `
       <p><strong>${orderNumber}</strong></p>
-      <ul>${sold.map(({ slug, editionNumber }) =>
-        `<li><strong>${nameOf(slug)}</strong> — reserved box
-         <strong>${editionNumber}</strong> (provisional)</li>`).join('')}${openList.join('')}</ul>
+      ${ownerPiles}
+      ${packedList}
       <p><strong>Paid:</strong> ${formatAmount(session)}<br>
          <strong>Buyer:</strong> ${session.customer_details?.name || 'unknown'}
          &lt;${session.customer_details?.email || 'no email'}&gt;</p>
@@ -414,3 +489,8 @@ module.exports.orderNumberFrom = orderNumberFrom
 // The manual pack-and-ship flow lives entirely in the owner's order email, so
 // the draft link it contains is worth covering.
 module.exports.draftEditionEmail = draftEditionEmail
+// Pre-orders: what was promised at purchase, what was paid, and the two piles.
+module.exports.preorderSlugs = preorderSlugs
+module.exports.paidBySlug = paidBySlug
+module.exports.splitShipments = splitShipments
+module.exports.shipsLabel = shipsLabel

@@ -10,7 +10,7 @@
 // reserves the print when payment lands and refunds that item if it lost a
 // race for the last one.
 const Stripe = require('stripe')
-const { quote, SHIPPING } = require('./_catalog.js')
+const { quote, SHIPPING, BUNDLE, PREORDER } = require('./_catalog.js')
 const { store } = require('./_store.js')
 
 let _stripe
@@ -51,7 +51,9 @@ async function handler(req, res) {
   const site = siteUrl(req)
   try {
     // A coupon can only be attached by ID, so the bundle discount gets a
-    // single-use one per checkout.
+    // single-use one per checkout. The lines already carry each card's unit
+    // (pre-order) price, so the coupon is only ever the bundle's share and
+    // Stripe's total equals quote()'s.
     let discounts
     if (order.discount) {
       const coupon = await stripe().coupons.create({
@@ -59,31 +61,37 @@ async function handler(req, res) {
         currency: 'usd',
         duration: 'once',
         max_redemptions: 1,
-        name: `Open edition bundle — $${order.discount / 100} off`,
+        name: `Open edition bundle — $${order.discount / 100} off every ${BUNDLE.size}${order.preorder ? ' (pre-order price)' : ''}`,
       })
       discounts = [{ coupon: coupon.id }]
     }
 
+    // The webhook reads the line metadata to know what was bought, and
+    // `preorder` to know what was promised: a pre-order line waits for stock.
+    const preorderMeta = (line) => (line.preorder ? { preorder: '1', ships: PREORDER.ships } : {})
     const session = await stripe().checkout.sessions.create({
       mode: 'payment',
-      line_items: order.lines.map(({ card, qty }) => ({
-        quantity: qty,
+      line_items: order.lines.map((line) => ({
+        quantity: line.qty,
         price_data: {
           currency: 'usd',
-          unit_amount: card.price,
-          product_data: card.kind === 'addon' ? {
-            name: `${card.title} (add-on)`,
-            description: card.note,
-            metadata: { slug: card.slug, kind: card.kind },
+          unit_amount: line.unit,
+          product_data: line.card.kind === 'addon' ? {
+            name: `${line.card.title} (add-on)`,
+            description: line.card.note,
+            metadata: { slug: line.card.slug, kind: line.card.kind },
           } : {
-            name: `${card.title} — ${card.kind === 'limited' ? 'Limited Edition' : 'Open Edition'} Mini Art Print`,
-            images: [`${site}/image/cards/${card.slug}-front.webp`],
-            // The webhook reads these to know what was bought.
-            metadata: { slug: card.slug, kind: card.kind },
+            name: `${line.card.title} — ${line.card.kind === 'limited' ? 'Limited Edition' : 'Open Edition'} Mini Art Print`
+              + (line.preorder ? ` — pre-order, ships ${PREORDER.label}` : ''),
+            images: [`${site}/image/cards/${line.card.slug}-front.webp`],
+            metadata: { slug: line.card.slug, kind: line.card.kind, ...preorderMeta(line) },
           },
         },
       })),
       ...(discounts ? { discounts } : {}),
+      ...(order.preorder ? {
+        custom_text: { submit: { message: `Pre-order cards ship ${PREORDER.label}. In-stock cards ship within 5–7 business days.` } },
+      } : {}),
       shipping_address_collection: { allowed_countries: ['US'] },
       shipping_options: [{
         shipping_rate_data: {
@@ -97,7 +105,11 @@ async function handler(req, res) {
         },
       }],
       // ship tells whoever packs the order: an envelope, or a tracked package.
-      metadata: { source: 'cart', ship: order.method },
+      // preorder says part of it waits for stock, and until when.
+      metadata: {
+        source: 'cart', ship: order.method,
+        ...(order.preorder ? { preorder: '1', preorder_ships: PREORDER.ships } : {}),
+      },
       success_url: `${site}/thanks.html?order={CHECKOUT_SESSION_ID}`,
       cancel_url: `${site}/cart.html`,
     })

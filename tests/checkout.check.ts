@@ -9,7 +9,7 @@ import { test, expect } from '@playwright/test'
 const STORE = require.resolve('../api/_store.js')
 const STRIPE = require.resolve('stripe')
 const CHECKOUT = require.resolve('../api/checkout.js')
-const { quote, CARDS } = require('../api/_catalog.js')
+const { quote, CARDS, BY_SLUG, PREORDER, BUNDLE, unitPrice, bundleDiscount } = require('../api/_catalog.js')
 
 type Call = { kind: string; args: Record<string, unknown> }
 type Result = { status: number; body: Record<string, unknown>; calls: Call[] }
@@ -185,6 +185,26 @@ test.describe('/api/checkout', () => {
     expect(calls).toHaveLength(0)
   })
 
+  test('Stripe charges exactly what quote() says, coupon included', async () => {
+    type Session = {
+      line_items: { quantity: number; price_data: { unit_amount: number } }[]
+      shipping_options: { shipping_rate_data: { fixed_amount: { amount: number } } }[]
+    }
+    for (const items of [
+      [{ slug: 'moonsail', qty: 4 }, { slug: 'reach', qty: 6 }],
+      [{ slug: 'moonsail', qty: 13 }, { slug: 'acrylic-case', qty: 2 }],
+      [{ slug: 'veritas', qty: 1 }, { slug: 'sweet-dreams', qty: 1 }, { slug: 'pride', qty: 1 }],
+    ]) {
+      const { calls } = await checkout({ items })
+      const session = calls.find(c => c.kind === 'session')!.args as Session
+      const coupon = calls.find(c => c.kind === 'coupon')
+      const lines = session.line_items.reduce((s, l) => s + l.quantity * l.price_data.unit_amount, 0)
+      const off = coupon ? (coupon.args as { amount_off: number }).amount_off : 0
+      const charged = lines - off + session.shipping_options[0].shipping_rate_data.fixed_amount.amount
+      expect(charged, JSON.stringify(items)).toBe(quote(items).total)
+    }
+  })
+
   test('return URLs follow a Vercel preview but never an arbitrary host', async () => {
     const preview = await checkout({ items: [{ slug: 'moonsail', qty: 1 }] }, { host: 'minicuration-git-x.vercel.app' })
     expect((preview.calls.find(c => c.kind === 'session')!.args as { cancel_url: string }).cancel_url)
@@ -192,5 +212,73 @@ test.describe('/api/checkout', () => {
     const evil = await checkout({ items: [{ slug: 'moonsail', qty: 1 }] }, { host: 'evil.example' })
     expect((evil.calls.find(c => c.kind === 'session')!.args as { cancel_url: string }).cancel_url)
       .toBe('https://minicuration.com/cart.html')
+  })
+})
+
+// Pre-orders: everything but the six originals sells at a discount and ships
+// later while PREORDER.active is on. These hold in both states, so the switch
+// can be flipped without rewriting them.
+test.describe('pre-orders — the switch', () => {
+  test('the originals and the add-ons are never on pre-order or discounted', () => {
+    for (const slug of ['dreamfall', 'dream-mountain', 'sky-miles', 'a-simple-meditation', 'veritas', 'sweet-dreams', 'acrylic-case', 'acrylic-stand']) {
+      expect(BY_SLUG[slug].preorder, slug).toBe(false)
+      expect(BY_SLUG[slug].unit, slug).toBe(BY_SLUG[slug].price)
+    }
+  })
+
+  test('every built card follows the switch, priced 25% off while it is on', () => {
+    const built = CARDS.filter((c: { handmade?: boolean }) => !c.handmade)
+    expect(built).toHaveLength(25)
+    for (const c of built) {
+      expect(c.preorder, c.slug).toBe(PREORDER.active)
+      expect(c.unit, c.slug).toBe(PREORDER.active ? Math.round(c.price * 0.75) : c.price)
+    }
+  })
+
+  test('unitPrice and bundleDiscount round to whole cents', () => {
+    expect(unitPrice({ price: 1000, preorder: true })).toBe(750)
+    expect(unitPrice({ price: 600, preorder: true })).toBe(450)
+    expect(unitPrice({ price: 1000, preorder: false })).toBe(1000)
+    expect(bundleDiscount()).toBe(PREORDER.active ? 750 : BUNDLE.discount)
+  })
+
+  test('a pre-order line is priced at its unit and flagged for the webhook', () => {
+    const q = quote([{ slug: 'pride', qty: 1 }, { slug: 'veritas', qty: 1 }])
+    const pride = q.lines.find((l: { card: { slug: string } }) => l.card.slug === 'pride')
+    const veritas = q.lines.find((l: { card: { slug: string } }) => l.card.slug === 'veritas')
+    expect(pride).toMatchObject({ unit: BY_SLUG.pride.unit, amount: BY_SLUG.pride.unit, preorder: PREORDER.active })
+    expect(veritas).toMatchObject({ unit: 1000, amount: 1000, preorder: false })
+    expect(q.preorder).toBe(PREORDER.active)
+    expect(q.ships).toBe(PREORDER.active ? PREORDER.ships : null)
+    expect(quote([{ slug: 'veritas', qty: 1 }])).toMatchObject({ preorder: false, ships: null })
+  })
+
+  test('the promised ship date has not passed (flip PREORDER.active off when it has)', () => {
+    if (!PREORDER.active) return
+    expect(PREORDER.ships >= new Date().toISOString().slice(0, 10), `PREORDER.ships is ${PREORDER.ships}`).toBe(true)
+  })
+
+  test('Stripe lines carry the pre-order flag, ship date and price only while on pre-order', async () => {
+    const { calls } = await checkout({ items: [{ slug: 'pride', qty: 1 }, { slug: 'veritas', qty: 1 }, { slug: 'moonsail', qty: 1 }, { slug: 'acrylic-case', qty: 1 }] })
+    const session = calls.find(c => c.kind === 'session')!.args as {
+      line_items: { price_data: { unit_amount: number; product_data: { name: string; metadata: Record<string, string> } } }[]
+      metadata: Record<string, string>; custom_text?: { submit: { message: string } }
+    }
+    const line = (slug: string) => session.line_items.find(l => l.price_data.product_data.metadata.slug === slug)!
+    expect(line('veritas').price_data.product_data.metadata).toEqual({ slug: 'veritas', kind: 'limited' })
+    expect(line('acrylic-case').price_data.product_data.metadata).toEqual({ slug: 'acrylic-case', kind: 'addon' })
+    if (PREORDER.active) {
+      expect(line('pride').price_data.product_data.metadata).toEqual({ slug: 'pride', kind: 'limited', preorder: '1', ships: PREORDER.ships })
+      expect(line('pride').price_data.product_data.name).toContain('pre-order')
+      expect(line('pride').price_data.unit_amount).toBe(750)
+      expect(line('moonsail').price_data.unit_amount).toBe(450)
+      expect(session.metadata).toEqual({ source: 'cart', ship: 'parcel', preorder: '1', preorder_ships: PREORDER.ships })
+      expect(session.custom_text?.submit.message).toContain(PREORDER.label)
+    } else {
+      expect(line('pride').price_data.product_data.metadata).toEqual({ slug: 'pride', kind: 'limited' })
+      expect(line('pride').price_data.unit_amount).toBe(1000)
+      expect(session.metadata).toEqual({ source: 'cart', ship: 'parcel' })
+      expect(session.custom_text).toBeUndefined()
+    }
   })
 })

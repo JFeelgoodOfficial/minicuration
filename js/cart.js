@@ -50,13 +50,17 @@
     return Object.keys(c).reduce(function (n, slug) { return n + c[slug] }, 0)
   }
 
-  // Mirrors quote() in api/_catalog.js.
+  // Mirrors quote() in api/_catalog.js: each card at its `unit` price (the
+  // pre-order price while on pre-order) and the bundle figures in force.
   function totals(c) {
-    var subtotal = 0, open = 0
+    var subtotal = 0, open = 0, savings = 0, preorder = false, stocked = false
     Object.keys(c).forEach(function (slug) {
       var card = DATA.cards[slug]
-      subtotal += card.price * c[slug]
+      subtotal += card.unit * c[slug]
+      savings += (card.price - card.unit) * c[slug]
       if (card.kind === 'open') open += c[slug]
+      if (card.preorder) preorder = true
+      else if (card.kind !== 'addon') stocked = true
     })
     var bundles = Math.floor(open / DATA.bundle.size)
     var discount = bundles * DATA.bundle.discount
@@ -65,7 +69,12 @@
     return { subtotal: subtotal, open: open, discount: discount, shipping: shipping, parcel: parcel,
       toFree: Math.max(0, DATA.shipping.freeFrom - (subtotal - discount)),
       total: subtotal - discount + shipping,
-      toNext: DATA.bundle.size - (open % DATA.bundle.size) }
+      toNext: DATA.bundle.size - (open % DATA.bundle.size),
+      savings: savings, preorder: preorder, mixed: preorder && stocked }
+  }
+
+  function buyLabel(card) {
+    return (card.preorder ? 'Pre-order — ' : 'Add to cart — ') + money(card.unit)
   }
 
   function add(slug, withAddons) {
@@ -77,7 +86,7 @@
     c[slug] = card.kind === 'limited' ? 1 : Math.min((c[slug] || 0) + 1, 50)
     if (card.kind === 'open') (withAddons || []).forEach(function (a) { c[a] = (c[a] || 0) + 1 })
     write(c)
-    if (window.mcTrack) window.mcTrack('add_to_cart', { slug: slug, kind: card.kind, value: card.price / 100, currency: 'USD' })
+    if (window.mcTrack) window.mcTrack('add_to_cart', { slug: slug, kind: card.kind, value: card.unit / 100, currency: 'USD' })
     return true
   }
 
@@ -100,9 +109,9 @@
       if (!card || btn.classList.contains('sold') || btn.getAttribute('aria-disabled') === 'true') return
       var inCart = cart()[slug]
       if (card.kind === 'limited') {
-        btn.textContent = inCart ? 'In your cart — view cart' : 'Add to cart — ' + money(card.price)
+        btn.textContent = inCart ? 'In your cart — view cart' : buyLabel(card)
       } else {
-        btn.textContent = inCart ? 'Add another — ' + inCart + ' in cart' : 'Add to cart — ' + money(card.price)
+        btn.textContent = inCart ? 'Add another — ' + inCart + ' in cart' : buyLabel(card)
       }
     })
     if (document.getElementById('cart-page')) renderCart()
@@ -164,14 +173,18 @@
       var title = addon
         ? '<span class="cart-line-title">' + esc(card.title) + '</span>'
         : '<a href="' + DATA.root + card.url + '" class="cart-line-title">' + esc(card.title) + '</a>'
+      // On pre-order the struck price is the list price; otherwise the regular one.
+      var was = card.preorder ? card.price : card.was
       return '<div class="cart-line">' + thumb +
         '<div class="cart-line-body">' + title +
-          '<p class="cart-line-kind">' + (addon ? esc(card.note) : card.kind === 'limited' ? 'Limited Edition' : 'Unlimited') + ' &middot; ' + money(card.price) +
-            (card.was ? ' <s class="price-was"><span class="sr-only">regular price </span>' + money(card.was) + '</s>' : '') + '</p>' +
+          '<p class="cart-line-kind">' + (addon ? esc(card.note) : card.kind === 'limited' ? 'Limited Edition' : 'Unlimited') +
+            (card.preorder ? ' &middot; Pre-order' : '') + ' &middot; ' + money(card.unit) +
+            (was ? ' <s class="price-was"><span class="sr-only">regular price </span>' + money(was) + '</s>' : '') + '</p>' +
+          (card.preorder ? '<p class="cart-line-ships">Ships ' + esc(DATA.preorder.label) + '</p>' : '') +
           control +
           '<button type="button" class="cart-remove" data-remove="' + slug + '">Remove</button>' +
         '</div>' +
-        '<p class="cart-line-total">' + money(card.price * qty) + '</p>' +
+        '<p class="cart-line-total">' + money(card.unit * qty) + '</p>' +
       '</div>'
     }).join('') + DATA.addons.map(function (slug) {
       var a = DATA.cards[slug]
@@ -192,11 +205,24 @@
     var hint = summary.querySelector('[data-bundle-hint]')
     var more = 'Add ' + t.toNext + ' more unlimited card' + (t.toNext === 1 ? '' : 's')
     var ship = t.shipping ? ' Add ' + money(t.toFree) + ' more for free shipping.' : ''
+    // A full bundle only ships free while it clears the free-shipping line.
+    var free = DATA.bundle.free
     hint.textContent = (t.discount
       ? 'Bundle applied: ' + money(t.discount) + ' off. ' + more + ' to save another ' + money(DATA.bundle.discount) + '.'
       : t.open
-        ? more + ': ' + DATA.bundle.size + ' for ' + money(DATA.bundle.price) + ', shipped free.'
-        : 'Buy ' + DATA.bundle.size + ' unlimited pieces for ' + money(DATA.bundle.price) + ' (save ' + money(DATA.bundle.discount) + ' & it\'s free shipping!)') + ship
+        ? more + ': ' + DATA.bundle.size + ' for ' + money(DATA.bundle.price) + (free ? ', shipped free.' : '.')
+        : 'Buy ' + DATA.bundle.size + ' unlimited pieces for ' + money(DATA.bundle.price) + ' (save ' + money(DATA.bundle.discount) + (free ? ' & it\'s free shipping!)' : ')')) + ship
+    // When it ships: in-stock cards now, pre-orders when the stock lands.
+    var note = summary.querySelector('[data-ship-note]')
+    if (note) {
+      note.textContent = t.mixed
+        ? 'In-stock cards ship within 5–7 business days; pre-order cards ship ' + DATA.preorder.label + ' in a second package. Shipping is charged once.'
+        : t.preorder
+          ? 'Pre-order · ships ' + DATA.preorder.label + '. Cancel for a full refund any time before it ships.'
+          : 'Ships in 5–7 days.'
+      if (t.savings) note.textContent += ' You save ' + money(t.savings) + ' with pre-order pricing.'
+      note.hidden = false
+    }
   }
 
   function checkout(btn) {

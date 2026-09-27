@@ -21,6 +21,11 @@ button.btn-buy[aria-disabled="true"]{cursor:not-allowed;}
 .bundle-note{display:inline-block;margin-top:6px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);}
 .shop-card .card-edition.is-open{color:var(--link);}
 
+/* Pre-order: the notice over the shop, the chip on a card, the tag on a product page */
+.preorder-notice{max-width:1200px;margin:8px auto 0;padding:12px 48px 0;text-align:center;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);}
+.shop-card .card-preorder{display:inline-block;margin-left:10px;padding:2px 8px;border:1px solid var(--accent);border-radius:2px;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);vertical-align:1px;}
+.product-info .tag.is-preorder{margin-left:8px;background:var(--accent-soft);}
+
 /* Product page: the acrylic case add-on */
 .addon-opt{display:flex;align-items:center;gap:10px;margin:-8px 0 14px;font-size:13px;color:var(--text);cursor:pointer;}
 .addon-opt input{width:16px;height:16px;accent-color:var(--accent);}
@@ -65,6 +70,8 @@ button.btn-buy[aria-disabled="true"]{cursor:not-allowed;}
 .cart-summary .row-total{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--text);padding-top:10px;border-top:1px solid var(--border);}
 .cart-summary [hidden]{display:none;}
 .cart-hint{font-size:12px;color:var(--accent);line-height:1.5;margin-bottom:16px;}
+.cart-line-ships{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:-6px 0 10px;}
+.cart-ship-note{font-size:12px;color:var(--muted);line-height:1.5;margin:-8px 0 16px;}
 .cart-status{font-size:13px;color:var(--accent);line-height:1.5;margin-top:12px;min-height:1em;}
 .cart-summary .trust-row{margin-top:12px;font-size:11px;color:var(--muted);text-align:center;line-height:1.7;}
 @media(max-width:820px){
