@@ -203,29 +203,45 @@
     .bundle-inner { max-width:1100px; margin:0 auto; display:grid;
       grid-template-columns:1.05fr .95fr; gap:72px; align-items:center; }
 
-    /* fanned stack of the ten upright unlimited cards; each card's angle
-       (--r), drop (--y) and hover spread (--x) are set by scripts/build-cards.js */
-    .bundle-fan { display:flex; justify-content:center; padding:28px 0; }
-    .bundle-card { width:88px; aspect-ratio:5/7; background:var(--surface); flex:none;
+    /* fanned stack of the ten upright unlimited cards. scripts/build-cards.js
+       sets each card's fan angle (--r), drop (--y) and spread (--x), its place
+       in the grid (--i index, --c column, --rw row) and its scatter offsets
+       (--sx, --sy as fractions of a card width, --sr). A hover or tap moves
+       the fan to its next arrangement (data-mode, set by the script below). */
+    .bundle-fan { --w:88px; --step:44px;
+
+      display:flex; justify-content:center; padding:28px 0; touch-action:manipulation; cursor:pointer; }
+    .bundle-card { width:var(--w); aspect-ratio:5/7; background:var(--surface); flex:none;
       padding:4px; border:1px solid var(--border); border-radius:3px;
-      box-shadow:0 10px 26px var(--shadow-color); margin-right:-44px;
+      box-shadow:0 10px 26px var(--shadow-color); margin-right:calc(var(--step) - var(--w));
       transform-origin:bottom center; transform:rotate(var(--r)) translateY(var(--y));
       transition:transform .45s cubic-bezier(.4,0,.2,1); }
     .bundle-card:last-child { margin-right:0; }
     .bundle-card img { width:100%; height:100%; object-fit:cover; display:block; border-radius:2px; }
-    .bundle-fan:hover .bundle-card { transform:rotate(calc(var(--r) * 1.4)) translate(var(--x), calc(var(--y) - 10px)); }
+
+    /* spread: the fan opens and lifts */
+    .bundle-fan[data-mode="spread"] .bundle-card { transform:rotate(calc(var(--r) * 1.4)) translate(var(--x), calc(var(--y) - 10px)); }
+
+    /* scatter: a messy pile, as if tipped out on a table */
+    .bundle-fan[data-mode="scatter"] .bundle-card { transition-duration:.55s;
+      transform:translate(calc(var(--sx) * var(--w)), calc(var(--sy) * var(--w))) rotate(var(--sr)); }
+
+    /* grid: dealt out in two rows of five */
+    .bundle-fan[data-mode="grid"] .bundle-card { transform-origin:center;
+      transform:translate(calc((var(--c) - 2) * (var(--w) * .82 + 8px) - (var(--i) - 4.5) * var(--step)),
+        calc((var(--rw) - .5) * (var(--w) * 1.15 + 8px))) scale(.82); }
 
     /* cards:home-bundle-css */
-    .bundle-card:nth-child(1) { --r:-13.5deg; --y:16.2px; --x:-23px; }
-    .bundle-card:nth-child(2) { --r:-10.5deg; --y:9.8px; --x:-18px; }
-    .bundle-card:nth-child(3) { --r:-7.5deg; --y:5.0px; --x:-13px; }
-    .bundle-card:nth-child(4) { --r:-4.5deg; --y:1.8px; --x:-8px; }
-    .bundle-card:nth-child(5) { --r:-1.5deg; --y:0.2px; --x:-3px; }
-    .bundle-card:nth-child(6) { --r:1.5deg; --y:0.2px; --x:3px; }
-    .bundle-card:nth-child(7) { --r:4.5deg; --y:1.8px; --x:8px; }
-    .bundle-card:nth-child(8) { --r:7.5deg; --y:5.0px; --x:13px; }
-    .bundle-card:nth-child(9) { --r:10.5deg; --y:9.8px; --x:18px; }
-    .bundle-card:nth-child(10) { --r:13.5deg; --y:16.2px; --x:23px; }
+    .bundle-card:nth-child(1) { --r:-13.5deg; --y:16.2px; --x:-23px; --i:0; --c:0; --rw:0; --sx:-0.64; --sy:-0.54; --sr:10deg; }
+    .bundle-card:nth-child(2) { --r:-10.5deg; --y:9.8px; --x:-18px; --i:1; --c:1; --rw:0; --sx:-0.68; --sy:-0.51; --sr:16deg; }
+    .bundle-card:nth-child(3) { --r:-7.5deg; --y:5.0px; --x:-13px; --i:2; --c:2; --rw:0; --sx:-0.60; --sy:0.20; --sr:11deg; }
+    .bundle-card:nth-child(4) { --r:-4.5deg; --y:1.8px; --x:-8px; --i:3; --c:3; --rw:0; --sx:-0.49; --sy:0.18; --sr:-4deg; }
+    .bundle-card:nth-child(5) { --r:-1.5deg; --y:0.2px; --x:-3px; --i:4; --c:4; --rw:0; --sx:-0.41; --sy:0.52; --sr:-15deg; }
+    .bundle-card:nth-child(6) { --r:1.5deg; --y:0.2px; --x:3px; --i:5; --c:0; --rw:1; --sx:0.00; --sy:0.30; --sr:-4deg; }
+    .bundle-card:nth-child(7) { --r:4.5deg; --y:1.8px; --x:8px; --i:6; --c:1; --rw:1; --sx:0.13; --sy:0.31; --sr:-12deg; }
+    .bundle-card:nth-child(8) { --r:7.5deg; --y:5.0px; --x:13px; --i:7; --c:2; --rw:1; --sx:0.18; --sy:0.31; --sr:-33deg; }
+    .bundle-card:nth-child(9) { --r:10.5deg; --y:9.8px; --x:18px; --i:8; --c:3; --rw:1; --sx:0.35; --sy:0.32; --sr:-6deg; }
+    .bundle-card:nth-child(10) { --r:13.5deg; --y:16.2px; --x:23px; --i:9; --c:4; --rw:1; --sx:0.95; --sy:-0.24; --sr:-36deg; }
 
     /* /cards:home-bundle-css */
     .bundle-rule { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
@@ -244,13 +260,14 @@
     @media(max-width:860px){
       .bundle { padding:64px 20px; }
       .bundle-inner { grid-template-columns:1fr; gap:40px; }
-      .bundle-card { width:64px; margin-right:-32px; }
+      .bundle-fan { --w:64px; --step:32px; }
       .bundle-price { font-size:46px; }
     }
 
     /* Keep the fan (10 cards + their rotation) inside the viewport on phones. */
     @media(max-width:480px){
-      .bundle-card { width:50px; margin-right:-25px; padding:3px; }
+      .bundle-fan { --w:50px; --step:25px; }
+      .bundle-card { padding:3px; }
     }
     @media(prefers-reduced-motion:reduce){ .bundle-card { transition:none; } }
   </style>
@@ -570,6 +587,24 @@
         const behind = swap.classList.contains('is-flipped') ? '.swap-front' : '.swap-back'
         if (card && card.matches(behind)) turn()
       })
+    })
+  </script>
+  <script>
+    // The bundle fan rearranges itself on each hover or tap, never the same
+    // way twice running: spread apart, a messy scatter, or a grid. A mouse
+    // leaving puts it back; on touch, tapping cycles on to the next one.
+    document.querySelectorAll('.bundle-fan').forEach(function (fan) {
+      const modes = ['spread', 'scatter', 'grid']
+      let last = ''
+      function next() {
+        const choices = modes.filter(function (m) { return m !== last })
+        last = choices[Math.floor(Math.random() * choices.length)]
+        fan.dataset.mode = last
+      }
+      function rest() { delete fan.dataset.mode }
+      fan.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') next() })
+      fan.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') rest() })
+      fan.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') next() })
     })
   </script>
   <script defer src="/js/analytics.js"></script>

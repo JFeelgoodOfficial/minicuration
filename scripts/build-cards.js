@@ -395,9 +395,18 @@ function build() {
   const mid = (fan.length - 1) / 2
   splice('index.html', 'cards:home-bundle', fan.map(c =>
     `        <div class="bundle-card"><img width="600" height="816" src="${front(c)}" alt="" loading="lazy" decoding="async"/></div>`).join('\n'))
+  // Scatter offsets come from a fixed sequence, so the "messy" pile is the
+  // same on every build and the page doesn't change without a card change.
+  const jitter = (i, k) => Math.sin(i * 12.9898 + k * 78.233) * 43758.5453 % 1
   spliceCss('index.html', 'cards:home-bundle-css', fan.map((c, i) => {
     const d = i - mid
-    return `    .bundle-card:nth-child(${i + 1}) { --r:${(d * 3).toFixed(1)}deg; --y:${(d * d * 0.8).toFixed(1)}px; --x:${(d * 5).toFixed(0)}px; }`
+    const vars = [
+      `--r:${(d * 3).toFixed(1)}deg`, `--y:${(d * d * 0.8).toFixed(1)}px`, `--x:${(d * 5).toFixed(0)}px`,
+      `--i:${i}`, `--c:${i % 5}`, `--rw:${Math.floor(i / 5)}`,
+      `--sx:${(d * 0.16 + jitter(i, 1) * 0.45).toFixed(2)}`, `--sy:${(jitter(i, 2) * 0.55).toFixed(2)}`,
+      `--sr:${(jitter(i, 3) * 38).toFixed(0)}deg`,
+    ]
+    return `    .bundle-card:nth-child(${i + 1}) { ${vars.join('; ')}; }`
   }).join('\n'))
 
   const data = {
