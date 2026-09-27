@@ -89,3 +89,51 @@ test.describe('Homepage — /', () => {
     await expect(page.locator('#limited-editions .ltd-item').first()).toHaveAttribute('href', 'shop/dreamfall.html')
   })
 })
+
+// While the pre-order runs, the home page carries a "Be the first" section
+// right under the hero: the offer, a countdown to the ship date and a ring of
+// the new cards. It is written by scripts/build-cards.js from the catalog, so
+// it follows PREORDER and disappears when the pre-order ends.
+test.describe('Homepage — pre-order section', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { PREORDER, CARDS } = require('../api/_catalog.js')
+
+  test('is there exactly while the pre-order runs', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.locator('#preorder')).toHaveCount(PREORDER.active ? 1 : 0)
+  })
+
+  test('offers the pre-order prices, counts down to the ship date and links to the pre-order cards', async ({ page }) => {
+    test.skip(!PREORDER.active, 'pre-order is off')
+    await page.goto('/')
+    const po = page.locator('#preorder')
+    await expect(po.locator('h2')).toHaveText('Be the first to hold them.')
+    await expect(po.locator('.po-prices')).toContainText('$7.50')
+    await expect(po.locator('.po-prices')).toContainText('$4.50')
+    const days = Math.round((Date.parse(PREORDER.ships) - Date.parse(new Date().toISOString().slice(0, 10))) / 864e5)
+    if (days > 0) await expect(po.locator('[data-po-count] b')).toHaveText(String(days))
+    // A ring of the new cards, none of them the in-stock originals, each linking to its page.
+    const ring = po.locator('.po-card')
+    await expect(ring).toHaveCount(12)
+    const slugs = await ring.evaluateAll(as => as.map(a => (a.getAttribute('href') || '').replace(/^shop\/|\.html$/g, '')))
+    const preorder = CARDS.filter((c: { preorder: boolean }) => c.preorder).map((c: { slug: string }) => c.slug)
+    for (const slug of slugs) expect(preorder, slug).toContain(slug)
+    // Decorative for assistive tech: the call to action is the way in.
+    await expect(po.locator('.po-ring')).toHaveAttribute('aria-hidden', 'true')
+    await po.locator('[data-po-cta]').click()
+    await expect(page).toHaveURL(/\/shop(\.html)?#preorder$/)
+    await expect(page.locator('.shop-card:visible')).toHaveCount(25)
+  })
+
+  test('the ring stops turning while the pointer is over it', async ({ page, isMobile }) => {
+    test.skip(!PREORDER.active || isMobile, 'needs a mouse')
+    await page.goto('/')
+    const stage = page.locator('#preorder .po-stage')
+    await stage.scrollIntoViewIfNeeded()
+    const state = () => stage.locator('.po-ring').evaluate(el => getComputedStyle(el).animationPlayState)
+    await page.mouse.move(0, 0)
+    await expect.poll(state).toBe('running')
+    await stage.hover()
+    await expect.poll(state).toBe('paused')
+  })
+})

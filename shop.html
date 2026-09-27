@@ -1416,6 +1416,12 @@ window.openModal = function(id) {
         card.style.display = shown ? '' : 'none'
       })
     }
+    // shop.html#preorder (the home page's "Pre-order now") opens on the
+    // pre-order cards.
+    if (location.hash === '#preorder') {
+      const preorderBtn = document.querySelector('.filter-btn[onclick*="preorder"]')
+      if (preorderBtn) window.filterCards('preorder', preorderBtn)
+    }
     // Tap/click "Flip" to reveal the card back (the artist's story) — works on
     // touch, where hover-to-spin never fires. Listens in the capture phase so it
     // runs before the card's own click handler and can stop the click from

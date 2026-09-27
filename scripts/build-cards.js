@@ -351,6 +351,66 @@ function shopCard(c) {
     </div>`
 }
 
+// Home page, while the pre-order runs: "Be the first", the prices, a countdown
+// and a ring of the new cards turning on the table, limited and unlimited
+// taking turns. Upright cards only: the ring is sized for portrait cards.
+const RING_SIZE = 12
+function homePreorder() {
+  const pre = CARDS.filter(c => c.preorder)
+  const lim = pre.filter(c => isLimited(c) && !c.wide)
+  const opn = pre.filter(c => !isLimited(c) && !c.wide)
+  const ring = []
+  for (let i = 0; ring.length < RING_SIZE && (i < lim.length || i < opn.length); i++) {
+    if (lim[i]) ring.push(lim[i])
+    if (opn[i] && ring.length < RING_SIZE) ring.push(opn[i])
+  }
+  const off = `${Math.round(PREORDER.off * 100)}%`
+  const count = (n) => ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve',
+    'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen', 'Twenty'][n] || String(n)
+  const nLim = pre.filter(isLimited).length
+  const nOpen = pre.length - nLim
+  const limUnit = unitPrice({ price: PRICES.limited.price, preorder: true })
+  const words = (n) => (n === 25 ? 'Twenty-five' : count(n))
+  // Each card's place on the ring, and the ring's radius in card widths (just
+  // clear of the neighbours, with a gap), go in the page's stylesheet.
+  const k = (0.5 / Math.tan(Math.PI / ring.length) * 1.18).toFixed(3)
+  spliceCss('index.html', 'cards:home-preorder-css', [
+    `    .po-stage .po-ring { --n:${ring.length}; --k:${k}; }`,
+    ...ring.map((c, i) => `    .po-card:nth-child(${i + 1}) { --i:${i}; }`),
+  ].join('\n'))
+  return `  <section class="po" id="preorder" aria-labelledby="po-heading" data-po data-ships="${PREORDER.ships}">
+    <div class="po-inner">
+      <div class="po-text">
+        <p class="po-rule"><span>Pre-order &middot; ${off} off</span></p>
+        <h2 id="po-heading">Be the first <em>to hold them.</em></h2>
+        <p class="po-copy">${words(pre.length)} new cards are at the printer: ${count(nLim).toLowerCase()} numbered limited editions and ${count(nOpen).toLowerCase()} from the unlimited archive. Pre-order now at ${off} off and yours ships ${esc(PREORDER.label)}.</p>
+        <p class="po-count" data-po-count hidden><b></b><span></span></p>
+        <ul class="po-prices">
+          <li><span class="what">Limited edition of 50</span><span class="cost">${money(limUnit)}<s><span class="sr-only">regular price </span>${money(PRICES.limited.price)}</s></span></li>
+          <li><span class="what">Unlimited</span><span class="cost">${money(OPEN_UNIT)}<s><span class="sr-only">regular price </span>${money(PRICES.open.price)}</s></span></li>
+        </ul>
+        <div class="po-actions">
+          <a href="shop.html#preorder" class="btn-primary po-cta" data-po-cta>Pre-order now</a>
+          <a href="policies.html#preorders" class="po-more">How pre-orders work</a>
+        </div>
+        <p class="po-fine">The original six are in stock and ship within 5&ndash;7 days. ${off} off while the new cards are on pre-order.</p>
+      </div>
+      <div class="po-stage">
+        <p class="po-stamp">Pre-order<strong>${off} off</strong>ships ${esc(PREORDER.label.replace(/^on or before /, 'by '))}</p>
+        <div class="po-floor"></div>
+        <div class="po-tilt">
+          <div class="po-ring" aria-hidden="true">
+${ring.map((c) => `            <a class="po-card" href="shop/${c.slug}.html" tabindex="-1"><span class="po-lift">
+              <span class="po-face po-front"><img width="600" height="816" src="${front(c)}" alt="" loading="lazy" decoding="async"/></span>
+              <span class="po-face po-back"><img width="600" height="816" src="${back(c)}" alt="" loading="lazy" decoding="async"/></span>
+            </span></a>`).join('\n')}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>`
+}
+
 function sitemapEntry(c) {
   return `  <url>
     <loc>${SITE}/shop/${c.slug}.html</loc>
@@ -443,6 +503,8 @@ function build() {
         <p class="bundle-note">${bundleOffer()}</p>
         <a href="shop.html#unlimited" class="btn-primary">Choose your ten</a>
         <p class="bundle-terms">${PREORDER.active ? `Pre-order: ships ${esc(PREORDER.label)}. ` : ''}Any ten unlimited cards in one order; every further ten saves another ${money(BUNDLE_OFF)}.${BUNDLE_FREE ? '' : ` Free shipping on orders of ${money(SHIPPING.freeFrom)}+.`} Secure checkout via Stripe &middot; ${PREORDER.active ? '' : 'Ships in 5&ndash;7 days &middot; '}14-day guarantee.</p>`)
+  if (PREORDER.active) splice('index.html', 'cards:home-preorder', homePreorder())
+  else { splice('index.html', 'cards:home-preorder', ''); spliceCss('index.html', 'cards:home-preorder-css', '') }
   const fan = open.filter(c => !c.wide)
   const mid = (fan.length - 1) / 2
   splice('index.html', 'cards:home-bundle', fan.map(c =>
