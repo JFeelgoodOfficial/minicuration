@@ -150,3 +150,42 @@ test.describe('webhook — the buyer\'s edition-number draft', () => {
     expect(body).not.toContain('undefined')
   })
 })
+
+// Pre-orders: the checkout marks each line sold on pre-order, and the webhook
+// tells the packer (and the buyer) what ships now and what waits.
+test.describe('webhook — pre-orders', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { preorderSlugs, paidBySlug, splitShipments, shipsLabel } = require('../api/webhook.js')
+  const line = (slug: string, kind: string, extra: Record<string, string> = {}, amount_total = 0) =>
+    ({ quantity: 1, amount_total, price: { product: { metadata: { slug, kind, ...extra } } } })
+
+  test('reads the pre-order flag from the line metadata, not the catalog', () => {
+    const items = [line('veritas', 'limited'), line('pride', 'limited', { preorder: '1', ships: '2026-11-01' }), line('moonsail', 'open', { preorder: '1' })]
+    expect([...preorderSlugs(items)]).toEqual(['pride', 'moonsail'])
+    expect(preorderSlugs([{ price: { id: 'price_legacy' } }]).size).toBe(0)
+  })
+
+  test('refunds what the buyer paid for a line, after the coupon', () => {
+    expect(paidBySlug([line('pride', 'limited', {}, 742), line('moonsail', 'open', {}, 4500)])).toEqual({ pride: 742, moonsail: 4500 })
+    expect(paidBySlug([{ price: { id: 'price_legacy' } }])).toEqual({})
+  })
+
+  test('splits the order into what ships now and what waits, add-ons riding with the pre-order', () => {
+    const sold = [{ slug: 'veritas', editionNumber: 3 }, { slug: 'pride', editionNumber: 1 }]
+    const open = [{ slug: 'moonsail', qty: 2 }, { slug: 'acrylic-case', qty: 2 }]
+    expect(splitShipments(sold, open, new Set(['pride', 'moonsail']))).toEqual({
+      now: [{ slug: 'veritas', qty: 1 }],
+      later: [{ slug: 'pride', qty: 1 }, { slug: 'moonsail', qty: 2 }, { slug: 'acrylic-case', qty: 2 }],
+    })
+    // Nothing on pre-order: one pile, add-ons with the cards.
+    expect(splitShipments(sold, open, new Set())).toEqual({
+      now: [{ slug: 'veritas', qty: 1 }, { slug: 'pride', qty: 1 }, { slug: 'moonsail', qty: 2 }, { slug: 'acrylic-case', qty: 2 }],
+      later: [],
+    })
+  })
+
+  test('words the promised date from the session, falling back to the catalog', () => {
+    expect(shipsLabel('2026-11-01')).toBe('on or before Nov 1, 2026')
+    expect(shipsLabel(undefined)).toBe('on or before Nov 1')
+  })
+})

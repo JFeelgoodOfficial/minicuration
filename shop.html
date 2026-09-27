@@ -223,17 +223,19 @@
   <div class="page-header">
     <p class="eyebrow">The Collection</p>
     <h1>50 prints. Pocket-sized.</h1>
-    <p>Reproductions of original paintings in two collections: numbered limited editions of 50, magnetically sealed in an acrylic case, and an unlimited run from the archive. Hover any card to set it spinning &mdash; or tap <strong>Flip</strong> to see the back. US shipping is $2 an order for unlimited cards by letter mail, or $7 tracked for anything with a limited edition, case or stand. Free on orders of $50+.</p>
+    <p>Reproductions of original paintings in two collections: numbered limited editions of 50, magnetically sealed in an acrylic case, and an unlimited run from the archive. Hover any card to set it spinning &mdash; or tap <strong>Flip</strong> to see the back. US shipping is $2 an order for unlimited cards by letter mail, or $7 tracked for anything with a limited edition, case or stand. Free on orders of $50+. The original six are in stock; every other card is a pre-order at 25% off, shipping on or before Nov 1.</p>
     <div class="divider"></div>
   </div>
-
-
+<!-- cards:shop-notice -->
+  <p class="preorder-notice">Only the original six are in stock. Every other card is a pre-order at 25% off and ships on or before Nov 1.</p>
+<!-- /cards:shop-notice -->
 
   <div class="filter-bar">
     <button type="button" class="filter-btn active" onclick="filterCards('all',this)">All (31)</button>
     <button type="button" class="filter-btn" onclick="filterCards('limited',this)">Limited Edition (16)</button>
     <button type="button" class="filter-btn" onclick="filterCards('open',this)">Unlimited (15)</button>
     <button type="button" class="filter-btn" onclick="filterCards('available',this)">Available</button>
+    <button type="button" class="filter-btn" onclick="filterCards('preorder',this)">Pre-order</button>
     <button type="button" class="filter-btn" onclick="filterCards('sold',this)">Sold</button>
   </div>
 
@@ -450,7 +452,7 @@
       </div>
     </div>
 <!-- cards:limited -->
-    <div class="shop-card" data-slug="poetry-of-solace" data-kind="limited" data-status="available" onclick="location.href='shop/poetry-of-solace.html'">
+    <div class="shop-card" data-slug="poetry-of-solace" data-kind="limited" data-status="available" data-preorder="1" onclick="location.href='shop/poetry-of-solace.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap landscape">
           <div class="sc-spin-scene">
@@ -469,22 +471,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span></div>
+        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Poetry of Solace</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">From the series “The Lost”</p>
         <p class="card-concept">&ldquo;All suffering has cracks and crevices where life grows new... whether in tribulation or solace, the grand treasure is truth.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
+          <span class="card-price">$7.50 <s class="price-was"><span class="sr-only">regular price </span>$10</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="poetry-of-solace">Add to cart — $10</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="poetry-of-solace">Pre-order — $7.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="adonis" data-kind="limited" data-status="available" onclick="location.href='shop/adonis.html'">
+    <div class="shop-card" data-slug="adonis" data-kind="limited" data-status="available" data-preorder="1" onclick="location.href='shop/adonis.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap landscape">
           <div class="sc-spin-scene">
@@ -503,22 +505,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span></div>
+        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Adonis</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Acrylic on Canvas</p>
         <p class="card-concept">&ldquo;A simple, honest look at vulnerability, beauty, and the stories we carry behind our gaze.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
+          <span class="card-price">$7.50 <s class="price-was"><span class="sr-only">regular price </span>$10</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="adonis">Add to cart — $10</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="adonis">Pre-order — $7.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="vanity" data-kind="limited" data-status="available" onclick="location.href='shop/vanity.html'">
+    <div class="shop-card" data-slug="vanity" data-kind="limited" data-status="available" data-preorder="1" onclick="location.href='shop/vanity.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -537,22 +539,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span></div>
+        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Vanity</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Acrylic on Canvas, Epoxy Resin</p>
         <p class="card-concept">&ldquo;When I am selective in hearing, I feed the monster only what it wants to hear, instead of being open to opportunities for growth.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
+          <span class="card-price">$7.50 <s class="price-was"><span class="sr-only">regular price </span>$10</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="vanity">Add to cart — $10</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="vanity">Pre-order — $7.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="the-king" data-kind="limited" data-status="available" onclick="location.href='shop/the-king.html'">
+    <div class="shop-card" data-slug="the-king" data-kind="limited" data-status="available" data-preorder="1" onclick="location.href='shop/the-king.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -571,22 +573,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span></div>
+        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">The King</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Acrylic on Canvas, Epoxy Resin</p>
         <p class="card-concept">&ldquo;In being too bossy or vindictive, I lose sight of purpose and push others away due to uncouth behavior.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
+          <span class="card-price">$7.50 <s class="price-was"><span class="sr-only">regular price </span>$10</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="the-king">Add to cart — $10</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="the-king">Pre-order — $7.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="pride" data-kind="limited" data-status="available" onclick="location.href='shop/pride.html'">
+    <div class="shop-card" data-slug="pride" data-kind="limited" data-status="available" data-preorder="1" onclick="location.href='shop/pride.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -605,22 +607,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span></div>
+        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Pride</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Acrylic on Canvas, Epoxy Resin</p>
         <p class="card-concept">&ldquo;Work, no matter the urgency or size, has purpose. If I do not enjoy it, then the effort means nothing and I miss out on life.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
+          <span class="card-price">$7.50 <s class="price-was"><span class="sr-only">regular price </span>$10</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="pride">Add to cart — $10</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="pride">Pre-order — $7.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="lush" data-kind="limited" data-status="available" onclick="location.href='shop/lush.html'">
+    <div class="shop-card" data-slug="lush" data-kind="limited" data-status="available" data-preorder="1" onclick="location.href='shop/lush.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -639,22 +641,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span></div>
+        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Lush</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Acrylic on Canvas, Epoxy Resin</p>
         <p class="card-concept">&ldquo;Without them, I am the blank canvas… open to new ideas, new feelings, a new me.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
+          <span class="card-price">$7.50 <s class="price-was"><span class="sr-only">regular price </span>$10</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="lush">Add to cart — $10</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="lush">Pre-order — $7.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="businessman" data-kind="limited" data-status="available" onclick="location.href='shop/businessman.html'">
+    <div class="shop-card" data-slug="businessman" data-kind="limited" data-status="available" data-preorder="1" onclick="location.href='shop/businessman.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -673,22 +675,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span></div>
+        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Businessman</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Acrylic on Canvas, Wood Panel, Epoxy Resin</p>
         <p class="card-concept">&ldquo;Alignment solely with wealth building and material systems keeps my emotional and spiritual growth inhibited.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
+          <span class="card-price">$7.50 <s class="price-was"><span class="sr-only">regular price </span>$10</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="businessman">Add to cart — $10</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="businessman">Pre-order — $7.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="best-friend" data-kind="limited" data-status="available" onclick="location.href='shop/best-friend.html'">
+    <div class="shop-card" data-slug="best-friend" data-kind="limited" data-status="available" data-preorder="1" onclick="location.href='shop/best-friend.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -707,22 +709,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span></div>
+        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Best Friend</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Acrylic on Canvas, Wood Panel, Epoxy Resin</p>
         <p class="card-concept">&ldquo;Vulnerability is the precursor to authenticity. I grow bigger than my fears because I have them.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
+          <span class="card-price">$7.50 <s class="price-was"><span class="sr-only">regular price </span>$10</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="best-friend">Add to cart — $10</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="best-friend">Pre-order — $7.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="vicarious" data-kind="limited" data-status="available" onclick="location.href='shop/vicarious.html'">
+    <div class="shop-card" data-slug="vicarious" data-kind="limited" data-status="available" data-preorder="1" onclick="location.href='shop/vicarious.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -741,22 +743,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span></div>
+        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Vicarious</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Acrylic, Latex, Torn Canvas, Epoxy Resin</p>
         <p class="card-concept">&ldquo;Living in the throes of imagination, I am aged by experiences of a thousand lifetimes, at the cost of growing closer to real people.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
+          <span class="card-price">$7.50 <s class="price-was"><span class="sr-only">regular price </span>$10</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="vicarious">Add to cart — $10</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="vicarious">Pre-order — $7.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="permission" data-kind="limited" data-status="available" onclick="location.href='shop/permission.html'">
+    <div class="shop-card" data-slug="permission" data-kind="limited" data-status="available" data-preorder="1" onclick="location.href='shop/permission.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap landscape">
           <div class="sc-spin-scene">
@@ -775,19 +777,19 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span></div>
+        <div class="card-top-row"><span class="card-edition">Ltd. Ed. of 50</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Permission</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Acrylic on Canvas, Epoxy Resin</p>
         <p class="card-concept">&ldquo;Brilliant and mighty power. Sometimes, I seek it from others long before I consider it coming from myself.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$10 <s class="price-was"><span class="sr-only">regular price </span>$23</s></span>
+          <span class="card-price">$7.50 <s class="price-was"><span class="sr-only">regular price </span>$10</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="permission">Add to cart — $10</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="permission">Pre-order — $7.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
 <!-- /cards:limited -->
@@ -797,11 +799,15 @@
   <section class="shop-section" id="unlimited" data-kind="open" aria-labelledby="unlimited-heading">
   <div class="shop-section-head">
     <h2 id="unlimited-heading">Unlimited</h2>
-    <p>Open-edition cards from the JFeelgood archive, each with the painting's title on the back, shipped in a protective plastic slip. Add a magnetically sealed acrylic case for $4 or an acrylic display stand for $1. <strong>$6</strong> <s class="price-was"><span class="sr-only">regular price </span>$15</s> each.<br/><span class="bundle-note">Buy 10 unlimited pieces for $50 (save $10 &amp; it's free shipping!)</span></p>
+    <p>Open-edition cards from the JFeelgood archive, each with the painting's title on the back, shipped in a protective plastic slip. Add a magnetically sealed acrylic case for $4 or an acrylic display stand for $1.
+<!-- cards:shop-open-offer -->
+<strong>$4.50</strong> <s class="price-was"><span class="sr-only">regular price </span>$6</s> each on pre-order.<br/><span class="bundle-note">Buy 10 unlimited pieces for $37.50 (save $7.50 &mdash; pre-order price)</span>
+<!-- /cards:shop-open-offer -->
+    </p>
   </div>
   <div class="shop-grid" id="unlimitedGrid">
 <!-- cards:open -->
-    <div class="shop-card" data-slug="affordable-housing" data-kind="open" data-status="available" onclick="location.href='shop/affordable-housing.html'">
+    <div class="shop-card" data-slug="affordable-housing" data-kind="open" data-status="available" data-preorder="1" onclick="location.href='shop/affordable-housing.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap landscape">
           <div class="sc-spin-scene">
@@ -820,22 +826,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span></div>
+        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Affordable Housing</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Open edition</p>
         <p class="card-concept">&ldquo;We can all go outside&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$6 <s class="price-was"><span class="sr-only">regular price </span>$15</s></span>
+          <span class="card-price">$4.50 <s class="price-was"><span class="sr-only">regular price </span>$6</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="affordable-housing">Add to cart — $6</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="affordable-housing">Pre-order — $4.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="cornerstones" data-kind="open" data-status="available" onclick="location.href='shop/cornerstones.html'">
+    <div class="shop-card" data-slug="cornerstones" data-kind="open" data-status="available" data-preorder="1" onclick="location.href='shop/cornerstones.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap landscape">
           <div class="sc-spin-scene">
@@ -854,22 +860,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span></div>
+        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Cornerstones</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Open edition</p>
         <p class="card-concept">&ldquo;We often take for granted the most important things&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$6 <s class="price-was"><span class="sr-only">regular price </span>$15</s></span>
+          <span class="card-price">$4.50 <s class="price-was"><span class="sr-only">regular price </span>$6</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="cornerstones">Add to cart — $6</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="cornerstones">Pre-order — $4.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="gentrification" data-kind="open" data-status="available" onclick="location.href='shop/gentrification.html'">
+    <div class="shop-card" data-slug="gentrification" data-kind="open" data-status="available" data-preorder="1" onclick="location.href='shop/gentrification.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap landscape">
           <div class="sc-spin-scene">
@@ -888,22 +894,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span></div>
+        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Gentrification</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Open edition</p>
         <p class="card-concept">&ldquo;Every change has a price&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$6 <s class="price-was"><span class="sr-only">regular price </span>$15</s></span>
+          <span class="card-price">$4.50 <s class="price-was"><span class="sr-only">regular price </span>$6</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="gentrification">Add to cart — $6</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="gentrification">Pre-order — $4.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="grecia-monroc" data-kind="open" data-status="available" onclick="location.href='shop/grecia-monroc.html'">
+    <div class="shop-card" data-slug="grecia-monroc" data-kind="open" data-status="available" data-preorder="1" onclick="location.href='shop/grecia-monroc.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -922,22 +928,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span></div>
+        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Grecia Monroc</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Open edition</p>
         <p class="card-concept">Portrait of multidisciplinary artist Grecia Monroc.</p>
         <div class="card-price-row">
-          <span class="card-price">$6 <s class="price-was"><span class="sr-only">regular price </span>$15</s></span>
+          <span class="card-price">$4.50 <s class="price-was"><span class="sr-only">regular price </span>$6</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="grecia-monroc">Add to cart — $6</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="grecia-monroc">Pre-order — $4.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="ronin" data-kind="open" data-status="available" onclick="location.href='shop/ronin.html'">
+    <div class="shop-card" data-slug="ronin" data-kind="open" data-status="available" data-preorder="1" onclick="location.href='shop/ronin.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -956,22 +962,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span></div>
+        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Ronin</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Open edition</p>
         <p class="card-concept">&ldquo;Some would have their spirit share their tale&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$6 <s class="price-was"><span class="sr-only">regular price </span>$15</s></span>
+          <span class="card-price">$4.50 <s class="price-was"><span class="sr-only">regular price </span>$6</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="ronin">Add to cart — $6</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="ronin">Pre-order — $4.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="supernova" data-kind="open" data-status="available" onclick="location.href='shop/supernova.html'">
+    <div class="shop-card" data-slug="supernova" data-kind="open" data-status="available" data-preorder="1" onclick="location.href='shop/supernova.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -990,22 +996,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span></div>
+        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Supernova</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Open edition</p>
         <p class="card-concept">&ldquo;We miss the beauty of the universe while lost in our thoughts&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$6 <s class="price-was"><span class="sr-only">regular price </span>$15</s></span>
+          <span class="card-price">$4.50 <s class="price-was"><span class="sr-only">regular price </span>$6</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="supernova">Add to cart — $6</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="supernova">Pre-order — $4.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="reach" data-kind="open" data-status="available" onclick="location.href='shop/reach.html'">
+    <div class="shop-card" data-slug="reach" data-kind="open" data-status="available" data-preorder="1" onclick="location.href='shop/reach.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -1024,22 +1030,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span></div>
+        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Reach</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Open edition</p>
         <p class="card-concept">&ldquo;All adventure has an origin&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$6 <s class="price-was"><span class="sr-only">regular price </span>$15</s></span>
+          <span class="card-price">$4.50 <s class="price-was"><span class="sr-only">regular price </span>$6</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="reach">Add to cart — $6</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="reach">Pre-order — $4.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="little-wanderer" data-kind="open" data-status="available" onclick="location.href='shop/little-wanderer.html'">
+    <div class="shop-card" data-slug="little-wanderer" data-kind="open" data-status="available" data-preorder="1" onclick="location.href='shop/little-wanderer.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap landscape">
           <div class="sc-spin-scene">
@@ -1058,22 +1064,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span></div>
+        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Little Wanderer</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Open edition</p>
         <p class="card-concept">&ldquo;A good friend is a precious thing&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$6 <s class="price-was"><span class="sr-only">regular price </span>$15</s></span>
+          <span class="card-price">$4.50 <s class="price-was"><span class="sr-only">regular price </span>$6</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="little-wanderer">Add to cart — $6</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="little-wanderer">Pre-order — $4.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="summer-field" data-kind="open" data-status="available" onclick="location.href='shop/summer-field.html'">
+    <div class="shop-card" data-slug="summer-field" data-kind="open" data-status="available" data-preorder="1" onclick="location.href='shop/summer-field.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap landscape">
           <div class="sc-spin-scene">
@@ -1092,22 +1098,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span></div>
+        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Summer Field</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Open edition</p>
         <p class="card-concept">&ldquo;You may not be here but I remember where you stood&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$6 <s class="price-was"><span class="sr-only">regular price </span>$15</s></span>
+          <span class="card-price">$4.50 <s class="price-was"><span class="sr-only">regular price </span>$6</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="summer-field">Add to cart — $6</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="summer-field">Pre-order — $4.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="hidden-grove" data-kind="open" data-status="available" onclick="location.href='shop/hidden-grove.html'">
+    <div class="shop-card" data-slug="hidden-grove" data-kind="open" data-status="available" data-preorder="1" onclick="location.href='shop/hidden-grove.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -1126,22 +1132,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span></div>
+        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Hidden Grove</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Open edition</p>
         <p class="card-concept">&ldquo;Love in the hardest of times&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$6 <s class="price-was"><span class="sr-only">regular price </span>$15</s></span>
+          <span class="card-price">$4.50 <s class="price-was"><span class="sr-only">regular price </span>$6</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="hidden-grove">Add to cart — $6</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="hidden-grove">Pre-order — $4.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="moonsail" data-kind="open" data-status="available" onclick="location.href='shop/moonsail.html'">
+    <div class="shop-card" data-slug="moonsail" data-kind="open" data-status="available" data-preorder="1" onclick="location.href='shop/moonsail.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -1160,22 +1166,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span></div>
+        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Moonsail</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Open edition</p>
         <p class="card-concept">&ldquo;We don&#39;t always see what carries us.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$6 <s class="price-was"><span class="sr-only">regular price </span>$15</s></span>
+          <span class="card-price">$4.50 <s class="price-was"><span class="sr-only">regular price </span>$6</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="moonsail">Add to cart — $6</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="moonsail">Pre-order — $4.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="tidewatcher" data-kind="open" data-status="available" onclick="location.href='shop/tidewatcher.html'">
+    <div class="shop-card" data-slug="tidewatcher" data-kind="open" data-status="available" data-preorder="1" onclick="location.href='shop/tidewatcher.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -1194,22 +1200,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span></div>
+        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Tidewatcher</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Open edition</p>
         <p class="card-concept">&ldquo;Curiosity is the universal language&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$6 <s class="price-was"><span class="sr-only">regular price </span>$15</s></span>
+          <span class="card-price">$4.50 <s class="price-was"><span class="sr-only">regular price </span>$6</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="tidewatcher">Add to cart — $6</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="tidewatcher">Pre-order — $4.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="awakening" data-kind="open" data-status="available" onclick="location.href='shop/awakening.html'">
+    <div class="shop-card" data-slug="awakening" data-kind="open" data-status="available" data-preorder="1" onclick="location.href='shop/awakening.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -1228,22 +1234,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span></div>
+        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Awakening</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Open edition</p>
         <p class="card-concept">&ldquo;Always remember to stretch&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$6 <s class="price-was"><span class="sr-only">regular price </span>$15</s></span>
+          <span class="card-price">$4.50 <s class="price-was"><span class="sr-only">regular price </span>$6</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="awakening">Add to cart — $6</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="awakening">Pre-order — $4.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="gilded-cage" data-kind="open" data-status="available" onclick="location.href='shop/gilded-cage.html'">
+    <div class="shop-card" data-slug="gilded-cage" data-kind="open" data-status="available" data-preorder="1" onclick="location.href='shop/gilded-cage.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -1262,22 +1268,22 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span></div>
+        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Gilded Cage</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Open edition</p>
         <p class="card-concept">&ldquo;You can build anything but remember you are not bound to it.&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$6 <s class="price-was"><span class="sr-only">regular price </span>$15</s></span>
+          <span class="card-price">$4.50 <s class="price-was"><span class="sr-only">regular price </span>$6</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="gilded-cage">Add to cart — $6</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="gilded-cage">Pre-order — $4.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
-    <div class="shop-card" data-slug="le-verbeux" data-kind="open" data-status="available" onclick="location.href='shop/le-verbeux.html'">
+    <div class="shop-card" data-slug="le-verbeux" data-kind="open" data-status="available" data-preorder="1" onclick="location.href='shop/le-verbeux.html'">
       <div class="card-flipper" style="position:relative;">
         <div class="sc-spin-wrap">
           <div class="sc-spin-scene">
@@ -1296,19 +1302,19 @@
         <button type="button" class="flip-toggle" aria-label="Flip card to see the back">Flip &#10227;</button>
       </div>
       <div class="card-body">
-        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span></div>
+        <div class="card-top-row"><span class="card-edition is-open">Unlimited</span><span class="card-preorder">Pre-order</span></div>
         <h3 class="card-title">Le Verbeux</h3>
         <p class="card-artist">by JFeelgood</p>
         <p class="card-medium">Charcoal on Canvas · Open edition</p>
         <p class="card-concept">&ldquo;If a picture is worth a thousand words, how much is a dream?&rdquo;</p>
         <div class="card-price-row">
-          <span class="card-price">$6 <s class="price-was"><span class="sr-only">regular price </span>$15</s></span>
+          <span class="card-price">$4.50 <s class="price-was"><span class="sr-only">regular price </span>$6</s></span>
         </div>
         <p class="card-stock-count"></p>
       </div>
       <div class="stripe-wrap" onclick="event.stopPropagation()">
-        <button type="button" class="btn-buy" data-add-to-cart="le-verbeux">Add to cart — $6</button>
-        <p class="card-trust">Secure Stripe checkout &middot; Ships 5&ndash;7 days &middot; 14-day guarantee</p>
+        <button type="button" class="btn-buy" data-add-to-cart="le-verbeux">Pre-order — $4.50</button>
+        <p class="card-trust">Secure Stripe checkout &middot; Ships on or before Nov 1 &middot; 14-day guarantee</p>
       </div>
     </div>
 <!-- /cards:open -->
@@ -1396,7 +1402,7 @@ window.openModal = function(id) {
       })
     })()
     // 'limited' / 'open' show one collection; 'available' / 'sold' filter cards
-    // across both.
+    // across both, and 'preorder' the cards waiting for stock.
     window.filterCards = function(status, btn) {
       document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active')})
       btn.classList.add('active')
@@ -1405,8 +1411,16 @@ window.openModal = function(id) {
         section.hidden = byKind && section.dataset.kind !== status
       })
       document.querySelectorAll('.shop-card').forEach(function(card) {
-        card.style.display = (byKind || status === 'all' || card.dataset.status === status) ? '' : 'none'
+        const shown = byKind || status === 'all'
+          || (status === 'preorder' ? card.dataset.preorder === '1' : card.dataset.status === status)
+        card.style.display = shown ? '' : 'none'
       })
+    }
+    // shop.html#preorder (the home page's "Pre-order now") opens on the
+    // pre-order cards.
+    if (location.hash === '#preorder') {
+      const preorderBtn = document.querySelector('.filter-btn[onclick*="preorder"]')
+      if (preorderBtn) window.filterCards('preorder', preorderBtn)
     }
     // Tap/click "Flip" to reveal the card back (the artist's story) — works on
     // touch, where hover-to-spin never fires. Listens in the capture phase so it

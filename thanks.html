@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="theme-color" content="#f5efe4"/>
   <title>Thank You — Your Order Is Confirmed | Minicuration</title>
-  <meta name="description" content="Your Minicuration order is confirmed and ships within 5–7 business days."/>
+  <meta name="description" content="Your Minicuration order is confirmed. A confirmation with your order number is on its way to your inbox."/>
   <meta name="robots" content="noindex, follow"/>
   <link rel="canonical" href="https://minicuration.com/thanks.html"/>
   <link rel="stylesheet" href="/css/theme.css"/>
@@ -65,7 +65,7 @@
     <p>We&rsquo;ve received it, and a confirmation with your order number is on its way to your inbox. We&rsquo;ll email you again when it ships.</p>
     <div class="divider"></div>
     <div class="order-facts">
-      <div><strong>Ships in 5–7 days</strong>Packed flat and protected</div>
+      <div><strong data-ships-fact>Ships in 5–7 days</strong>Packed flat and protected</div>
       <div><strong>Questions?</strong>Reply to your confirmation email</div>
     </div>
   </section>
@@ -123,6 +123,9 @@
       const data = window.MC_CATALOG
       const grid = document.getElementById('more-cards')
       if (!data || !grid) return
+      // While a pre-order runs, part of an order may wait for stock.
+      const fact = document.querySelector('[data-ships-fact]')
+      if (fact && data.preorder && data.preorder.active) fact.textContent = 'In stock: 5–7 days · Pre-orders: ' + data.preorder.label
       const cards = Object.keys(data.cards)
         .map(function (slug) { return Object.assign({ slug: slug }, data.cards[slug]) })
         // Upright cards only, so the row lines up; add-ons are not cards.
@@ -137,7 +140,7 @@
         const kind = c.kind === 'limited' ? 'Limited edition' : 'Unlimited'
         return '<a href="' + data.root + c.url + '" class="cross-card">' +
           '<img width="600" height="816" src="' + data.root + c.img + '" alt="' + esc(c.title) + ' by JFeelgood" loading="lazy" decoding="async"/>' +
-          '<div class="cross-card-body"><h3>' + esc(c.title) + '</h3><p>' + kind + ' · ' + money(c.price) + '</p></div></a>'
+          '<div class="cross-card-body"><h3>' + esc(c.title) + '</h3><p>' + kind + ' · ' + money(c.unit) + (c.preorder ? ' · Pre-order' : '') + '</p></div></a>'
       }).join('')
     })
   </script>

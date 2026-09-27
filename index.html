@@ -170,6 +170,120 @@
     .why-collect-grid > div:hover { border-color:var(--crimson); }
     .journal-card:hover { background: var(--surface-2); }
 
+    /* ── PRE-ORDER ── the press room: the new cards turning on a ring under a
+       lamp, their printed backs showing as they swing away. scripts/build-cards.js
+       writes the section (only while PREORDER.active) with --n cards on the
+       ring and --k, the ring's radius in card widths for that many. */
+    .po { --ink:#1b1714; --paper:#f3ecdf; --dim:rgb(243 236 223 / 64%); --hot:#e0795c;
+
+      position:relative; overflow:hidden; background:var(--ink); color:var(--paper); padding:104px 48px 96px; }
+    .po::before { content:""; position:absolute; inset:0; pointer-events:none;
+      background:radial-gradient(60% 70% at 72% 46%, rgb(224 121 92 / 16%) 0%, transparent 70%),
+        radial-gradient(40% 50% at 12% 90%, rgb(243 236 223 / 6%) 0%, transparent 70%); }
+    .po::after { content:""; position:absolute; inset:0; pointer-events:none; opacity:9%; mix-blend-mode:screen;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+    .po-inner { position:relative; z-index:1; max-width:1160px; margin:0 auto; display:grid;
+      grid-template-columns:.9fr 1.1fr; gap:40px; align-items:center; }
+    .po-rule { display:flex; align-items:center; gap:14px; margin-bottom:22px; }
+    .po-rule span { font-size:10px; letter-spacing:.4em; text-transform:uppercase; color:var(--hot); white-space:nowrap; }
+    .po-rule::after { content:""; flex:1; height:1px; background:rgb(243 236 223 / 18%); }
+    .po h2 { font-family:'Cormorant Garamond',serif; font-weight:300; font-size:clamp(46px,6.2vw,84px);
+      line-height:.98; letter-spacing:-.01em; margin-bottom:24px; text-wrap:balance; }
+    .po h2 em { display:block; font-style:italic; color:var(--hot); }
+    .po-copy { font-size:15px; line-height:1.8; color:var(--dim); max-width:44ch; margin-bottom:28px; }
+    .po-prices { list-style:none; margin:0 0 30px; border-top:1px solid rgb(243 236 223 / 14%); max-width:420px; }
+    .po-prices li { display:flex; justify-content:space-between; align-items:baseline; gap:16px;
+      padding:12px 0; border-bottom:1px solid rgb(243 236 223 / 14%); }
+    .po-prices .what { font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); }
+    .po-prices .cost { font-family:'Cormorant Garamond',serif; font-size:30px; line-height:1; }
+    .po-prices s { font-family:'DM Sans',sans-serif; font-size:14px; font-weight:300; color:var(--dim);
+      margin-left:8px; text-decoration-color:rgb(224 121 92 / 80%); }
+    .po-actions { display:flex; flex-wrap:wrap; align-items:center; gap:14px 26px; }
+    .po-cta { font-size:14px; padding:16px 40px; box-shadow:0 12px 30px rgb(158 43 24 / 45%); }
+    .po-cta:focus-visible, .po-more:focus-visible, .po-card:focus-visible { outline:2px solid var(--hot); outline-offset:4px; }
+    .po-more { color:var(--paper); font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+      text-decoration:none; border-bottom:1px solid rgb(243 236 223 / 35%); padding-bottom:3px; transition:border-color .3s; }
+    .po-more:hover { border-color:var(--hot); }
+    .po-fine { font-size:12px; color:var(--dim); margin-top:22px; }
+
+    /* the countdown, filled in by the script at the foot of the page */
+    .po-count { display:flex; align-items:baseline; gap:12px; margin:-6px 0 22px; }
+    .po-count[hidden] { display:none; }
+    .po-count b { font-family:'Cormorant Garamond',serif; font-weight:400; font-size:64px; line-height:.9; color:var(--hot);
+      font-variant-numeric:lining-nums tabular-nums; }
+    .po-count span { font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--dim); line-height:1.6; }
+
+    /* the ring */
+    .po-stage { --cw:122px; --tx:0deg; --ty:0deg;
+
+      position:relative; height:470px; perspective:1200px; perspective-origin:50% 38%; }
+    .po-tilt { position:absolute; inset:0; transform-style:preserve-3d;
+      transform:rotateX(calc(-9deg + var(--ty))) rotateY(var(--tx)); transition:transform .5s cubic-bezier(.2,.7,.2,1); }
+    .po-ring { position:absolute; left:50%; top:46%; width:var(--cw); aspect-ratio:5/7;
+      margin:calc(var(--cw) * -.7) 0 0 calc(var(--cw) / -2); transform-style:preserve-3d;
+      animation:po-turn 48s linear infinite; }
+    .po-stage:hover .po-ring, .po-stage:focus-within .po-ring, .po-stage.is-away .po-ring { animation-play-state:paused; }
+    @keyframes po-turn { from { transform:rotateY(0deg); } to { transform:rotateY(-360deg); } }
+    .po-card { position:absolute; inset:0; display:block; transform-style:preserve-3d;
+      transform:rotateY(calc(var(--i) * 360deg / var(--n))) translateZ(calc(var(--cw) * var(--k))); }
+    .po-lift { position:absolute; inset:0; transform-style:preserve-3d; transition:transform .45s cubic-bezier(.2,.7,.2,1); }
+    .po-card:hover .po-lift, .po-card:focus-visible .po-lift { transform:translateY(-18px) scale(1.06); }
+    .po-face { position:absolute; inset:0; backface-visibility:hidden; border-radius:5px; overflow:hidden;
+      background:var(--paper); padding:4px; box-shadow:0 18px 34px rgb(0 0 0 / 45%); }
+    .po-face img { width:100%; height:100%; object-fit:cover; display:block; border-radius:3px; }
+    .po-back { transform:rotateY(180deg); background:var(--card-back); padding:0; filter:brightness(.72); }
+
+    /* the lamp's pool of light on the table, and the stamp */
+    .po-floor { position:absolute; left:50%; top:78%; width:min(560px,94%); height:90px; transform:translateX(-50%);
+      background:radial-gradient(closest-side, rgb(243 236 223 / 14%), transparent); border-radius:50%; pointer-events:none; }
+    .po-stamp { position:absolute; right:4%; top:6%; z-index:2; transform:rotate(-11deg);
+      padding:12px 18px 10px; border:2px solid var(--hot); border-radius:4px; color:var(--hot); text-align:center;
+      font-size:10px; letter-spacing:.34em; text-transform:uppercase; line-height:1.5; mix-blend-mode:screen; opacity:92%;
+      box-shadow:inset 0 0 0 4px var(--ink), inset 0 0 0 5px rgb(224 121 92 / 55%); }
+
+    /* cards:home-preorder-css */
+    .po-stage .po-ring { --n:12; --k:2.202; }
+    .po-card:nth-child(1) { --i:0; }
+    .po-card:nth-child(2) { --i:1; }
+    .po-card:nth-child(3) { --i:2; }
+    .po-card:nth-child(4) { --i:3; }
+    .po-card:nth-child(5) { --i:4; }
+    .po-card:nth-child(6) { --i:5; }
+    .po-card:nth-child(7) { --i:6; }
+    .po-card:nth-child(8) { --i:7; }
+    .po-card:nth-child(9) { --i:8; }
+    .po-card:nth-child(10) { --i:9; }
+    .po-card:nth-child(11) { --i:10; }
+    .po-card:nth-child(12) { --i:11; }
+
+    /* /cards:home-preorder-css */
+    .po-stamp strong { display:block; font-family:'Cormorant Garamond',serif; font-size:34px; font-weight:600;
+      letter-spacing:.02em; line-height:1; text-transform:none; }
+
+    @media(max-width:960px){
+      .po { padding:72px 20px 64px; }
+      .po-inner { grid-template-columns:1fr; gap:8px; }
+      .po-stage { order:-1; height:360px; --cw:92px; }
+      .po-stamp { right:0; top:0; }
+    }
+    @media(max-width:480px){
+      .po-stage { height:300px; --cw:72px; }
+      .po-stamp { padding:8px 12px 6px; font-size:8px; }
+      .po-stamp strong { font-size:26px; }
+      .po-count b { font-size:52px; }
+    }
+
+    /* Still, for anyone who asked for less motion: the new cards dealt out flat. */
+    @media(prefers-reduced-motion:reduce){
+      .po-stage { height:auto; perspective:none; padding:24px 0; }
+      .po-tilt, .po-ring { position:static; transform:none; animation:none; transition:none; }
+      .po-ring { width:auto; aspect-ratio:auto; margin:0; display:flex; flex-wrap:wrap; justify-content:center; gap:12px; }
+      .po-card { position:relative; inset:auto; transform:none; width:var(--cw); aspect-ratio:5/7; }
+      .po-lift { transition:none; }
+      .po-back, .po-floor { display:none; }
+      .po-stamp { position:static; display:inline-block; margin:0 0 16px; }
+    }
+
     /* ── LIMITED EDITIONS ── a scrolling row of every numbered design ── */
     .ltd { padding:88px 0 72px; border-top:1px solid var(--border); }
     .ltd-head { max-width:1100px; margin:0 auto 40px; padding:0 48px; display:grid;
@@ -292,6 +406,85 @@
     <a href="shop.html" class="btn-primary">Shop the Collection</a>
   </section>
 
+  <!-- PRE-ORDER: written by scripts/build-cards.js while PREORDER.active -->
+<!-- cards:home-preorder -->
+  <section class="po" id="preorder" aria-labelledby="po-heading" data-po data-ships="2026-11-01">
+    <div class="po-inner">
+      <div class="po-text">
+        <p class="po-rule"><span>Pre-order &middot; 25% off</span></p>
+        <h2 id="po-heading">Be the first <em>to hold them.</em></h2>
+        <p class="po-copy">Twenty-five new cards are at the printer: ten numbered limited editions and fifteen from the unlimited archive. Pre-order now at 25% off and yours ships on or before Nov 1.</p>
+        <p class="po-count" data-po-count hidden><b></b><span></span></p>
+        <ul class="po-prices">
+          <li><span class="what">Limited edition of 50</span><span class="cost">$7.50<s><span class="sr-only">regular price </span>$10</s></span></li>
+          <li><span class="what">Unlimited</span><span class="cost">$4.50<s><span class="sr-only">regular price </span>$6</s></span></li>
+        </ul>
+        <div class="po-actions">
+          <a href="shop.html#preorder" class="btn-primary po-cta" data-po-cta>Pre-order now</a>
+          <a href="policies.html#preorders" class="po-more">How pre-orders work</a>
+        </div>
+        <p class="po-fine">The original six are in stock and ship within 5&ndash;7 days. 25% off while the new cards are on pre-order.</p>
+      </div>
+      <div class="po-stage">
+        <p class="po-stamp">Pre-order<strong>25% off</strong>ships by Nov 1</p>
+        <div class="po-floor"></div>
+        <div class="po-tilt">
+          <div class="po-ring" aria-hidden="true">
+            <a class="po-card" href="shop/vanity.html" tabindex="-1"><span class="po-lift">
+              <span class="po-face po-front"><img width="600" height="816" src="image/cards/vanity-front.webp" alt="" loading="lazy" decoding="async"/></span>
+              <span class="po-face po-back"><img width="600" height="816" src="image/cards/vanity-back.webp" alt="" loading="lazy" decoding="async"/></span>
+            </span></a>
+            <a class="po-card" href="shop/grecia-monroc.html" tabindex="-1"><span class="po-lift">
+              <span class="po-face po-front"><img width="600" height="816" src="image/cards/grecia-monroc-front.webp" alt="" loading="lazy" decoding="async"/></span>
+              <span class="po-face po-back"><img width="600" height="816" src="image/cards/grecia-monroc-back.webp" alt="" loading="lazy" decoding="async"/></span>
+            </span></a>
+            <a class="po-card" href="shop/the-king.html" tabindex="-1"><span class="po-lift">
+              <span class="po-face po-front"><img width="600" height="816" src="image/cards/the-king-front.webp" alt="" loading="lazy" decoding="async"/></span>
+              <span class="po-face po-back"><img width="600" height="816" src="image/cards/the-king-back.webp" alt="" loading="lazy" decoding="async"/></span>
+            </span></a>
+            <a class="po-card" href="shop/ronin.html" tabindex="-1"><span class="po-lift">
+              <span class="po-face po-front"><img width="600" height="816" src="image/cards/ronin-front.webp" alt="" loading="lazy" decoding="async"/></span>
+              <span class="po-face po-back"><img width="600" height="816" src="image/cards/ronin-back.webp" alt="" loading="lazy" decoding="async"/></span>
+            </span></a>
+            <a class="po-card" href="shop/pride.html" tabindex="-1"><span class="po-lift">
+              <span class="po-face po-front"><img width="600" height="816" src="image/cards/pride-front.webp" alt="" loading="lazy" decoding="async"/></span>
+              <span class="po-face po-back"><img width="600" height="816" src="image/cards/pride-back.webp" alt="" loading="lazy" decoding="async"/></span>
+            </span></a>
+            <a class="po-card" href="shop/supernova.html" tabindex="-1"><span class="po-lift">
+              <span class="po-face po-front"><img width="600" height="816" src="image/cards/supernova-front.webp" alt="" loading="lazy" decoding="async"/></span>
+              <span class="po-face po-back"><img width="600" height="816" src="image/cards/supernova-back.webp" alt="" loading="lazy" decoding="async"/></span>
+            </span></a>
+            <a class="po-card" href="shop/lush.html" tabindex="-1"><span class="po-lift">
+              <span class="po-face po-front"><img width="600" height="816" src="image/cards/lush-front.webp" alt="" loading="lazy" decoding="async"/></span>
+              <span class="po-face po-back"><img width="600" height="816" src="image/cards/lush-back.webp" alt="" loading="lazy" decoding="async"/></span>
+            </span></a>
+            <a class="po-card" href="shop/reach.html" tabindex="-1"><span class="po-lift">
+              <span class="po-face po-front"><img width="600" height="816" src="image/cards/reach-front.webp" alt="" loading="lazy" decoding="async"/></span>
+              <span class="po-face po-back"><img width="600" height="816" src="image/cards/reach-back.webp" alt="" loading="lazy" decoding="async"/></span>
+            </span></a>
+            <a class="po-card" href="shop/businessman.html" tabindex="-1"><span class="po-lift">
+              <span class="po-face po-front"><img width="600" height="816" src="image/cards/businessman-front.webp" alt="" loading="lazy" decoding="async"/></span>
+              <span class="po-face po-back"><img width="600" height="816" src="image/cards/businessman-back.webp" alt="" loading="lazy" decoding="async"/></span>
+            </span></a>
+            <a class="po-card" href="shop/hidden-grove.html" tabindex="-1"><span class="po-lift">
+              <span class="po-face po-front"><img width="600" height="816" src="image/cards/hidden-grove-front.webp" alt="" loading="lazy" decoding="async"/></span>
+              <span class="po-face po-back"><img width="600" height="816" src="image/cards/hidden-grove-back.webp" alt="" loading="lazy" decoding="async"/></span>
+            </span></a>
+            <a class="po-card" href="shop/best-friend.html" tabindex="-1"><span class="po-lift">
+              <span class="po-face po-front"><img width="600" height="816" src="image/cards/best-friend-front.webp" alt="" loading="lazy" decoding="async"/></span>
+              <span class="po-face po-back"><img width="600" height="816" src="image/cards/best-friend-back.webp" alt="" loading="lazy" decoding="async"/></span>
+            </span></a>
+            <a class="po-card" href="shop/moonsail.html" tabindex="-1"><span class="po-lift">
+              <span class="po-face po-front"><img width="600" height="816" src="image/cards/moonsail-front.webp" alt="" loading="lazy" decoding="async"/></span>
+              <span class="po-face po-back"><img width="600" height="816" src="image/cards/moonsail-back.webp" alt="" loading="lazy" decoding="async"/></span>
+            </span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+<!-- /cards:home-preorder -->
+
   <!-- LIMITED EDITIONS: every numbered design -->
   <section class="ltd" id="limited-editions" aria-labelledby="ltd-heading">
     <div class="ltd-head">
@@ -301,7 +494,9 @@
       </div>
       <div class="ltd-side">
         <p class="ltd-copy">Numbered prints of original JFeelgood paintings, each sealed in a magnetic acrylic case with a display stand. When a design&rsquo;s fifty are gone, it&rsquo;s gone.</p>
-        <p class="ltd-price"><strong>$10 each</strong> <s class="price-was"><span class="sr-only">regular price </span>$23</s></p>
+<!-- cards:home-limited-price -->
+        <p class="ltd-price"><strong>The original six: $10 each</strong>, in stock. <strong>Ten new designs: $7.50</strong> on pre-order, shipping on or before Nov 1.</p>
+<!-- /cards:home-limited-price -->
         <a href="shop.html#limited" class="btn-primary">Shop the limited editions</a>
       </div>
     </div>
@@ -340,52 +535,52 @@
       <li><a class="ltd-item" href="shop/poetry-of-solace.html">
         <img width="816" height="600" src="image/cards/poetry-of-solace-front.webp" alt="Poetry of Solace — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
         <p class="ltd-name">Poetry of Solace</p>
-        <p class="ltd-meta">Ed. of 50 · $10</p>
+        <p class="ltd-meta">Ed. of 50 · $7.50 · Pre-order</p>
       </a></li>
       <li><a class="ltd-item" href="shop/adonis.html">
         <img width="816" height="600" src="image/cards/adonis-front.webp" alt="Adonis — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
         <p class="ltd-name">Adonis</p>
-        <p class="ltd-meta">Ed. of 50 · $10</p>
+        <p class="ltd-meta">Ed. of 50 · $7.50 · Pre-order</p>
       </a></li>
       <li><a class="ltd-item" href="shop/vanity.html">
         <img width="600" height="816" src="image/cards/vanity-front.webp" alt="Vanity — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
         <p class="ltd-name">Vanity</p>
-        <p class="ltd-meta">Ed. of 50 · $10</p>
+        <p class="ltd-meta">Ed. of 50 · $7.50 · Pre-order</p>
       </a></li>
       <li><a class="ltd-item" href="shop/the-king.html">
         <img width="600" height="816" src="image/cards/the-king-front.webp" alt="The King — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
         <p class="ltd-name">The King</p>
-        <p class="ltd-meta">Ed. of 50 · $10</p>
+        <p class="ltd-meta">Ed. of 50 · $7.50 · Pre-order</p>
       </a></li>
       <li><a class="ltd-item" href="shop/pride.html">
         <img width="600" height="816" src="image/cards/pride-front.webp" alt="Pride — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
         <p class="ltd-name">Pride</p>
-        <p class="ltd-meta">Ed. of 50 · $10</p>
+        <p class="ltd-meta">Ed. of 50 · $7.50 · Pre-order</p>
       </a></li>
       <li><a class="ltd-item" href="shop/lush.html">
         <img width="600" height="816" src="image/cards/lush-front.webp" alt="Lush — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
         <p class="ltd-name">Lush</p>
-        <p class="ltd-meta">Ed. of 50 · $10</p>
+        <p class="ltd-meta">Ed. of 50 · $7.50 · Pre-order</p>
       </a></li>
       <li><a class="ltd-item" href="shop/businessman.html">
         <img width="600" height="816" src="image/cards/businessman-front.webp" alt="Businessman — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
         <p class="ltd-name">Businessman</p>
-        <p class="ltd-meta">Ed. of 50 · $10</p>
+        <p class="ltd-meta">Ed. of 50 · $7.50 · Pre-order</p>
       </a></li>
       <li><a class="ltd-item" href="shop/best-friend.html">
         <img width="600" height="816" src="image/cards/best-friend-front.webp" alt="Best Friend — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
         <p class="ltd-name">Best Friend</p>
-        <p class="ltd-meta">Ed. of 50 · $10</p>
+        <p class="ltd-meta">Ed. of 50 · $7.50 · Pre-order</p>
       </a></li>
       <li><a class="ltd-item" href="shop/vicarious.html">
         <img width="600" height="816" src="image/cards/vicarious-front.webp" alt="Vicarious — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
         <p class="ltd-name">Vicarious</p>
-        <p class="ltd-meta">Ed. of 50 · $10</p>
+        <p class="ltd-meta">Ed. of 50 · $7.50 · Pre-order</p>
       </a></li>
       <li><a class="ltd-item" href="shop/permission.html">
         <img width="816" height="600" src="image/cards/permission-front.webp" alt="Permission — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
         <p class="ltd-name">Permission</p>
-        <p class="ltd-meta">Ed. of 50 · $10</p>
+        <p class="ltd-meta">Ed. of 50 · $7.50 · Pre-order</p>
       </a></li>
 <!-- /cards:home-limited -->
     </ul>
@@ -413,13 +608,15 @@
         <p class="bundle-rule"><span>The Unlimited Bundle</span></p>
         <h2 id="bundle-heading">Ten pieces. <em>Your pick.</em></h2>
         <p class="bundle-copy">Mix any ten cards from the unlimited collection &mdash; open-edition prints of paintings from the JFeelgood archive, each with its title on the back.</p>
+<!-- cards:home-bundle-offer -->
         <div class="bundle-price-row">
-          <span class="bundle-price">$50</span>
-          <span class="bundle-ship">Shipping free</span>
+          <span class="bundle-price">$37.50</span>
+          <span class="bundle-ship">+ $2 letter mail</span>
         </div>
-        <p class="bundle-note">Buy 10 unlimited pieces for $50 (save $10 &amp; it's free shipping!)</p>
+        <p class="bundle-note">Buy 10 unlimited pieces for $37.50 (save $7.50 &mdash; pre-order price)</p>
         <a href="shop.html#unlimited" class="btn-primary">Choose your ten</a>
-        <p class="bundle-terms">Any ten unlimited cards in one order; every further ten saves another $10. Secure checkout via Stripe &middot; Ships in 5&ndash;7 days &middot; 14-day guarantee.</p>
+        <p class="bundle-terms">Pre-order: ships on or before Nov 1. Any ten unlimited cards in one order; every further ten saves another $7.50. Free shipping on orders of $50+. Secure checkout via Stripe &middot; 14-day guarantee.</p>
+<!-- /cards:home-bundle-offer -->
       </div>
     </div>
   </section>
@@ -605,6 +802,45 @@
       fan.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') next() })
       fan.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') rest() })
       fan.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') next() })
+    })
+  </script>
+  <script>
+    // Pre-order section: the days left until the promised ship date, a
+    // gentle tilt of the ring toward a mouse, and the ring stops turning when
+    // it is off screen.
+    document.querySelectorAll('[data-po]').forEach(function (po) {
+      const count = po.querySelector('[data-po-count]')
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(po.dataset.ships || '')
+      if (count && m) {
+        const now = new Date()
+        const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
+        const days = Math.round((Date.UTC(+m[1], +m[2] - 1, +m[3]) - today) / 864e5)
+        if (days > 0) {
+          count.querySelector('b').textContent = days
+          count.querySelector('span').innerHTML = (days === 1 ? 'day' : 'days') + ' until<br/>they ship'
+          count.hidden = false
+        }
+      }
+      const stage = po.querySelector('.po-stage')
+      if (!stage) return
+      stage.addEventListener('pointermove', function (e) {
+        if (e.pointerType !== 'mouse') return
+        const r = stage.getBoundingClientRect()
+        stage.style.setProperty('--tx', (((e.clientX - r.left) / r.width - .5) * 14).toFixed(2) + 'deg')
+        stage.style.setProperty('--ty', (((e.clientY - r.top) / r.height - .5) * -8).toFixed(2) + 'deg')
+      })
+      stage.addEventListener('pointerleave', function () {
+        stage.style.setProperty('--tx', '0deg')
+        stage.style.setProperty('--ty', '0deg')
+      })
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          stage.classList.toggle('is-away', !entries[0].isIntersecting)
+        }, { rootMargin: '80px' }).observe(stage)
+      }
+      po.querySelectorAll('[data-po-cta]').forEach(function (a) {
+        a.addEventListener('click', function () { if (window.mcTrack) window.mcTrack('preorder_cta', { source: 'home' }) })
+      })
     })
   </script>
   <script defer src="/js/analytics.js"></script>

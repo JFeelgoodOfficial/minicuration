@@ -78,7 +78,9 @@ in the catalog, which the build skips):
 Prices: limited $10 (on sale, shown against $23); unlimited $6 (shown against $15). The bundle is "buy 10
 unlimited pieces for $50 (save $10 & it's free shipping!)": every full 10
 unlimited cards in one order take $10 off (10 cards $50, 20 cards $100),
-applied as a single-use Stripe coupon created for that checkout. US shipping
+applied as a single-use Stripe coupon created for that checkout. (While the
+pre-order runs, see below, the built cards are 25% cheaper and the bundle
+saves $7.50 per ten.) US shipping
 on cart orders is charged per order: $2 by stamped letter (untracked) when the
 cart holds only unlimited cards, $7 as a tracked Ground Advantage package when
 it holds a limited edition or any add-on, and free once the order comes to $50
@@ -106,6 +108,47 @@ cart and payment, only that card is refunded and the rest of the order ships.
 
 New limited designs need no spreadsheet work: the first time the shop reads the
 sheet, any design in the catalog with no rows gets its 50 prints appended.
+
+### Pre-orders
+
+Only the six originals are in stock. Every other card (the ten newer limited
+editions and all fifteen unlimited cards) is sold on pre-order until the
+printed stock lands, governed by one block in `api/_catalog.js`:
+
+```js
+const PREORDER = { active: true, off: 0.25, ships: '2026-11-01', label: 'on or before Nov 1' }
+```
+
+While `active`, every built card carries `preorder: true` and a `unit` price
+25% below its list price (limited $7.50 instead of $10, unlimited $4.50
+instead of $6; the originals and the add-ons are never discounted). The
+owner's rule is "bundle first, then 25% off", which is the same arithmetic as
+charging the unit price per card and scaling the bundle discount to $7.50 per
+ten (0.75 × (S − B) = 0.75S − 0.75B), so that is the one rule `quote()`,
+`js/cart.js` and the Stripe session all use: 10 unlimited cards are $37.50,
+which is under the $50 free-shipping line, so a full bundle ships for $2 by
+letter mail while the pre-order runs (13 unlimited cards ship free). The build
+computes every price and bundle line from these fields, writes a Pre-order
+badge, the ship date and `PreOrder` JSON-LD on each affected page, and refuses
+to run once `ships` has passed; a test fails on that day too.
+
+Checkout marks each pre-order line (`metadata.preorder = '1'`, `ships`) and the
+session (`preorder`, `preorder_ships`), and Stripe shows the ship date under the
+pay button. The webhook reads those marks, not the catalog, so an order is
+described as it was sold: the buyer's confirmation and the owner's order email
+split it into what ships now (5–7 business days) and what waits for stock, and
+a limited card that loses a race for its last print is refunded at the amount
+actually paid for that line. In-stock and pre-order cards in one order go out
+as two packages; shipping is charged once.
+
+**When the stock lands:** set `active: false`, run `node scripts/build-cards.js`
+and commit. Everything generated reverts on its own; the build then lists the
+hand-written files that still mention the pre-order (`policies.html`,
+`about.html`, `llms.txt`, `journal/limited-vs-unlimited.html`, the header
+paragraph and filter button in `shop.html`), and the expected numbers in
+`tests/checkout.check.ts`, `tests/cart.e2e.ts` and `tests/shop.e2e.ts` go back
+to the list prices. Rows in the `sales` tab with an empty `shipped_at` are the
+pre-orders still to pack.
 
 ## Inventory and orders
 
