@@ -170,32 +170,64 @@
     .why-collect-grid > div:hover { border-color:var(--crimson); }
     .journal-card:hover { background: var(--surface-2); }
 
+    /* ── LIMITED EDITIONS ── a scrolling row of every numbered design ── */
+    .ltd { padding:88px 0 72px; border-top:1px solid var(--border); }
+    .ltd-head { max-width:1100px; margin:0 auto 40px; padding:0 48px; display:grid;
+      grid-template-columns:1fr 1fr; gap:48px; align-items:end; }
+    .ltd h2 { font-family:'Cormorant Garamond',serif; font-size:clamp(34px,4.4vw,54px);
+      font-weight:300; line-height:1.1; text-wrap:balance; }
+    .ltd h2 em { font-style:italic; color:var(--accent); }
+    .ltd-copy { font-size:15px; color:var(--muted); line-height:1.8; margin-bottom:14px; max-width:46ch; }
+    .ltd-price { font-size:15px; margin-bottom:22px; }
+    .ltd-strip { list-style:none; margin:0; display:flex; gap:22px; overflow-x:auto;
+      padding:8px max(48px, calc((100% - 1100px) / 2 + 48px)) 20px; scrollbar-width:thin; }
+    .ltd-strip li { flex:none; }
+    .ltd-item { display:block; text-decoration:none; color:var(--text); }
+    .ltd-item img { display:block; height:230px; width:auto; max-width:none; border-radius:3px;
+      box-shadow:0 10px 24px var(--shadow-color); transition:transform .35s cubic-bezier(.4,0,.2,1); }
+    .ltd-item:hover img, .ltd-item:focus-visible img { transform:translateY(-6px); }
+    .ltd-item:focus-visible { outline:2px solid var(--accent); outline-offset:6px; border-radius:3px; }
+    .ltd-name { font-family:'Cormorant Garamond',serif; font-size:18px; margin-top:14px; }
+    .ltd-meta { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-top:3px; }
+    @media(max-width:860px){
+      .ltd { padding:64px 0 56px; }
+      .ltd-head { grid-template-columns:1fr; gap:20px; padding:0 20px; }
+      .ltd-strip { padding:8px 20px 18px; gap:16px; }
+      .ltd-item img { height:190px; }
+    }
+    @media(prefers-reduced-motion:reduce){ .ltd-item img { transition:none; } }
+
     /* ── BUNDLE ADVERT ── any ten unlimited cards ── */
     .bundle { background:var(--surface-2); border-top:1px solid var(--border);
       border-bottom:1px solid var(--border); padding:88px 48px; overflow:hidden; }
     .bundle-inner { max-width:1100px; margin:0 auto; display:grid;
       grid-template-columns:1.05fr .95fr; gap:72px; align-items:center; }
 
-    /* fanned stack of six unlimited card faces */
-    .bundle-fan { display:flex; justify-content:center; padding:24px 0; }
-    .bundle-card { width:104px; aspect-ratio:5/7; background:var(--surface);
-      padding:5px; border:1px solid var(--border); border-radius:3px;
-      box-shadow:0 10px 26px var(--shadow-color); margin-right:-30px;
-      transform-origin:bottom center; transition:transform .45s cubic-bezier(.4,0,.2,1); }
+    /* fanned stack of the ten upright unlimited cards; each card's angle
+       (--r), drop (--y) and hover spread (--x) are set by scripts/build-cards.js */
+    .bundle-fan { display:flex; justify-content:center; padding:28px 0; }
+    .bundle-card { width:88px; aspect-ratio:5/7; background:var(--surface); flex:none;
+      padding:4px; border:1px solid var(--border); border-radius:3px;
+      box-shadow:0 10px 26px var(--shadow-color); margin-right:-44px;
+      transform-origin:bottom center; transform:rotate(var(--r)) translateY(var(--y));
+      transition:transform .45s cubic-bezier(.4,0,.2,1); }
     .bundle-card:last-child { margin-right:0; }
     .bundle-card img { width:100%; height:100%; object-fit:cover; display:block; border-radius:2px; }
-    .bundle-card:nth-child(1){ transform:rotate(-9deg) translateY(6px); }
-    .bundle-card:nth-child(2){ transform:rotate(-5.4deg) translateY(1px); }
-    .bundle-card:nth-child(3){ transform:rotate(-1.8deg); z-index:2; }
-    .bundle-card:nth-child(4){ transform:rotate(1.8deg); z-index:2; }
-    .bundle-card:nth-child(5){ transform:rotate(5.4deg) translateY(1px); }
-    .bundle-card:nth-child(6){ transform:rotate(9deg) translateY(6px); }
-    .bundle-fan:hover .bundle-card:nth-child(1){ transform:rotate(-14deg) translate(-16px,-4px); }
-    .bundle-fan:hover .bundle-card:nth-child(2){ transform:rotate(-8.4deg) translate(-8px,-9px); }
-    .bundle-fan:hover .bundle-card:nth-child(3){ transform:rotate(-2.8deg) translateY(-12px); }
-    .bundle-fan:hover .bundle-card:nth-child(4){ transform:rotate(2.8deg) translateY(-12px); }
-    .bundle-fan:hover .bundle-card:nth-child(5){ transform:rotate(8.4deg) translate(8px,-9px); }
-    .bundle-fan:hover .bundle-card:nth-child(6){ transform:rotate(14deg) translate(16px,-4px); }
+    .bundle-fan:hover .bundle-card { transform:rotate(calc(var(--r) * 1.4)) translate(var(--x), calc(var(--y) - 10px)); }
+
+    /* cards:home-bundle-css */
+    .bundle-card:nth-child(1) { --r:-13.5deg; --y:16.2px; --x:-23px; }
+    .bundle-card:nth-child(2) { --r:-10.5deg; --y:9.8px; --x:-18px; }
+    .bundle-card:nth-child(3) { --r:-7.5deg; --y:5.0px; --x:-13px; }
+    .bundle-card:nth-child(4) { --r:-4.5deg; --y:1.8px; --x:-8px; }
+    .bundle-card:nth-child(5) { --r:-1.5deg; --y:0.2px; --x:-3px; }
+    .bundle-card:nth-child(6) { --r:1.5deg; --y:0.2px; --x:3px; }
+    .bundle-card:nth-child(7) { --r:4.5deg; --y:1.8px; --x:8px; }
+    .bundle-card:nth-child(8) { --r:7.5deg; --y:5.0px; --x:13px; }
+    .bundle-card:nth-child(9) { --r:10.5deg; --y:9.8px; --x:18px; }
+    .bundle-card:nth-child(10) { --r:13.5deg; --y:16.2px; --x:23px; }
+
+    /* /cards:home-bundle-css */
     .bundle-rule { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
     .bundle-rule span { font-size:10px; letter-spacing:.4em; text-transform:uppercase;
       color:var(--accent); white-space:nowrap; }
@@ -212,13 +244,13 @@
     @media(max-width:860px){
       .bundle { padding:64px 20px; }
       .bundle-inner { grid-template-columns:1fr; gap:40px; }
-      .bundle-card { width:76px; margin-right:-22px; }
+      .bundle-card { width:64px; margin-right:-32px; }
       .bundle-price { font-size:46px; }
     }
 
-    /* Keep the fan (6 cards + their rotation) inside the viewport on phones. */
+    /* Keep the fan (10 cards + their rotation) inside the viewport on phones. */
     @media(max-width:480px){
-      .bundle-card { width:60px; margin-right:-16px; }
+      .bundle-card { width:50px; margin-right:-25px; padding:3px; }
     }
     @media(prefers-reduced-motion:reduce){ .bundle-card { transition:none; } }
   </style>
@@ -243,16 +275,121 @@
     <a href="shop.html" class="btn-primary">Shop the Collection</a>
   </section>
 
+  <!-- LIMITED EDITIONS: every numbered design -->
+  <section class="ltd" id="limited-editions" aria-labelledby="ltd-heading">
+    <div class="ltd-head">
+      <div>
+        <p class="bundle-rule"><span>The Limited Editions</span></p>
+        <h2 id="ltd-heading">Sixteen paintings. <em>Fifty of each.</em></h2>
+      </div>
+      <div class="ltd-side">
+        <p class="ltd-copy">Numbered prints of original JFeelgood paintings, each sealed in a magnetic acrylic case with a display stand. When a design&rsquo;s fifty are gone, it&rsquo;s gone.</p>
+        <p class="ltd-price"><strong>$10 each</strong> <s class="price-was"><span class="sr-only">regular price </span>$23</s></p>
+        <a href="shop.html#limited" class="btn-primary">Shop the limited editions</a>
+      </div>
+    </div>
+    <ul class="ltd-strip">
+<!-- cards:home-limited -->
+      <li><a class="ltd-item" href="shop/dreamfall.html">
+        <img width="500" height="700" src="image/spin/dreamfall_artwork.webp" alt="Dreamfall — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
+        <p class="ltd-name">Dreamfall</p>
+        <p class="ltd-meta">Ed. of 50 · $10</p>
+      </a></li>
+      <li><a class="ltd-item" href="shop/dream-mountain.html">
+        <img width="500" height="700" src="image/spin/dream-mountain_artwork.webp" alt="Dream Mountain — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
+        <p class="ltd-name">Dream Mountain</p>
+        <p class="ltd-meta">Ed. of 50 · $10</p>
+      </a></li>
+      <li><a class="ltd-item" href="shop/sky-miles.html">
+        <img width="500" height="700" src="image/spin/skymiles_artwork.webp" alt="Sky Miles — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
+        <p class="ltd-name">Sky Miles</p>
+        <p class="ltd-meta">Ed. of 50 · $10</p>
+      </a></li>
+      <li><a class="ltd-item" href="shop/a-simple-meditation.html">
+        <img width="500" height="700" src="image/spin/asimplemeditation_artwork.webp" alt="A Simple Meditation — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
+        <p class="ltd-name">A Simple Meditation</p>
+        <p class="ltd-meta">Ed. of 50 · $10</p>
+      </a></li>
+      <li><a class="ltd-item" href="shop/veritas.html">
+        <img width="500" height="700" src="image/spin/veritas_artwork.webp" alt="Veritas — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
+        <p class="ltd-name">Veritas</p>
+        <p class="ltd-meta">Ed. of 50 · $10</p>
+      </a></li>
+      <li><a class="ltd-item" href="shop/sweet-dreams.html">
+        <img width="500" height="700" src="image/spin/sweet-dreams_artwork.webp" alt="Sweet Dreams — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
+        <p class="ltd-name">Sweet Dreams</p>
+        <p class="ltd-meta">Ed. of 50 · $8</p>
+      </a></li>
+      <li><a class="ltd-item" href="shop/poetry-of-solace.html">
+        <img width="816" height="600" src="image/cards/poetry-of-solace-front.webp" alt="Poetry of Solace — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
+        <p class="ltd-name">Poetry of Solace</p>
+        <p class="ltd-meta">Ed. of 50 · $10</p>
+      </a></li>
+      <li><a class="ltd-item" href="shop/adonis.html">
+        <img width="816" height="600" src="image/cards/adonis-front.webp" alt="Adonis — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
+        <p class="ltd-name">Adonis</p>
+        <p class="ltd-meta">Ed. of 50 · $10</p>
+      </a></li>
+      <li><a class="ltd-item" href="shop/vanity.html">
+        <img width="600" height="816" src="image/cards/vanity-front.webp" alt="Vanity — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
+        <p class="ltd-name">Vanity</p>
+        <p class="ltd-meta">Ed. of 50 · $10</p>
+      </a></li>
+      <li><a class="ltd-item" href="shop/the-king.html">
+        <img width="600" height="816" src="image/cards/the-king-front.webp" alt="The King — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
+        <p class="ltd-name">The King</p>
+        <p class="ltd-meta">Ed. of 50 · $10</p>
+      </a></li>
+      <li><a class="ltd-item" href="shop/pride.html">
+        <img width="600" height="816" src="image/cards/pride-front.webp" alt="Pride — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
+        <p class="ltd-name">Pride</p>
+        <p class="ltd-meta">Ed. of 50 · $10</p>
+      </a></li>
+      <li><a class="ltd-item" href="shop/lush.html">
+        <img width="600" height="816" src="image/cards/lush-front.webp" alt="Lush — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
+        <p class="ltd-name">Lush</p>
+        <p class="ltd-meta">Ed. of 50 · $10</p>
+      </a></li>
+      <li><a class="ltd-item" href="shop/businessman.html">
+        <img width="600" height="816" src="image/cards/businessman-front.webp" alt="Businessman — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
+        <p class="ltd-name">Businessman</p>
+        <p class="ltd-meta">Ed. of 50 · $10</p>
+      </a></li>
+      <li><a class="ltd-item" href="shop/best-friend.html">
+        <img width="600" height="816" src="image/cards/best-friend-front.webp" alt="Best Friend — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
+        <p class="ltd-name">Best Friend</p>
+        <p class="ltd-meta">Ed. of 50 · $10</p>
+      </a></li>
+      <li><a class="ltd-item" href="shop/vicarious.html">
+        <img width="600" height="816" src="image/cards/vicarious-front.webp" alt="Vicarious — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
+        <p class="ltd-name">Vicarious</p>
+        <p class="ltd-meta">Ed. of 50 · $10</p>
+      </a></li>
+      <li><a class="ltd-item" href="shop/permission.html">
+        <img width="816" height="600" src="image/cards/permission-front.webp" alt="Permission — limited edition card by JFeelgood" loading="lazy" decoding="async"/>
+        <p class="ltd-name">Permission</p>
+        <p class="ltd-meta">Ed. of 50 · $10</p>
+      </a></li>
+<!-- /cards:home-limited -->
+    </ul>
+  </section>
+
   <!-- BUNDLE: any ten unlimited cards -->
   <section class="bundle" id="bundle" aria-labelledby="bundle-heading">
     <div class="bundle-inner">
       <div class="bundle-fan" aria-hidden="true">
+<!-- cards:home-bundle -->
         <div class="bundle-card"><img width="600" height="816" src="image/cards/grecia-monroc-front.webp" alt="" loading="lazy" decoding="async"/></div>
         <div class="bundle-card"><img width="600" height="816" src="image/cards/ronin-front.webp" alt="" loading="lazy" decoding="async"/></div>
         <div class="bundle-card"><img width="600" height="816" src="image/cards/supernova-front.webp" alt="" loading="lazy" decoding="async"/></div>
-        <div class="bundle-card"><img width="600" height="816" src="image/cards/tidewatcher-front.webp" alt="" loading="lazy" decoding="async"/></div>
+        <div class="bundle-card"><img width="600" height="816" src="image/cards/reach-front.webp" alt="" loading="lazy" decoding="async"/></div>
+        <div class="bundle-card"><img width="600" height="816" src="image/cards/hidden-grove-front.webp" alt="" loading="lazy" decoding="async"/></div>
         <div class="bundle-card"><img width="600" height="816" src="image/cards/moonsail-front.webp" alt="" loading="lazy" decoding="async"/></div>
+        <div class="bundle-card"><img width="600" height="816" src="image/cards/tidewatcher-front.webp" alt="" loading="lazy" decoding="async"/></div>
         <div class="bundle-card"><img width="600" height="816" src="image/cards/awakening-front.webp" alt="" loading="lazy" decoding="async"/></div>
+        <div class="bundle-card"><img width="600" height="816" src="image/cards/gilded-cage-front.webp" alt="" loading="lazy" decoding="async"/></div>
+        <div class="bundle-card"><img width="600" height="816" src="image/cards/le-verbeux-front.webp" alt="" loading="lazy" decoding="async"/></div>
+<!-- /cards:home-bundle -->
       </div>
 
       <div class="bundle-text">
