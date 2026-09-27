@@ -40,7 +40,7 @@ Limited edition ACEO-sized art prints by JFeelgood. 50 numbered editions per des
 │   ├── webhook.js          # Stripe checkout.session.completed handler
 │   └── stock.js            # Read-only inventory endpoint
 ├── js/
-│   ├── analytics.js        # Pageview + buy_click / newsletter event tracking
+│   ├── analytics.js        # Vercel Web Analytics + GA4 (G-5NGLJ1RXVX), commerce events
 │   ├── store.js            # Product-page inventory, edition #, sold-out capture
 │   └── nav.js              # Mobile nav toggle
 ├── thanks.html             # Post-purchase landing (newsletter + cross-sell)
@@ -193,9 +193,11 @@ Two manual steps activate the order and analytics flows:
    owner is emailed. Use the endpoint's delivery log to confirm orders arrive.
 2. **Enable analytics.** Turn on **Web Analytics** in the Vercel project
    dashboard. `js/analytics.js` (loaded on every page) sends pageviews and
-   custom events — `buy_click`, `begin_checkout`, `newsletter_signup`,
-   `flip_back`, `sold_out_click` — and mirrors them to `window.dataLayer` for
-   an optional GA4/GTM container.
+   events to it and to Google Analytics 4 (`G-5NGLJ1RXVX`, loaded only on
+   minicuration.com so previews and tests don't count): `add_to_cart`,
+   `begin_checkout` and `purchase` (with value in USD, from `js/cart.js`),
+   `newsletter_signup`, `flip_back` and `sold_out_click`. In GA, mark
+   `purchase` as a key event to see sales and revenue.
 
 Checkout refuses a limited card that has sold out before anyone pays. If two
 buyers race for the last print, the webhook refunds the one who lost, and for

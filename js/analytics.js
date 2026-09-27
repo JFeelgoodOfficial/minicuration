@@ -1,8 +1,8 @@
-/* Minicuration — lightweight analytics + commerce event instrumentation.
+/* Minicuration — analytics + commerce event instrumentation.
    Pageviews and custom events go to Vercel Web Analytics (enable "Web Analytics"
-   in the Vercel project dashboard) and are mirrored to window.dataLayer, so a
-   GTM / GA4 container can be added later without editing any page. No cookies,
-   no PII collected. */
+   in the Vercel project dashboard) and to Google Analytics 4, and are mirrored
+   to window.dataLayer. GA only loads on minicuration.com itself, so previews,
+   localhost and CI don't count as visits. No PII is sent. */
 (function () {
   // Vercel Web Analytics queue stub + loader (auto-tracks pageviews).
   // The insights script is only served by Vercel's edge, so load it only on
@@ -12,6 +12,17 @@
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments) }
   window.dataLayer = window.dataLayer || []
   const host = location.hostname
+  const GA_ID = 'G-5NGLJ1RXVX'
+  const onLive = host === 'minicuration.com' || host === 'www.minicuration.com'
+  if (onLive && !window.gtag) {
+    window.gtag = function () { window.dataLayer.push(arguments) }
+    window.gtag('js', new Date())
+    window.gtag('config', GA_ID)
+    const g = document.createElement('script')
+    g.async = true
+    g.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID
+    document.head.appendChild(g)
+  }
   const onVercel = host === 'minicuration.com' || host === 'www.minicuration.com' || /\.vercel\.app$/.test(host)
   if (onVercel && !document.querySelector('script[src*="/_vercel/insights/script.js"]')) {
     const s = document.createElement('script')
@@ -23,6 +34,7 @@
   function track(name, props) {
     props = props || {}
     try { window.va('event', { name: name, data: props }) } catch (e) { /* queued */ }
+    if (window.gtag) window.gtag('event', name, props)
     const entry = { event: name }
     for (const k in props) {
       if (Object.prototype.hasOwnProperty.call(props, k)) entry[k] = props[k]
@@ -39,18 +51,20 @@
     return undefined
   }
 
-  // Buy-button clicks → buy_click + begin_checkout (the Stripe handoff).
+  // js/cart.js reports add_to_cart and begin_checkout itself; this only
+  // catches clicks on a sold-out card's closed button.
   document.addEventListener('click', function (e) {
-    const buy = e.target.closest && e.target.closest('a.btn-buy, [data-buy]')
-    if (!buy) return
-    if (buy.classList.contains('sold') || buy.getAttribute('aria-disabled') === 'true') {
+    const buy = e.target.closest && e.target.closest('.btn-buy')
+    if (buy && (buy.classList.contains('sold') || buy.getAttribute('aria-disabled') === 'true')) {
       track('sold_out_click', { slug: resolveSlug(buy) })
-      return
     }
-    const payload = { slug: resolveSlug(buy), value: 23, currency: 'USD' }
-    track('buy_click', payload)
-    track('begin_checkout', payload)
   }, true)
+
+  // The thank-you page after a cart checkout: js/cart.js (loaded first) left
+  // what was bought in window.mcOrder before emptying the cart.
+  if (window.mcOrder) {
+    track('purchase', { transaction_id: window.mcOrder.id, value: window.mcOrder.value, currency: 'USD', items: window.mcOrder.items })
+  }
 
   // Newsletter / next-drop signups.
   document.addEventListener('submit', function (e) {
