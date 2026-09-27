@@ -45,7 +45,7 @@ const SHIPPING = {
 //   node scripts/build-cards.js
 //
 // and fix the hand-written copy the build lists.
-const PREORDER = { active: false, off: 0.25, ships: '2026-11-01', label: 'on or before Nov 1' }
+const PREORDER = { active: true, off: 0.25, ships: '2026-11-01', label: 'on or before Nov 1' }
 
 // What a card costs: the pre-order price while it is on pre-order, else its
 // list price. Add-ons and the originals are never discounted.

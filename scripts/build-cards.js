@@ -256,10 +256,10 @@ ${nav('../')}
 
     <div class="product-info">
 ${isLimited(c)
-    ? `      <span class="tag" id="product-edition-tag">Limited Edition of 50</span>
+    ? `      <span class="tag" id="product-edition-tag">Limited Edition of 50</span>${c.preorder ? `<span class="tag is-preorder">Pre-order &middot; ships ${esc(PREORDER.label)}</span>` : ''}
       <span class="product-stock-count" id="product-stock-count" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:16px;min-height:14px;"></span>`
-    : '      <span class="tag is-open">Unlimited &middot; Open Edition</span>'}
-${c.preorder ? `      <span class="tag is-preorder">Pre-order &middot; ships ${esc(PREORDER.label)}</span>\n` : ''}      <h1>${esc(c.title)}</h1>
+    : `      <span class="tag is-open">Unlimited &middot; Open Edition</span>${c.preorder ? `<span class="tag is-preorder">Pre-order &middot; ships ${esc(PREORDER.label)}</span>` : ''}`}
+      <h1>${esc(c.title)}</h1>
       <p class="product-meta">by <a href="../artists/jfeelgood.html">JFeelgood</a></p>
       <p class="product-medium">${esc(isLimited(c) ? c.medium : c.material ? `${c.material} · open edition from the JFeelgood archive` : 'Open edition · from the JFeelgood archive')}</p>
 ${c.quote ? `      <blockquote class="product-quote">&ldquo;${esc(c.quote)}&rdquo;</blockquote>\n` : ''}${c.description ? `      <div class="expanded-note">

@@ -52,17 +52,38 @@ test.describe('Shop catalog — /shop.html', () => {
     await expect(page.locator('a.btn-buy')).toHaveCount(0)
   })
 
-  test('unlimited pricing: $6 with struck $15; limited cards $10 with struck $23 (Sweet Dreams aside)', async ({ page }) => {
+  test('pricing: the originals $10 against $23 (Sweet Dreams aside); pre-order limited $7.50 against $10; unlimited $4.50 against $6', async ({ page }) => {
     for (const price of await page.locator('#unlimited .card-price').all()) {
-      await expect(price).toContainText('$6')
-      await expect(price.locator('s.price-was')).toContainText('$15')
+      await expect(price).toContainText('$4.50')
+      await expect(price.locator('s.price-was')).toContainText('$6')
     }
-    const newLimited = page.locator('#limited .shop-card:not([data-slug="sweet-dreams"]) .card-price')
-    await expect(newLimited).toHaveCount(15)
-    for (const price of await newLimited.all()) {
+    const originals = page.locator('#limited .shop-card:not([data-preorder]):not([data-slug="sweet-dreams"]) .card-price')
+    await expect(originals).toHaveCount(5)
+    for (const price of await originals.all()) {
       await expect(price).toContainText('$10')
       await expect(price.locator('s.price-was')).toContainText('$23')
     }
+    const newLimited = page.locator('#limited .shop-card[data-preorder] .card-price')
+    await expect(newLimited).toHaveCount(10)
+    for (const price of await newLimited.all()) {
+      await expect(price).toContainText('$7.50')
+      await expect(price.locator('s.price-was')).toContainText('$10')
+    }
+  })
+
+  test('every card but the original six is badged Pre-order, and the Pre-order filter shows just those', async ({ page }) => {
+    await expect(page.locator('.preorder-notice')).toContainText('pre-order at 25% off')
+    await expect(page.locator('.shop-card[data-preorder]')).toHaveCount(25)
+    await expect(page.locator('.shop-card .card-preorder')).toHaveCount(25)
+    for (const slug of ['dreamfall', 'dream-mountain', 'sky-miles', 'a-simple-meditation', 'veritas', 'sweet-dreams']) {
+      await expect(page.locator(`.shop-card[data-slug="${slug}"] .card-preorder`)).toHaveCount(0)
+      await expect(page.locator(`.shop-card[data-slug="${slug}"] [data-add-to-cart]`)).toContainText('Add to cart')
+    }
+    await expect(page.locator('.shop-card[data-slug="pride"] [data-add-to-cart]')).toHaveText('Pre-order — $7.50')
+    await expect(page.locator('.shop-card[data-slug="pride"] .card-trust')).toContainText('Ships on or before Nov 1')
+    await page.getByRole('button', { name: 'Pre-order', exact: true }).click()
+    await expect(page.locator('.shop-card:visible')).toHaveCount(25)
+    await expect(page.locator('.shop-card[data-slug="veritas"]')).toBeHidden()
   })
 
   test('Flip turns the card over without leaving the shop; clicking the picture opens its page', async ({ page }) => {

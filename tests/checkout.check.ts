@@ -58,41 +58,47 @@ async function checkout(
 test.describe('catalog pricing — quote()', () => {
   const open = (qty: number) => quote([{ slug: 'moonsail', qty }])
 
-  test('unlimited cards are $6 each and go by letter: $2 an order, however many', () => {
-    expect(open(1)).toMatchObject({ subtotal: 600, discount: 0, method: 'letter', shipping: 200, total: 800 })
-    expect(open(3)).toMatchObject({ subtotal: 1800, method: 'letter', shipping: 200, total: 2000 })
+  // While the pre-order runs an unlimited card is $4.50 (25% off $6) and the
+  // bundle saves $7.50 per ten, so the numbers below are the pre-order ones.
+  test('unlimited cards are $4.50 each on pre-order and go by letter: $2 an order, however many', () => {
+    expect(open(1)).toMatchObject({ subtotal: 450, discount: 0, method: 'letter', shipping: 200, total: 650 })
+    expect(open(3)).toMatchObject({ subtotal: 1350, method: 'letter', shipping: 200, total: 1550 })
   })
 
   test('a limited card, case or stand makes it a $7 tracked package', () => {
-    expect(quote([{ slug: 'pride', qty: 1 }, { slug: 'lush', qty: 1 }])).toMatchObject({ subtotal: 2000, method: 'parcel', shipping: 700 })
+    expect(quote([{ slug: 'pride', qty: 1 }, { slug: 'lush', qty: 1 }])).toMatchObject({ subtotal: 1500, method: 'parcel', shipping: 700 })
     expect(quote([{ slug: 'pride', qty: 1 }, { slug: 'moonsail', qty: 2 }])).toMatchObject({ method: 'parcel', shipping: 700 })
     expect(quote([{ slug: 'moonsail', qty: 1 }, { slug: 'acrylic-case', qty: 1 }])).toMatchObject({ method: 'parcel', shipping: 700 })
     expect(quote([{ slug: 'moonsail', qty: 1 }, { slug: 'acrylic-stand', qty: 1 }])).toMatchObject({ method: 'parcel', shipping: 700 })
   })
 
-  test('orders of $50 or more ship free, add-ons included in the $50', () => {
-    expect(open(8)).toMatchObject({ subtotal: 4800, shipping: 200 })
-    expect(open(9)).toMatchObject({ subtotal: 5400, shipping: 0 })
-    expect(quote([{ slug: 'moonsail', qty: 7 }, { slug: 'acrylic-case', qty: 2 }]))
-      .toMatchObject({ subtotal: 5000, method: 'parcel', shipping: 0 })
+  test('orders of $50 or more after the discount ship free, add-ons included in the $50', () => {
+    // 12 cards are $54 less the $7.50 bundle: $46.50, still a $2 letter.
+    expect(open(12)).toMatchObject({ subtotal: 5400, discount: 750, shipping: 200 })
+    expect(open(13)).toMatchObject({ subtotal: 5850, discount: 750, shipping: 0 })
+    // Ten cards and two cases: $45.50 after the bundle, so a $7 tracked package.
+    expect(quote([{ slug: 'moonsail', qty: 10 }, { slug: 'acrylic-case', qty: 2 }]))
+      .toMatchObject({ subtotal: 5300, discount: 750, method: 'parcel', shipping: 700 })
+    expect(quote([{ slug: 'moonsail', qty: 13 }, { slug: 'acrylic-case', qty: 2 }]))
+      .toMatchObject({ subtotal: 6650, discount: 750, method: 'parcel', shipping: 0, total: 5900 })
   })
 
-  test('10 unlimited pieces for $50 with free shipping; $10 off every full 10', () => {
+  test('10 unlimited pieces for $37.50 on pre-order ($60 − $10 bundle, then 25% off); $7.50 off every full 10', () => {
     expect(open(9)).toMatchObject({ discount: 0 })
-    expect(open(10)).toMatchObject({ subtotal: 6000, discount: 1000, shipping: 0, total: 5000 })
-    expect(open(13)).toMatchObject({ subtotal: 7800, discount: 1000 })
-    expect(open(20)).toMatchObject({ subtotal: 12000, discount: 2000 })
+    expect(open(10)).toMatchObject({ subtotal: 4500, discount: 750, shipping: 200, total: 3950 })
+    expect(open(13)).toMatchObject({ subtotal: 5850, discount: 750 })
+    expect(open(20)).toMatchObject({ subtotal: 9000, discount: 1500 })
   })
 
   test('the bundle counts across different unlimited cards, and ignores limited ones', () => {
     const q = quote([{ slug: 'pride', qty: 1 }, { slug: 'moonsail', qty: 6 }, { slug: 'reach', qty: 4 }])
-    expect(q).toMatchObject({ openCount: 10, subtotal: 1000 + 6000, discount: 1000 })
+    expect(q).toMatchObject({ openCount: 10, subtotal: 750 + 4500, discount: 750 })
     expect(quote([{ slug: 'pride', qty: 1 }, { slug: 'moonsail', qty: 9 }]).discount).toBe(0)
   })
 
   test('the acrylic case is $4, one per unlimited card, and not part of the bundle', () => {
     expect(quote([{ slug: 'moonsail', qty: 2 }, { slug: 'acrylic-case', qty: 2 }]))
-      .toMatchObject({ openCount: 2, subtotal: 1200 + 800, discount: 0, shipping: 700, total: 2000 + 700 })
+      .toMatchObject({ openCount: 2, subtotal: 900 + 800, discount: 0, shipping: 700, total: 1700 + 700 })
     expect(quote([{ slug: 'moonsail', qty: 1 }, { slug: 'acrylic-case', qty: 2 }]).error).toBe('too_many_addons')
     expect(quote([{ slug: 'pride', qty: 1 }, { slug: 'acrylic-case', qty: 1 }]).error).toBe('too_many_addons')
     expect(quote([{ slug: 'moonsail', qty: 9 }, { slug: 'acrylic-case', qty: 9 }]).discount).toBe(0)
@@ -100,7 +106,7 @@ test.describe('catalog pricing — quote()', () => {
 
   test('the acrylic stand is $1, one per unlimited card, alongside a case', () => {
     expect(quote([{ slug: 'moonsail', qty: 2 }, { slug: 'acrylic-case', qty: 2 }, { slug: 'acrylic-stand', qty: 2 }]))
-      .toMatchObject({ subtotal: 1200 + 800 + 200 })
+      .toMatchObject({ subtotal: 900 + 800 + 200 })
     expect(quote([{ slug: 'moonsail', qty: 1 }, { slug: 'acrylic-stand', qty: 2 }]))
       .toMatchObject({ error: 'too_many_addons', slug: 'acrylic-stand' })
   })
@@ -126,18 +132,20 @@ test.describe('/api/checkout', () => {
       discounts?: unknown; metadata: Record<string, string>; success_url: string
     }
     expect(session.line_items.map(l => [l.price_data.product_data.metadata.slug, l.quantity, l.price_data.unit_amount]))
-      .toEqual([['moonsail', 3, 600], ['pride', 1, 1000]])
+      .toEqual([['moonsail', 3, 450], ['pride', 1, 750]])
     expect(session.discounts).toBeUndefined()
-    expect(session.metadata).toEqual({ source: 'cart', ship: 'parcel' })
+    expect(session.metadata).toEqual({ source: 'cart', ship: 'parcel', preorder: '1', preorder_ships: '2026-11-01' })
     expect(session.success_url).toBe('https://minicuration.com/thanks.html?order={CHECKOUT_SESSION_ID}')
   })
 
-  test('ten unlimited cards get a single-use $10 coupon', async () => {
+  test('ten unlimited cards get a single-use $7.50 coupon (the $10 bundle at the pre-order rate)', async () => {
     const { calls } = await checkout({ items: [{ slug: 'moonsail', qty: 4 }, { slug: 'reach', qty: 6 }] })
     const coupon = calls.find(c => c.kind === 'coupon')!.args
-    expect(coupon).toMatchObject({ amount_off: 1000, currency: 'usd', max_redemptions: 1 })
+    expect(coupon).toMatchObject({ amount_off: 750, currency: 'usd', max_redemptions: 1 })
+    expect(coupon.name).toContain('pre-order')
     const session = calls.find(c => c.kind === 'session')!.args as { shipping_options: { shipping_rate_data: { fixed_amount: { amount: number } } }[] }
-    expect(session.shipping_options[0].shipping_rate_data.fixed_amount.amount).toBe(0)
+    // $37.50 is under the $50 free-shipping line: a $2 letter.
+    expect(session.shipping_options[0].shipping_rate_data.fixed_amount.amount).toBe(200)
     expect(calls.find(c => c.kind === 'session')!.args.discounts).toEqual([{ coupon: 'co_test' }])
   })
 
@@ -159,7 +167,7 @@ test.describe('/api/checkout', () => {
   test('a price sent by the browser is ignored', async () => {
     const { calls } = await checkout({ items: [{ slug: 'moonsail', qty: 1, price: 1 }] })
     const session = calls.find(c => c.kind === 'session')!.args as { line_items: { price_data: { unit_amount: number } }[] }
-    expect(session.line_items[0].price_data.unit_amount).toBe(600)
+    expect(session.line_items[0].price_data.unit_amount).toBe(450)
   })
 
   test('a sold-out limited card is refused before payment', async () => {
