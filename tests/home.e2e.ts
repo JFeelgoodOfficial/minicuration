@@ -66,4 +66,26 @@ test.describe('Homepage — /', () => {
     await swap.locator('.swap-back').click({ position: { x: 20, y: 20 } })
     await expect(swap).toHaveClass(/is-flipped/)
   })
+
+  test('the bundle fan rearranges on hover, never the same way twice running, and settles on leave', async ({ page }) => {
+    await page.goto('/')
+    const fan = page.locator('.bundle-fan')
+    await expect(fan.locator('.bundle-card')).toHaveCount(10)
+    await fan.scrollIntoViewIfNeeded()
+    const seen: (string | null)[] = []
+    for (let i = 0; i < 4; i++) {
+      await fan.hover()
+      seen.push(await fan.getAttribute('data-mode'))
+      await page.mouse.move(0, 0)
+      await expect(fan).not.toHaveAttribute('data-mode')
+    }
+    for (const mode of seen) expect(['spread', 'scatter', 'grid']).toContain(mode)
+    for (let i = 1; i < seen.length; i++) expect(seen[i]).not.toBe(seen[i - 1])
+  })
+
+  test('the limited-edition row lists every limited card', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.locator('#limited-editions .ltd-item')).toHaveCount(16)
+    await expect(page.locator('#limited-editions .ltd-item').first()).toHaveAttribute('href', 'shop/dreamfall.html')
+  })
 })
