@@ -29,15 +29,36 @@ function orderNumberFrom(sessionId) {
 // ── Email ─────────────────────────────────────────────────────────────────────
 // A failed send must never fail its caller: in the webhook, returning an error
 // to Stripe would trigger a retry and decrement stock a second time.
+//
+// The Resend SDK reports API failures (rate limit, unverified domain, bad
+// address) as { error } rather than throwing, so both paths are checked. A
+// rate-limited send is retried once, since the webhook sends two emails
+// back to back and the owner's is the second.
 async function sendMail({ to, subject, html }) {
-  if (!process.env.RESEND_API_KEY || !to) return false
-  try {
-    await resend().emails.send({ from: STORE_EMAIL, to, subject, html })
-    return true
-  } catch (err) {
-    console.error(`Email failed (${subject}):`, err.message)
+  if (!process.env.RESEND_API_KEY) {
+    console.error(`Email skipped (${subject}): RESEND_API_KEY is not set`)
     return false
   }
+  if (!to) {
+    console.error(`Email skipped (${subject}): no recipient`)
+    return false
+  }
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const { data, error } = await resend().emails.send({ from: STORE_EMAIL, to, subject, html })
+      if (!error) {
+        console.log(`Email sent (${subject}) id=${data?.id}`)
+        return true
+      }
+      console.error(`Email failed (${subject}), attempt ${attempt}:`, error.name, error.message)
+      if (error.name !== 'rate_limit_exceeded') return false
+      await new Promise(r => setTimeout(r, 1000))
+    } catch (err) {
+      console.error(`Email failed (${subject}):`, err.message)
+      return false
+    }
+  }
+  return false
 }
 
 module.exports = {
