@@ -15,6 +15,7 @@ const urlToFile = {
   'https://minicuration.com/artists/jfeelgood.html': 'artists/jfeelgood.html',
   'https://minicuration.com/policies.html': 'policies.html',
   'https://minicuration.com/journal.html': 'journal.html',
+  'https://minicuration.com/journal/why-collect-minicuration.html': 'journal/why-collect-minicuration.html',
   'https://minicuration.com/journal/what-is-aceo.html': 'journal/what-is-aceo.html',
   'https://minicuration.com/journal/self-work-series.html': 'journal/self-work-series.html',
   'https://minicuration.com/journal/limited-vs-unlimited.html': 'journal/limited-vs-unlimited.html',
