@@ -4,8 +4,8 @@ window.MC_CATALOG = {
  "preorder": {
   "active": true,
   "off": 0.25,
-  "ships": "2026-11-01",
-  "label": "on or before Nov 1"
+  "ships": "2026-12-01",
+  "label": "on or before Dec 1"
  },
  "bundle": {
   "size": 10,

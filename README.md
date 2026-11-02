@@ -116,7 +116,7 @@ editions and all fifteen unlimited cards) is sold on pre-order until the
 printed stock lands, governed by one block in `api/_catalog.js`:
 
 ```js
-const PREORDER = { active: true, off: 0.25, ships: '2026-11-01', label: 'on or before Nov 1' }
+const PREORDER = { active: true, off: 0.25, ships: '2026-12-01', label: 'on or before Dec 1' }
 ```
 
 While `active`, every built card carries `preorder: true` and a `unit` price

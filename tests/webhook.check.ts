@@ -160,7 +160,7 @@ test.describe('webhook — pre-orders', () => {
     ({ quantity: 1, amount_total, price: { product: { metadata: { slug, kind, ...extra } } } })
 
   test('reads the pre-order flag from the line metadata, not the catalog', () => {
-    const items = [line('veritas', 'limited'), line('pride', 'limited', { preorder: '1', ships: '2026-11-01' }), line('moonsail', 'open', { preorder: '1' })]
+    const items = [line('veritas', 'limited'), line('pride', 'limited', { preorder: '1', ships: '2026-12-01' }), line('moonsail', 'open', { preorder: '1' })]
     expect([...preorderSlugs(items)]).toEqual(['pride', 'moonsail'])
     expect(preorderSlugs([{ price: { id: 'price_legacy' } }]).size).toBe(0)
   })
@@ -185,7 +185,7 @@ test.describe('webhook — pre-orders', () => {
   })
 
   test('words the promised date from the session, falling back to the catalog', () => {
-    expect(shipsLabel('2026-11-01')).toBe('on or before Nov 1, 2026')
-    expect(shipsLabel(undefined)).toBe('on or before Nov 1')
+    expect(shipsLabel('2026-12-01')).toBe('on or before Dec 1, 2026')
+    expect(shipsLabel(undefined)).toBe('on or before Dec 1')
   })
 })

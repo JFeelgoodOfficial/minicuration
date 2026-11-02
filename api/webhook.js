@@ -43,7 +43,7 @@ function splitShipments(sold, open, preorder) {
   return { now, later }
 }
 
-// '2026-11-01' → 'Nov 1, 2026'; falls back to the catalog's wording.
+// '2026-12-01' → 'Dec 1, 2026'; falls back to the catalog's wording.
 function shipsLabel(iso) {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '')
   if (!m) return PREORDER.label

@@ -21,7 +21,7 @@ const ROOT = path.join(__dirname, '..')
 const SITE = 'https://minicuration.com'
 const TODAY = new Date().toISOString().slice(0, 10)
 
-// "Ships on or before Nov 1" must never be printed after Nov 1.
+// "Ships on or before Dec 1" must never be printed after Dec 1.
 if (PREORDER.active && PREORDER.ships < TODAY) {
   throw new Error(`PREORDER.ships (${PREORDER.ships}) has passed: set PREORDER.active to false in api/_catalog.js, or move the date, then build again.`)
 }

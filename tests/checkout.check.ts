@@ -134,7 +134,7 @@ test.describe('/api/checkout', () => {
     expect(session.line_items.map(l => [l.price_data.product_data.metadata.slug, l.quantity, l.price_data.unit_amount]))
       .toEqual([['moonsail', 3, 450], ['pride', 1, 750]])
     expect(session.discounts).toBeUndefined()
-    expect(session.metadata).toEqual({ source: 'cart', ship: 'parcel', preorder: '1', preorder_ships: '2026-11-01' })
+    expect(session.metadata).toEqual({ source: 'cart', ship: 'parcel', preorder: '1', preorder_ships: '2026-12-01' })
     expect(session.success_url).toBe('https://minicuration.com/thanks.html?order={CHECKOUT_SESSION_ID}')
   })
 

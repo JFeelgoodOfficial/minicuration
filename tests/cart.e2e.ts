@@ -39,7 +39,7 @@ test.describe('Cart', () => {
     await expect(page.locator('[data-discount]')).toHaveText('−$7.50')
     await expect(page.locator('[data-shipping]')).toHaveText('$2')
     await expect(page.locator('[data-total]')).toHaveText('$39.50')
-    await expect(page.locator('[data-ship-note]')).toContainText('Pre-order · ships on or before Nov 1')
+    await expect(page.locator('[data-ship-note]')).toContainText('Pre-order · ships on or before Dec 1')
     await expect(page.locator('[data-ship-note]')).toContainText('You save $15')
     await expect(page.locator('.cart-line-ships')).toHaveCount(2)
 
@@ -99,11 +99,11 @@ test.describe('Cart', () => {
 
   test('a pre-order card page says so, and a mixed cart says what ships when', async ({ page }) => {
     await page.goto('/shop/pride.html')
-    await expect(page.locator('.tag.is-preorder')).toContainText('Pre-order · ships on or before Nov 1')
+    await expect(page.locator('.tag.is-preorder')).toContainText('Pre-order · ships on or before Dec 1')
     await expect(page.locator('.product-price')).toContainText('$7.50')
     await expect(page.locator('.product-price s.price-was')).toContainText('$10')
-    await expect(page.locator('.trust-row')).toContainText('Ships on or before Nov 1')
-    await expect(page.locator('.edition-table')).toContainText('Pre-order — ships on or before Nov 1')
+    await expect(page.locator('.trust-row')).toContainText('Ships on or before Dec 1')
+    await expect(page.locator('.edition-table')).toContainText('Pre-order — ships on or before Dec 1')
     await expect(page.locator('.faq-q').first()).toHaveText('When does it ship?')
     await page.locator('[data-add-to-cart="pride"]').click()
     await page.goto('/shop/veritas.html')
@@ -111,10 +111,10 @@ test.describe('Cart', () => {
     await page.goto('/cart.html')
     await expect(page.locator('.cart-line')).toHaveCount(2)
     await expect(page.locator('.cart-line', { hasText: 'Pride' })).toContainText('Pre-order')
-    await expect(page.locator('.cart-line', { hasText: 'Pride' }).locator('.cart-line-ships')).toHaveText('Ships on or before Nov 1')
+    await expect(page.locator('.cart-line', { hasText: 'Pride' }).locator('.cart-line-ships')).toHaveText('Ships on or before Dec 1')
     await expect(page.locator('.cart-line', { hasText: 'Veritas' }).locator('.cart-line-ships')).toHaveCount(0)
     await expect(page.locator('[data-subtotal]')).toHaveText('$17.50')
-    await expect(page.locator('[data-ship-note]')).toContainText('In-stock cards ship within 5–7 business days; pre-order cards ship on or before Nov 1 in a second package')
+    await expect(page.locator('[data-ship-note]')).toContainText('In-stock cards ship within 5–7 business days; pre-order cards ship on or before Dec 1 in a second package')
   })
 
   test('the thanks page reports the purchase once, with its value, then empties the cart', async ({ page }) => {
