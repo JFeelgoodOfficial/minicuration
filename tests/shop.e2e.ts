@@ -80,7 +80,7 @@ test.describe('Shop catalog — /shop.html', () => {
       await expect(page.locator(`.shop-card[data-slug="${slug}"] [data-add-to-cart]`)).toContainText('Add to cart')
     }
     await expect(page.locator('.shop-card[data-slug="pride"] [data-add-to-cart]')).toHaveText('Pre-order — $7.50')
-    await expect(page.locator('.shop-card[data-slug="pride"] .card-trust')).toContainText('Ships on or before Nov 1')
+    await expect(page.locator('.shop-card[data-slug="pride"] .card-trust')).toContainText('Ships on or before Dec 1')
     await page.getByRole('button', { name: 'Pre-order', exact: true }).click()
     await expect(page.locator('.shop-card:visible')).toHaveCount(25)
     await expect(page.locator('.shop-card[data-slug="veritas"]')).toBeHidden()
